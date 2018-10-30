@@ -23,9 +23,9 @@ public abstract class PDDLPredicate implements Comparable<PDDLPredicate> {
 		return toPredicate().compareTo(o.toPredicate());
 	}
 	
-	public static void dumpPredicates(Collection<? extends PDDLPredicate> predicates, int maxLineLength, String indent) {
+	public static void dumpPredicates(StringBuffer result, Collection<? extends PDDLPredicate> predicates, int maxLineLength, String indent) {
 		int len = 0;
-		System.out.print(indent);
+		result.append(indent);
 		int i = 0;
 		PDDLPredicate last = null;
 		for (PDDLPredicate predicate : predicates) {
@@ -35,26 +35,27 @@ public abstract class PDDLPredicate implements Comparable<PDDLPredicate> {
 			}
 			String pred = predicate.toPredicate();
 			if (len + pred.length() > maxLineLength) {
-				System.out.println();
-				System.out.print(indent);
+				result.append("\n");
+				result.append(indent);
 				len = 0;
 			}			
 			len += pred.length();
-			System.out.print(pred);			
-			System.out.print(" ");
+			result.append(pred);			
+			result.append(" ");
 			i += 1;
 		}
 		if (last != null) {
 			String pred = last.toPredicate();
 			if (len + pred.length() > maxLineLength) {
-				System.out.println();
-				System.out.print(indent);
+				result.append("\n");
+				result.append(indent);
 				len = 0;
 			}			
 			len += pred.length();
-			System.out.println(pred);			
+			result.append(pred);
+			result.append("\n");
 		} else {
-			System.out.println("none");
+			//System.out.println("none");
 		}
 	}
 	

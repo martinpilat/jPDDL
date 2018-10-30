@@ -10,6 +10,16 @@ public final class E_Auv extends PDDLEnum<T_Auv> {
 	private E_Auv() {		
 	}
 	
+	@Override
+	public String getName() {
+		return "auv";
+	}
+	
+	@Override
+	public boolean isFinalType() {
+		return true;
+	}
+	
 	protected void register(int index, T_Auv e) {
 		super.register(index, e);
 	}

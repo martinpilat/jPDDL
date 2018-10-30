@@ -9,6 +9,16 @@ public final class E_Location extends PDDLEnum<T_Location> {
 	
 	private E_Location() {	
 	}
+	
+	@Override
+	public String getName() {
+		return "location";
+	}
+	
+	@Override
+	public boolean isFinalType() {
+		return true;
+	}
 
 	protected void register(int index, T_Location e) {
 		super.register(index, e);

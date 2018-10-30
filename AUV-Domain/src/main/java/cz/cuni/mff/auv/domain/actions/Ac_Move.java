@@ -83,6 +83,13 @@ public final class Ac_Move extends Action {
 	}
 	
 	@Override
+	public void assign(String[] args) {
+		a = E_Auv.THIS.getElement(args[0]);
+		l1 = E_Location.THIS.getElement(args[1]);
+		l2 = E_Location.THIS.getElement(args[2]);
+	}
+	
+	@Override
 	public void reset() {
 		a  = null;
 		l1 = null;

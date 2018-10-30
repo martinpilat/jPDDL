@@ -6,6 +6,18 @@ import cz.cuni.mff.jpddl.PDDLState;
 
 public class Goal extends PDDLGoal {
 	
+	@Override
+	public String toPDDL() {
+		return  "(:goal (and (sampled r1)\n"
+			  + "           (sampled r2)\n"
+			  + "           (sampled r3)\n"
+			  + "           (at a l-1-1)\n"
+			  + "           (operational a)\n"
+			  + "       )\n"
+			  + ")";
+	}
+
+	
 	/**
 	 * Whether the goal has been achieved in 'state'.
 	 * 

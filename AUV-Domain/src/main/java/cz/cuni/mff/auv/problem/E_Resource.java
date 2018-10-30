@@ -10,6 +10,16 @@ public final class E_Resource extends PDDLEnum<T_Resource> {
 	private E_Resource() {
 	}
 	
+	@Override
+	public String getName() {
+		return "resource";
+	}
+	
+	@Override
+	public boolean isFinalType() {
+		return true;
+	}
+	
 	protected void register(int index, T_Resource e) {
 		super.register(index, e);
 	}

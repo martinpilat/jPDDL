@@ -1,9 +1,5 @@
 package cz.cuni.mff.auv.domain;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import cz.cuni.mff.auv.domain.predicates.P_ActTurn.Storage_P_ActTurn;
 import cz.cuni.mff.auv.domain.predicates.P_At.Storage_P_At;
 import cz.cuni.mff.auv.domain.predicates.P_AtRes.Storage_P_AtRes;
@@ -16,9 +12,7 @@ import cz.cuni.mff.auv.domain.predicates.P_Free.Storage_P_Free;
 import cz.cuni.mff.auv.domain.predicates.P_Operational.Storage_P_Operational;
 import cz.cuni.mff.auv.domain.predicates.P_Outside.Storage_P_Outside;
 import cz.cuni.mff.auv.domain.predicates.P_Sampled.Storage_P_Sampled;
-import cz.cuni.mff.jpddl.IPDDLUnification;
 import cz.cuni.mff.jpddl.IStorage;
-import cz.cuni.mff.jpddl.PDDLEffector;
 import cz.cuni.mff.jpddl.PDDLState;
 
 public class State extends PDDLState {
@@ -56,6 +50,15 @@ public class State extends PDDLState {
 			p_Sampled = new Storage_P_Sampled();
 		}
 	}
+	
+	public IStorage[] getStorages() {
+		return new IStorage[] {
+				p_ActTurn, p_At, p_AtRes, p_Connected, p_ConnectedShip,
+				p_DupFree, p_Entry, p_Exit, p_Free, p_Operational,
+				p_Outside, p_Sampled
+		};
+	}
+
 	
 	@Override
 	public State clone() {

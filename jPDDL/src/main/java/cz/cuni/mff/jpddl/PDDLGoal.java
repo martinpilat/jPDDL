@@ -7,5 +7,7 @@ public abstract class PDDLGoal {
 	public abstract boolean isAchievedUnion(PDDLState... states);
 	public abstract boolean isAchievedAny(PDDLState... states);
 	
+	public abstract String toPDDL();
+	
 
 }

@@ -6,13 +6,20 @@ import java.util.Map;
 
 import gnu.trove.map.hash.THashMap;
 
-public class PDDLEnum<T extends PDDLType> {
+public abstract class PDDLEnum<T extends PDDLType> {
 
+	/**
+	 * The first element is ALWAYS null!
+	 */
 	private final List<T> elements = new ArrayList<T>();
 	
 	private T[] elementsArray;
 
 	private Map<String, T> elementsMap = new THashMap<String, T>();
+	
+	public abstract String getName();
+	
+	public abstract boolean isFinalType();
 	
 	protected void register(int index, T e) {
 		while (elements.size() <= index) elements.add(null);
@@ -36,6 +43,15 @@ public class PDDLEnum<T extends PDDLType> {
 	
 	public T getElement(String name) {
 		return elementsMap.get(name);
+	}
+	
+	public int getSize() {
+		return elements.size();
+	}
+	
+	@Override
+	public String toString() {
+		return (getClass() == null ? "PDDLEnum[" : getClass().getSimpleName() + "[") + "size=" + getSize() + "]";
 	}
 	
 }

@@ -10,6 +10,16 @@ public final class E_Vehicle extends PDDLEnum<T_Vehicle> {
 	private E_Vehicle() {
 	}
 	
+	@Override
+	public String getName() {
+		return "vehicle";
+	}
+	
+	@Override
+	public boolean isFinalType() {
+		return false;
+	}
+	
 	protected void register(int index, T_Vehicle e) {
 		super.register(index, e);
 	}

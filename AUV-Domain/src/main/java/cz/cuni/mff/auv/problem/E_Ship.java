@@ -10,6 +10,16 @@ public final class E_Ship extends PDDLEnum<T_Ship> {
 	private E_Ship() {
 	}
 	
+	@Override
+	public String getName() {
+		return "ship";
+	}
+	
+	@Override
+	public boolean isFinalType() {
+		return true;
+	}
+	
 	protected void register(int index, T_Ship e) {
 		super.register(index, e);
 	}

@@ -84,6 +84,13 @@ public final class Ac_Sample extends Action {
 	}
 	
 	@Override
+	public void assign(String[] args) {
+		a = E_Auv.THIS.getElement(args[0]);
+		r = E_Resource.THIS.getElement(args[1]);
+		l = E_Location.THIS.getElement(args[2]);
+	}
+	
+	@Override
 	public void reset() {
 		a = null;
 		r = null;

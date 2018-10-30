@@ -27,8 +27,10 @@ public abstract class PDDLState implements ICloneable {
 		storage.getAll(predicates);
 		if (!includeEmpty && predicates.size() == 0) return;
 		System.out.println(storage.getName() + ":");	
-		predicates.sort(PDDLPredicate.COMPARATOR);		
-		PDDLPredicate.dumpPredicates(predicates, maxLineLength, "  ");
+		predicates.sort(PDDLPredicate.COMPARATOR);
+		StringBuffer predicatesDump = new StringBuffer();
+		PDDLPredicate.dumpPredicates(predicatesDump, predicates, maxLineLength, "  ");
+		System.out.println(predicatesDump.toString());
 	}	
 	
 	public static <T extends PDDLPredicate> void diff(IStorage<T> source, IStorage<T> diffFrom, Collection<T> resultAdded, Collection<T> resultRemoved) {
@@ -60,12 +62,16 @@ public abstract class PDDLState implements ICloneable {
 		if (added.size() > 0) {
 			System.out.println("+++ ADDED:");
 			added.sort(PDDLPredicate.COMPARATOR);
-			PDDLPredicate.dumpPredicates(added, maxLineLength, "  ");			
+			StringBuffer result = new StringBuffer();
+			PDDLPredicate.dumpPredicates(result, added, maxLineLength, "  ");
+			System.out.println(result.toString());
 		}
 		if (removed.size() > 0) {
 			System.out.println("--- REMOVED:");
 			removed.sort(PDDLPredicate.COMPARATOR);
-			PDDLPredicate.dumpPredicates(removed, maxLineLength, "  ");			
+			StringBuffer result = new StringBuffer();
+			PDDLPredicate.dumpPredicates(result, removed, maxLineLength, "  ");
+			System.out.println(result.toString());
 		}		
 	}
 	

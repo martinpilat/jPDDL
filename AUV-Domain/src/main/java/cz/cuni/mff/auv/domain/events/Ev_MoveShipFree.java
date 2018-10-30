@@ -7,6 +7,7 @@ import cz.cuni.mff.auv.domain.predicates.P_ConnectedShip;
 import cz.cuni.mff.auv.domain.predicates.P_Entry;
 import cz.cuni.mff.auv.domain.types.T_Location;
 import cz.cuni.mff.auv.domain.types.T_Ship;
+import cz.cuni.mff.auv.problem.E_Auv;
 import cz.cuni.mff.auv.problem.E_Location;
 import cz.cuni.mff.auv.problem.E_Ship;
 import cz.cuni.mff.jpddl.IPDDLUnification;
@@ -81,6 +82,13 @@ public final class Ev_MoveShipFree extends Event {
 		effector.s = s;
 		effector.l1 = l1;
 		effector.l2 = l2;
+	}
+	
+	@Override
+	public void assign(String[] args) {
+		s = E_Ship.THIS.getElement(args[0]);
+		l1 = E_Location.THIS.getElement(args[1]);
+		l2 = E_Location.THIS.getElement(args[2]);
 	}
 	
 	@Override

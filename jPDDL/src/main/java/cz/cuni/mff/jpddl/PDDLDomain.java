@@ -1,12 +1,18 @@
 package cz.cuni.mff.jpddl;
 
+import java.io.File;
 import java.util.Collection;
 
 public abstract class PDDLDomain {
 
+	public abstract String getName();
+	
+	public abstract File getDomainFile();
+	
 	public abstract PDDLEffector[] getActions();
 	public abstract PDDLEffector[] getEvents();
 	public abstract PDDLEffector[] getEffectors();
+	public abstract PDDLEnum[] getEnums();
 	
 	public <T extends PDDLEffector> void dump(T[] effectors) {
 		boolean first = true;

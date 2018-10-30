@@ -8,6 +8,7 @@ import cz.cuni.mff.auv.domain.types.T_Auv;
 import cz.cuni.mff.auv.domain.types.T_Location;
 import cz.cuni.mff.auv.domain.types.T_Ship;
 import cz.cuni.mff.auv.domain.types.T_Vehicle;
+import cz.cuni.mff.auv.problem.E_Auv;
 import cz.cuni.mff.auv.problem.E_Location;
 import cz.cuni.mff.auv.problem.E_Ship;
 import cz.cuni.mff.auv.problem.E_Vehicle;
@@ -86,6 +87,14 @@ public final class Ev_MoveShipAuv extends Event {
 		effector.l1 = l1;
 		effector.l2 = l2;
 		effector.a = a;
+	}
+	
+	@Override
+	public void assign(String[] args) {
+		s = E_Ship.THIS.getElement(args[0]);
+		l1 = E_Location.THIS.getElement(args[1]);
+		l2 = E_Location.THIS.getElement(args[2]);
+		a = E_Auv.THIS.getElement(args[3]);
 	}
 	
 	@Override

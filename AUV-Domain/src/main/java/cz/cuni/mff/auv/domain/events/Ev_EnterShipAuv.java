@@ -9,7 +9,9 @@ import cz.cuni.mff.auv.domain.types.T_Auv;
 import cz.cuni.mff.auv.domain.types.T_Location;
 import cz.cuni.mff.auv.domain.types.T_Ship;
 import cz.cuni.mff.auv.domain.types.T_Vehicle;
+import cz.cuni.mff.auv.problem.E_Auv;
 import cz.cuni.mff.auv.problem.E_Location;
+import cz.cuni.mff.auv.problem.E_Resource;
 import cz.cuni.mff.auv.problem.E_Ship;
 import cz.cuni.mff.auv.problem.E_Vehicle;
 import cz.cuni.mff.jpddl.IPDDLUnification;
@@ -84,6 +86,13 @@ public final class Ev_EnterShipAuv extends Event {
 		effector.s = s;
 		effector.l = l;
 		effector.a = a;
+	}
+
+	@Override
+	public void assign(String[] args) {
+		s = E_Ship.THIS.getElement(args[0]);
+		l = E_Location.THIS.getElement(args[1]);
+		a = E_Auv.THIS.getElement(args[2]);
 	}
 	
 	@Override

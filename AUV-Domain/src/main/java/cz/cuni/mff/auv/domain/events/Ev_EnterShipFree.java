@@ -5,6 +5,7 @@ import cz.cuni.mff.auv.domain.State;
 import cz.cuni.mff.auv.domain.predicates.P_Entry;
 import cz.cuni.mff.auv.domain.types.T_Location;
 import cz.cuni.mff.auv.domain.types.T_Ship;
+import cz.cuni.mff.auv.problem.E_Auv;
 import cz.cuni.mff.auv.problem.E_Location;
 import cz.cuni.mff.auv.problem.E_Ship;
 import cz.cuni.mff.jpddl.IPDDLUnification;
@@ -76,6 +77,12 @@ public final class Ev_EnterShipFree extends Event {
 	public void rewrite(Ev_EnterShipFree effector) {
 		effector.s = s;
 		effector.l = l;
+	}
+	
+	@Override
+	public void assign(String[] args) {
+		s = E_Ship.THIS.getElement(args[0]);
+		l = E_Location.THIS.getElement(args[1]);
 	}
 	
 	@Override

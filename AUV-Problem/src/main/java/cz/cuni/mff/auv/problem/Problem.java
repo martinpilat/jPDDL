@@ -1,8 +1,20 @@
 package cz.cuni.mff.auv.problem;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+
 import cz.cuni.mff.auv.domain.Domain;
 import cz.cuni.mff.auv.domain.State;
+import cz.cuni.mff.jpddl.IStorage;
+import cz.cuni.mff.jpddl.PDDLEnum;
+import cz.cuni.mff.jpddl.PDDLPredicate;
 import cz.cuni.mff.jpddl.PDDLProblem;
+import cz.cuni.mff.jpddl.PDDLState;
+import cz.cuni.mff.jpddl.PDDLType;
 
 public final class Problem extends PDDLProblem {
 	
@@ -387,6 +399,11 @@ public final class Problem extends PDDLProblem {
 	}
 	
 	@Override
+	public String getName() {
+		return "AUV-Problem";
+	}
+	
+	@Override
 	public Domain getDomain() {
 		return domain;
 	}
@@ -404,6 +421,63 @@ public final class Problem extends PDDLProblem {
 	@Override
 	public Applicables getApplicables() {
 		return applicables;
+	}
+	
+	@Override
+	public String toPDDL(PDDLState state) {
+		return toPDDL((State)state);
+	}
+	
+	public String toPDDL(State state) {
+		StringBuffer sb = new StringBuffer();
+		sb.append("(define (problem " + getName() + ")\n");
+		sb.append("(:domain " + domain.getName() + ")\n");
+		sb.append("  (:objects");
+		
+		boolean first = true;
+		for (PDDLEnum pddlEnum : domain.getEnums()) {
+			if (!pddlEnum.isFinalType()) continue;
+			if (pddlEnum.getSize() <= 1) continue;
+			if (first) first = false;
+			else sb.append("            ");
+			for (PDDLType type : pddlEnum.elements()) {
+				if (type == null) continue;
+				sb.append(" ");
+				sb.append(type.name);
+			}
+			sb.append(" - " + pddlEnum.getName() + "\n");
+		}
+		
+		sb.append(")\n");
+		sb.append("\n");
+		
+		sb.append("(:init\n");
+		
+		List predicates = new ArrayList();
+		for (IStorage storage : state.getStorages()) {
+			predicates.clear();
+			storage.getAll(predicates);
+			PDDLPredicate.dumpPredicates(sb, (List<PDDLPredicate>)predicates, 80, "       ");
+		}
+		sb.append("\n");
+		sb.append(")\n");		
+		sb.append("\n");
+		sb.append(goal.toPDDL());
+		sb.append("\n");
+		sb.append(")");
+		
+		return sb.toString();
+	}
+	
+	@Override
+	public void createProblemFile(File targetFile, PDDLState state) {
+		try {
+			PrintWriter writer = new PrintWriter(new BufferedOutputStream(new FileOutputStream(targetFile)));
+			writer.println(toPDDL(state));
+			writer.close();
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to produce PDDL Problem file at: " + targetFile.getAbsolutePath(), e);
+		}
 	}
 	
 }
