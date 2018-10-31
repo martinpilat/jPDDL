@@ -7,7 +7,17 @@ public abstract class PDDLDomain {
 
 	public abstract String getName();
 	
+	/**
+	 * Returns file with PDDL domain including events.
+	 * @return
+	 */
 	public abstract File getDomainFile();
+	
+	/**
+	 * Returns file with PDDL domain without events.
+	 * @return
+	 */
+	public abstract File getDomainPureFile();
 	
 	public abstract PDDLEffector[] getActions();
 	public abstract PDDLEffector[] getEvents();
