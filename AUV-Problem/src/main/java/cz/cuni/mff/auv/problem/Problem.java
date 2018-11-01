@@ -45,13 +45,13 @@ public final class Problem extends PDDLProblem {
 		state.p_Operational.set(E_Auvs.a);
 		state.p_Outside.set(E_Ships.s);
 		state.p_At.set(E_Auvs.a, E_Locations.l11);
-//		state.p_AtRes.set(E_Resources.r1, E_Locations.l27);
-//		state.p_AtRes.set(E_Resources.r2, E_Locations.l76);
-//		state.p_AtRes.set(E_Resources.r3, E_Locations.l82);
+		state.p_AtRes.set(E_Resources.r1, E_Locations.l27);
+		state.p_AtRes.set(E_Resources.r2, E_Locations.l76);
+		state.p_AtRes.set(E_Resources.r3, E_Locations.l82);
 		
-		state.p_AtRes.set(E_Resources.r1, E_Locations.l12);
-		state.p_AtRes.set(E_Resources.r2, E_Locations.l21);
-		state.p_AtRes.set(E_Resources.r3, E_Locations.l22);
+//		state.p_AtRes.set(E_Resources.r1, E_Locations.l12);
+//		state.p_AtRes.set(E_Resources.r2, E_Locations.l21);
+//		state.p_AtRes.set(E_Resources.r3, E_Locations.l22);
 		
 		state.p_Free.set(E_Locations.l12);
 		state.p_Free.set(E_Locations.l13);

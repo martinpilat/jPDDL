@@ -9,6 +9,8 @@ import cz.cuni.mff.auv.domain.Effector;
 import cz.cuni.mff.auv.problem.Problem;
 import cz.cuni.mff.jpddl.PDDLStringEffector;
 import cz.cuni.mff.jpddl.tools.planners.Lama;
+import cz.cuni.mff.jpddl.tools.validators.PlanChecker;
+import cz.cuni.mff.jpddl.tools.validators.PlanChecker.PlanCheckerResult;
 
 public class Test01_LamaTest {
 
@@ -35,6 +37,17 @@ public class Test01_LamaTest {
 				else System.out.print(" -> ");
 				System.out.print(eff.toEffector());
 			}
+			
+			// CHECK THE PLAN
+			PlanChecker planChecker = new PlanChecker(problem.getDomain());
+			PlanCheckerResult planCheckerResult = planChecker.check(problem.getState(), plan);
+			
+			if (planCheckerResult.valid) {
+				System.out.println("PLAN CHECKER: plan is valid!");
+			} else {
+				System.out.println("PLAN CHECKER: plan is INvalid! Last executable action index is " + planCheckerResult.lastExecutableEffectorIndex + ".");
+			}
+			
 		}
 		
 		problemFile.delete();

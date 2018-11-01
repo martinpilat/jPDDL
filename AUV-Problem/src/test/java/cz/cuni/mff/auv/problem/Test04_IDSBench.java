@@ -12,7 +12,7 @@ public class Test04_IDSBench {
 	@Test
 	public void test() {
 		int minDepth = 1;
-		int maxDepth = 10;
+		int maxDepth = 20;
 		System.out.println("Using Iterative Deepening Search to solve the problem, max-limit = " + maxDepth + "...");
 		
 		Problem problem = new Problem();

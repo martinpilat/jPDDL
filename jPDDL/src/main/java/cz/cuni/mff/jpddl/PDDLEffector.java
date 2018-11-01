@@ -8,6 +8,11 @@ public abstract class PDDLEffector implements ICloneable {
 	public abstract PDDLEffector clone();
 	
 	/**
+	 * Returns the instance back to the pool. Call this method before you discard last pointers to the effector.
+	 */
+	public abstract void recycle();
+	
+	/**
 	 * Returns PDDL name of the effector.
 	 * @return
 	 */

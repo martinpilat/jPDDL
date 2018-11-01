@@ -99,7 +99,14 @@ public class DLSBench extends SearchBase {
 			
 //			System.out.println("---=== STATE AFTER REVERT ===---");
 //			state.dump();			
+
+			// WE WILL NOT BE USING THIS INSTANCE AGAIN
+			action.recycle();
 		}
+		
+				
+		pool.back(actions);
+
 		
 		return false;		
 	}

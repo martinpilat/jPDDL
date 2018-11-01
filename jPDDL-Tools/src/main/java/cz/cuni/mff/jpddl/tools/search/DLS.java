@@ -64,9 +64,13 @@ public class DLS extends SearchBase {
 			}
 			
 			action.reverse(state);
+			
+			// WE WILL NOT BE USING THIS INSTANCE AGAIN
+			action.recycle();
 		}
 		
-		
+				
+		pool.back(actions);
 		
 		return false;		
 	}

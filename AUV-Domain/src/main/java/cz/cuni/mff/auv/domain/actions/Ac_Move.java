@@ -68,6 +68,11 @@ public final class Ac_Move extends Action {
 	}
 	
 	@Override
+	public void recycle() {
+		effectorPool.back(this);
+	}
+	
+	@Override
 	public void rewrite(PDDLEffector assignInto) {
 		rewrite((Ac_Move)assignInto);
 	}	

@@ -74,6 +74,11 @@ public final class Ev_EnterShipAuv extends Event {
 	}
 	
 	@Override
+	public void recycle() {
+		effectorPool.back(this);
+	}
+	
+	@Override
 	public void rewrite(PDDLEffector assignInto) {
 		rewrite((Ev_EnterShipAuv)assignInto);
 	}
