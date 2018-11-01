@@ -2,6 +2,7 @@ package cz.cuni.mff.auv.domain.predicates;
 
 import java.util.Collection;
 
+import cz.cuni.mff.auv.domain.Predicate;
 import cz.cuni.mff.auv.domain.types.T_Auv;
 import cz.cuni.mff.auv.problem.E_Auv;
 import cz.cuni.mff.jpddl.IStorage;
@@ -14,7 +15,7 @@ import cz.cuni.mff.jpddl.store.Pool;
  * PREDICATE
  * (operational ?a - auv)
  */
-public class P_Operational extends PDDLPredicate implements Comparable<PDDLPredicate> {
+public class P_Operational extends Predicate {
 
 	public T_Auv a;
 	
@@ -25,8 +26,18 @@ public class P_Operational extends PDDLPredicate implements Comparable<PDDLPredi
 		this.a = a;
 	}
 	
+	@Override
+	public P_Operational create() {
+		return new P_Operational();
+	}
+	
 	public void reset() {
 		a = null;
+	}
+	
+	@Override
+	public void assign(String[] args) {
+		a = E_Auv.THIS.getElement(args[0]);
 	}
 	
 	@Override

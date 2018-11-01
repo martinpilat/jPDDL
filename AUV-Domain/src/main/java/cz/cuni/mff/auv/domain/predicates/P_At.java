@@ -2,12 +2,14 @@ package cz.cuni.mff.auv.domain.predicates;
 
 import java.util.Collection;
 
+import cz.cuni.mff.auv.domain.Predicate;
 import cz.cuni.mff.auv.domain.types.T_Location;
 import cz.cuni.mff.auv.domain.types.T_Vehicle;
+import cz.cuni.mff.auv.problem.E_Auv;
 import cz.cuni.mff.auv.problem.E_Location;
+import cz.cuni.mff.auv.problem.E_Ship;
 import cz.cuni.mff.auv.problem.E_Vehicle;
 import cz.cuni.mff.jpddl.IStorage;
-import cz.cuni.mff.jpddl.PDDLPredicate;
 import cz.cuni.mff.jpddl.store.FastIntMap;
 import cz.cuni.mff.jpddl.store.FastIntMap.ForEachEntry;
 import cz.cuni.mff.jpddl.store.Pool;
@@ -16,7 +18,7 @@ import cz.cuni.mff.jpddl.store.Pool;
  * PREDICATE
  * (at ?v - vehicle ?l - location)
  */
-public final class P_At extends PDDLPredicate {
+public final class P_At extends Predicate {
 	
 	public T_Vehicle v;
 	public T_Location l;
@@ -29,9 +31,22 @@ public final class P_At extends PDDLPredicate {
 		this.l = l;
 	}
 	
+	@Override
+	public P_At create() {
+		return new P_At();
+	}
+	
 	public void reset() {
 		v = null;
 		l = null;
+	}
+	
+	@Override
+	public void assign(String[] args) {
+		v = E_Auv.THIS.getElement(args[0]);
+		if (v == null) v = E_Ship.THIS.getElement(args[0]);
+		
+		l = E_Location.THIS.getElement(args[1]);
 	}
 	
 	@Override

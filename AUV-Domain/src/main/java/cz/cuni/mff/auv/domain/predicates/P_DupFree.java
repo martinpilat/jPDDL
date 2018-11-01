@@ -2,14 +2,10 @@ package cz.cuni.mff.auv.domain.predicates;
 
 import java.util.Collection;
 
-import cz.cuni.mff.auv.domain.predicates.P_ConnectedShip.Map_T_Location_3;
-import cz.cuni.mff.auv.domain.predicates.P_ConnectedShip.Map_T_Ship_1;
-import cz.cuni.mff.auv.domain.predicates.P_ConnectedShip.Storage_P_ConnectedShip;
+import cz.cuni.mff.auv.domain.Predicate;
 import cz.cuni.mff.auv.domain.types.T_Location;
-import cz.cuni.mff.auv.domain.types.T_Ship;
 import cz.cuni.mff.auv.problem.E_Location;
 import cz.cuni.mff.jpddl.IStorage;
-import cz.cuni.mff.jpddl.PDDLPredicate;
 import cz.cuni.mff.jpddl.store.FastIntMap;
 import cz.cuni.mff.jpddl.store.FastIntMap.ForEachEntry;
 import cz.cuni.mff.jpddl.store.Pool;
@@ -18,7 +14,7 @@ import cz.cuni.mff.jpddl.store.Pool;
  * PREDICATE
  * (dup-free ?l - location)
  */
-public class P_DupFree extends PDDLPredicate {
+public class P_DupFree extends Predicate {
 
 	public T_Location l;
 	
@@ -30,8 +26,18 @@ public class P_DupFree extends PDDLPredicate {
 		this.l = l;
 	}
 	
+	@Override
+	public P_DupFree create() {
+		return new P_DupFree();
+	}
+	
 	public void reset() {
 		l = null;
+	}
+	
+	@Override
+	public void assign(String[] args) {
+		l = E_Location.THIS.getElement(args[0]);
 	}
 	
 	@Override

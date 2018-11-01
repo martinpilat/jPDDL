@@ -12,6 +12,18 @@ public abstract class PDDLPredicate implements Comparable<PDDLPredicate> {
 	public abstract String getName();
 	
 	/**
+	 * Returns new instance of this predicate.
+	 * @return
+	 */
+	public abstract PDDLPredicate create();
+	
+	/**
+	 * Convert String arguments into {@link PDDLType}s and assign then into this predicate.
+	 * @param args
+	 */
+	public abstract void assign(String[] args);
+	
+	/**
 	 * Returns PDDL representation of the predicate instance.
 	 * @return
 	 */

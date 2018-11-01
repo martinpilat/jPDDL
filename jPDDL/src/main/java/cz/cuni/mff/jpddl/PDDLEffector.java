@@ -37,7 +37,7 @@ public abstract class PDDLEffector implements ICloneable {
 	public abstract void rewrite(PDDLEffector assignInto);
 	
 	/**
-	 * Convert String arguments into {@link PDDLType}s and assign then into this action.
+	 * Convert String arguments into {@link PDDLType}s and assign then into this effector.
 	 * @param args
 	 */
 	public abstract void assign(String[] args);

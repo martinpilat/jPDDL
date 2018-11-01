@@ -2,14 +2,12 @@ package cz.cuni.mff.auv.domain.predicates;
 
 import java.util.Collection;
 
-import cz.cuni.mff.auv.domain.predicates.P_Connected.Map_T_Location_1;
-import cz.cuni.mff.auv.domain.predicates.P_Connected.Storage_P_Connected;
+import cz.cuni.mff.auv.domain.Predicate;
 import cz.cuni.mff.auv.domain.types.T_Location;
 import cz.cuni.mff.auv.domain.types.T_Ship;
 import cz.cuni.mff.auv.problem.E_Location;
 import cz.cuni.mff.auv.problem.E_Ship;
 import cz.cuni.mff.jpddl.IStorage;
-import cz.cuni.mff.jpddl.PDDLPredicate;
 import cz.cuni.mff.jpddl.store.FastIntMap;
 import cz.cuni.mff.jpddl.store.FastIntMap.ForEachEntry;
 import cz.cuni.mff.jpddl.store.Pool;
@@ -18,7 +16,7 @@ import cz.cuni.mff.jpddl.store.Pool;
  * PREDICATE
  * (connected-ship ?s - ship ?l1 ?l2 - location)
  */
-public class P_ConnectedShip extends PDDLPredicate {
+public class P_ConnectedShip extends Predicate {
 
 	public T_Ship s;
 	public T_Location l1;
@@ -33,11 +31,23 @@ public class P_ConnectedShip extends PDDLPredicate {
 		this.l2 = l2;
 	}
 	
+	@Override
+	public P_ConnectedShip create() {
+		return new P_ConnectedShip();
+	}
+	
 	public void reset() {
 		s = null;
 		l1 = null;
 		l2 = null;
-	}	
+	}
+	
+	@Override
+	public void assign(String[] args) {
+		s = E_Ship.THIS.getElement(args[0]);
+		l1 = E_Location.THIS.getElement(args[1]);
+		l2 = E_Location.THIS.getElement(args[2]);
+	}
 	
 	@Override
 	public boolean equals(Object obj) {

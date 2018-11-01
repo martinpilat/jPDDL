@@ -1,18 +1,34 @@
 package cz.cuni.mff.auv.domain;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import cz.cuni.mff.auv.domain.predicates.P_ActTurn;
 import cz.cuni.mff.auv.domain.predicates.P_ActTurn.Storage_P_ActTurn;
+import cz.cuni.mff.auv.domain.predicates.P_At;
 import cz.cuni.mff.auv.domain.predicates.P_At.Storage_P_At;
+import cz.cuni.mff.auv.domain.predicates.P_AtRes;
 import cz.cuni.mff.auv.domain.predicates.P_AtRes.Storage_P_AtRes;
+import cz.cuni.mff.auv.domain.predicates.P_Connected;
 import cz.cuni.mff.auv.domain.predicates.P_Connected.Storage_P_Connected;
+import cz.cuni.mff.auv.domain.predicates.P_ConnectedShip;
 import cz.cuni.mff.auv.domain.predicates.P_ConnectedShip.Storage_P_ConnectedShip;
+import cz.cuni.mff.auv.domain.predicates.P_DupFree;
 import cz.cuni.mff.auv.domain.predicates.P_DupFree.Storage_P_DupFree;
+import cz.cuni.mff.auv.domain.predicates.P_Entry;
 import cz.cuni.mff.auv.domain.predicates.P_Entry.Storage_P_Entry;
+import cz.cuni.mff.auv.domain.predicates.P_Exit;
 import cz.cuni.mff.auv.domain.predicates.P_Exit.Storage_P_Exit;
+import cz.cuni.mff.auv.domain.predicates.P_Free;
 import cz.cuni.mff.auv.domain.predicates.P_Free.Storage_P_Free;
+import cz.cuni.mff.auv.domain.predicates.P_Operational;
 import cz.cuni.mff.auv.domain.predicates.P_Operational.Storage_P_Operational;
+import cz.cuni.mff.auv.domain.predicates.P_Outside;
 import cz.cuni.mff.auv.domain.predicates.P_Outside.Storage_P_Outside;
+import cz.cuni.mff.auv.domain.predicates.P_Sampled;
 import cz.cuni.mff.auv.domain.predicates.P_Sampled.Storage_P_Sampled;
 import cz.cuni.mff.jpddl.IStorage;
+import cz.cuni.mff.jpddl.PDDLPredicate;
 import cz.cuni.mff.jpddl.PDDLState;
 
 public class State extends PDDLState {
@@ -29,6 +45,8 @@ public class State extends PDDLState {
 	public Storage_P_Operational p_Operational;
 	public Storage_P_Outside p_Outside;
 	public Storage_P_Sampled p_Sampled;
+	
+	private Map<Class, IStorage> predicate2storage;
 	
 	public State() {
 		this(true);
@@ -58,6 +76,27 @@ public class State extends PDDLState {
 				p_Outside, p_Sampled
 		};
 	}
+	
+	public Map<Class, IStorage> getPredicate2StorageMap() {
+		if (predicate2storage != null) return predicate2storage;
+		
+		predicate2storage = new HashMap<Class, IStorage>();
+		
+		predicate2storage.put(P_ActTurn.class, p_ActTurn);
+		predicate2storage.put(P_At.class, p_At);
+		predicate2storage.put(P_AtRes.class, p_AtRes);
+		predicate2storage.put(P_Connected.class, p_Connected);
+		predicate2storage.put(P_ConnectedShip.class, p_ConnectedShip);
+		predicate2storage.put(P_DupFree.class, p_DupFree);
+		predicate2storage.put(P_Entry.class, p_Entry);
+		predicate2storage.put(P_Exit.class, p_Exit);
+		predicate2storage.put(P_Free.class, p_Free);
+		predicate2storage.put(P_Operational.class, p_Operational);
+		predicate2storage.put(P_Outside.class, p_Outside);
+		predicate2storage.put(P_Sampled.class, p_Sampled);
+		
+		return predicate2storage;
+	}
 
 	
 	@Override
@@ -76,6 +115,13 @@ public class State extends PDDLState {
 		result.p_Outside = p_Outside.clone();
 		result.p_Sampled = p_Sampled.clone();
 		return result;
+	}
+	
+	@Override
+	public boolean isSet(PDDLPredicate predicate) {
+		IStorage storage = getPredicate2StorageMap().get(predicate.getClass());
+		if (storage == null) return false;
+		return storage.isSet(predicate);
 	}
 
 	@Override

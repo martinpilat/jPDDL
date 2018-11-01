@@ -2,7 +2,7 @@ package cz.cuni.mff.auv.domain.predicates;
 
 import java.util.Collection;
 
-import cz.cuni.mff.jpddl.PDDLPredicate;
+import cz.cuni.mff.auv.domain.Predicate;
 import cz.cuni.mff.jpddl.store.FastIntMap;
 import cz.cuni.mff.jpddl.store.Pool;
 import cz.cuni.mff.jpddl.store.Single;
@@ -11,12 +11,21 @@ import cz.cuni.mff.jpddl.store.Single;
  * PREDICATE
  * (act-turn)
  */
-public final class P_ActTurn extends PDDLPredicate {
+public final class P_ActTurn extends Predicate {
 
 	public P_ActTurn() {		
 	}
 	
+	@Override
+	public P_ActTurn create() {
+		return new P_ActTurn();
+	}
+	
 	public void reset() {		
+	}
+	
+	@Override
+	public void assign(String[] args) {
 	}
 	
 	@Override

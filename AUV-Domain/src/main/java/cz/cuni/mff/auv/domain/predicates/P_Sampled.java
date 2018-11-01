@@ -2,10 +2,10 @@ package cz.cuni.mff.auv.domain.predicates;
 
 import java.util.Collection;
 
+import cz.cuni.mff.auv.domain.Predicate;
 import cz.cuni.mff.auv.domain.types.T_Resource;
 import cz.cuni.mff.auv.problem.E_Resource;
 import cz.cuni.mff.jpddl.IStorage;
-import cz.cuni.mff.jpddl.PDDLPredicate;
 import cz.cuni.mff.jpddl.store.FastIntMap;
 import cz.cuni.mff.jpddl.store.FastIntMap.ForEachEntry;
 import cz.cuni.mff.jpddl.store.Pool;
@@ -14,7 +14,7 @@ import cz.cuni.mff.jpddl.store.Pool;
  * PREDICATE
  * (sampled ?r - resource)
  */
-public class P_Sampled extends PDDLPredicate {
+public class P_Sampled extends Predicate {
 
 	public T_Resource r;
 	
@@ -26,8 +26,18 @@ public class P_Sampled extends PDDLPredicate {
 		this.r = r;
 	}
 	
+	@Override
+	public P_Sampled create() {
+		return new P_Sampled();
+	}
+	
 	public void reset() {
 		r = null;
+	}
+	
+	@Override
+	public void assign(String[] args) {
+		r = E_Resource.THIS.getElement(args[0]);
 	}
 	
 	@Override

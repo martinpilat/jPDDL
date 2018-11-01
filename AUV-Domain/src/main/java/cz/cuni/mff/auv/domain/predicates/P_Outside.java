@@ -2,13 +2,10 @@ package cz.cuni.mff.auv.domain.predicates;
 
 import java.util.Collection;
 
-import cz.cuni.mff.auv.domain.predicates.P_Operational.Map_T_AUV_1;
-import cz.cuni.mff.auv.domain.predicates.P_Operational.Storage_P_Operational;
-import cz.cuni.mff.auv.domain.types.T_Auv;
+import cz.cuni.mff.auv.domain.Predicate;
 import cz.cuni.mff.auv.domain.types.T_Ship;
 import cz.cuni.mff.auv.problem.E_Ship;
 import cz.cuni.mff.jpddl.IStorage;
-import cz.cuni.mff.jpddl.PDDLPredicate;
 import cz.cuni.mff.jpddl.store.FastIntMap;
 import cz.cuni.mff.jpddl.store.FastIntMap.ForEachEntry;
 import cz.cuni.mff.jpddl.store.Pool;
@@ -17,7 +14,7 @@ import cz.cuni.mff.jpddl.store.Pool;
  * PREDICATE
  * (operational ?s - ship)
  */
-public class P_Outside extends PDDLPredicate {
+public class P_Outside extends Predicate {
 
 	public T_Ship s;
 	
@@ -29,8 +26,18 @@ public class P_Outside extends PDDLPredicate {
 		this.s = s;
 	}
 	
+	@Override
+	public P_Outside create() {
+		return new P_Outside();
+	}
+	
 	public void reset() {
 		s = null;
+	}
+	
+	@Override
+	public void assign(String[] args) {
+		s = E_Ship.THIS.getElement(args[0]);
 	}
 	
 	@Override

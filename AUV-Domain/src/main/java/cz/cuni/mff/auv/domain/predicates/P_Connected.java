@@ -2,10 +2,10 @@ package cz.cuni.mff.auv.domain.predicates;
 
 import java.util.Collection;
 
+import cz.cuni.mff.auv.domain.Predicate;
 import cz.cuni.mff.auv.domain.types.T_Location;
 import cz.cuni.mff.auv.problem.E_Location;
 import cz.cuni.mff.jpddl.IStorage;
-import cz.cuni.mff.jpddl.PDDLPredicate;
 import cz.cuni.mff.jpddl.store.FastIntMap;
 import cz.cuni.mff.jpddl.store.FastIntMap.ForEachEntry;
 import cz.cuni.mff.jpddl.store.Pool;
@@ -14,7 +14,7 @@ import cz.cuni.mff.jpddl.store.Pool;
  * PREDICATE
  * (connected ?l1 ?l2 - location)
  */
-public class P_Connected extends PDDLPredicate {
+public class P_Connected extends Predicate {
 
 	public T_Location l1;
 	public T_Location l2;
@@ -27,9 +27,20 @@ public class P_Connected extends PDDLPredicate {
 		this.l2 = l2;
 	}
 	
+	@Override
+	public P_Connected create() {
+		return new P_Connected();
+	}
+	
 	public void reset() {
 		l1 = null;
 		l2 = null;
+	}
+	
+	@Override
+	public void assign(String[] args) {
+		l1 = E_Location.THIS.getElement(args[0]);
+		l2 = E_Location.THIS.getElement(args[1]);
 	}
 	
 	@Override

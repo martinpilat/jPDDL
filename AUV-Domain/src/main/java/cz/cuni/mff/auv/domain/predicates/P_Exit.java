@@ -2,15 +2,12 @@ package cz.cuni.mff.auv.domain.predicates;
 
 import java.util.Collection;
 
-import cz.cuni.mff.auv.domain.predicates.P_Entry.Map_T_Location_2;
-import cz.cuni.mff.auv.domain.predicates.P_Entry.Map_T_Ship_1;
-import cz.cuni.mff.auv.domain.predicates.P_Entry.Storage_P_Entry;
+import cz.cuni.mff.auv.domain.Predicate;
 import cz.cuni.mff.auv.domain.types.T_Location;
 import cz.cuni.mff.auv.domain.types.T_Ship;
 import cz.cuni.mff.auv.problem.E_Location;
 import cz.cuni.mff.auv.problem.E_Ship;
 import cz.cuni.mff.jpddl.IStorage;
-import cz.cuni.mff.jpddl.PDDLPredicate;
 import cz.cuni.mff.jpddl.store.FastIntMap;
 import cz.cuni.mff.jpddl.store.FastIntMap.ForEachEntry;
 import cz.cuni.mff.jpddl.store.Pool;
@@ -19,7 +16,7 @@ import cz.cuni.mff.jpddl.store.Pool;
  * PREDICATE
  * (exit ?s - ship ?l - location)
  */
-public final class P_Exit extends PDDLPredicate {
+public final class P_Exit extends Predicate {
 	
 	public T_Ship s;
 	public T_Location l;
@@ -33,10 +30,21 @@ public final class P_Exit extends PDDLPredicate {
 		this.l = l;
 	}
 	
+	@Override
+	public P_Exit create() {
+		return new P_Exit();
+	}
+	
 	public void reset() {
 		s = null;
 		l = null;
 	}	
+	
+	@Override
+	public void assign(String[] args) {
+		s = E_Ship.THIS.getElement(args[0]);
+		l = E_Location.THIS.getElement(args[1]);
+	}
 	
 	@Override
 	public boolean equals(Object obj) {
