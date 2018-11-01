@@ -16,7 +16,7 @@ public class Test01_LamaTest {
 	public void test() {
 		Problem problem = new Problem();
 		
-		File domainFile = problem.getDomain().getDomainFile();
+		File domainFile = problem.getDomain().getDomainPureFile();
 		File problemFile = new File("auv-problem.pddl");
 		problem.createProblemFile(problemFile, problem.getState());
 		
