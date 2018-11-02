@@ -203,7 +203,7 @@ public final class Ev_MoveShipAuv extends Event {
 	public void unify(State state, Ev_MoveShipAuv effector, IPDDLUnification<Ev_MoveShipAuv> callback) {
 		callback.start();
 		
-		Unify_Ev_EnterShipAuv unify = pool.get();
+		Unify_Ev_MoveShipAuv unify = pool.get();
 		unify.state = state;
 		unify.effector = effector;
 		unify.callback = callback;
@@ -215,16 +215,16 @@ public final class Ev_MoveShipAuv extends Event {
 		callback.end();
 	}
 	
-	private static final Pool<Unify_Ev_EnterShipAuv> pool = new Pool<Unify_Ev_EnterShipAuv>(1) {
+	private static final Pool<Unify_Ev_MoveShipAuv> pool = new Pool<Unify_Ev_MoveShipAuv>(1) {
 
 		@Override
-		protected Unify_Ev_EnterShipAuv create() {
-			return new Unify_Ev_EnterShipAuv();
+		protected Unify_Ev_MoveShipAuv create() {
+			return new Unify_Ev_MoveShipAuv();
 		}
 		
 	};
 	
-	private static final class Unify_Ev_EnterShipAuv {
+	private static final class Unify_Ev_MoveShipAuv {
 	
 		State state;
 		Ev_MoveShipAuv effector;
@@ -242,7 +242,9 @@ public final class Ev_MoveShipAuv extends Event {
 	
 			@Override
 			public boolean entry(int key, P_At.Map_T_Location_2 data) {
-				effector.s = E_Ship.THIS.getElement(key);
+				T_Vehicle v = E_Vehicle.THIS.getElement(key);
+				if (!(v instanceof T_Ship)) return true;
+				effector.s = (T_Ship)v;
 				unify_At_1_l1(data);
 				return true;
 			}

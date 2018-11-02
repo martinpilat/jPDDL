@@ -7,9 +7,11 @@ import cz.cuni.mff.auv.domain.predicates.P_ConnectedShip;
 import cz.cuni.mff.auv.domain.predicates.P_Entry;
 import cz.cuni.mff.auv.domain.types.T_Location;
 import cz.cuni.mff.auv.domain.types.T_Ship;
+import cz.cuni.mff.auv.domain.types.T_Vehicle;
 import cz.cuni.mff.auv.problem.E_Auv;
 import cz.cuni.mff.auv.problem.E_Location;
 import cz.cuni.mff.auv.problem.E_Ship;
+import cz.cuni.mff.auv.problem.E_Vehicle;
 import cz.cuni.mff.jpddl.IPDDLUnification;
 import cz.cuni.mff.jpddl.PDDLEffector;
 import cz.cuni.mff.jpddl.PDDLState;
@@ -240,7 +242,9 @@ public final class Ev_MoveShipFree extends Event {
 	
 			@Override
 			public boolean entry(int key, P_At.Map_T_Location_2 data) {
-				effector.s = E_Ship.THIS.getElement(key);
+				T_Vehicle v = E_Vehicle.THIS.getElement(key);
+				if (!(v instanceof T_Ship)) return true;
+				effector.s = (T_Ship)v;
 				unify_At_1_l1(data);
 				return true;
 			}
