@@ -37,12 +37,18 @@ public class PDDLStringInstance {
 		PDDLStringInstance result = new PDDLStringInstance();
 		
 		for (String part : parts) {
+			part = part.trim();
 			if (part.length() == 0) continue;
 			if (result.name == null) result.name = part;
 			else result.args.add(part);
 		}
 		
 		return result;		
+	}
+	
+	@Override
+	public String toString() {
+		return "PDDLStringInstance[name=" + name + ", args.size()=" + (args == null ? "null" : args.size()) + "]";
 	}
 
 }

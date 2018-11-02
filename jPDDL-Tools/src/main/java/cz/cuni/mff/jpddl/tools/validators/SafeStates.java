@@ -40,7 +40,7 @@ public class SafeStates {
 					int end = last.indexOf(")", start);
 					if (end < 0) break;
 					
-					String instance = line.substring(start, end+1);
+					String instance = last.substring(start, end+1);
 					predicates.add(domain.toPredicate(PDDLStringInstance.fromPDDLInstance(instance)));
 					
 					last = last.substring(end+1);
