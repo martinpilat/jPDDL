@@ -69,6 +69,11 @@ public final class Ac_Sample extends Action {
 	}
 	
 	@Override
+	public void recycle() {
+		effectorPool.back(this);
+	}
+	
+	@Override
 	public void rewrite(PDDLEffector assignInto) {
 		rewrite((Ac_Sample)assignInto);
 	}

@@ -18,7 +18,9 @@ public abstract class PDDLState implements ICloneable {
 	
 	public void dump() {
 		dump(false, 80);
-	}	
+	}
+	
+	public abstract boolean isSet(PDDLPredicate predicate);
 	
 	public abstract void dump(boolean includeEmpty, int maxLineLength);
 	

@@ -70,6 +70,11 @@ public final class Ev_MoveShipFree extends Event {
 	}
 	
 	@Override
+	public void recycle() {
+		effectorPool.back(this);
+	}
+	
+	@Override
 	public void rewrite(PDDLEffector assignInto) {
 		rewrite((Ev_MoveShipFree)assignInto);
 	}

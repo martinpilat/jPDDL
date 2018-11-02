@@ -22,6 +22,7 @@ public abstract class PDDLDomain {
 	public abstract PDDLEffector[] getActions();
 	public abstract PDDLEffector[] getEvents();
 	public abstract PDDLEffector[] getEffectors();
+	public abstract PDDLPredicate[] getPredicates();
 	public abstract PDDLEnum[] getEnums();
 	
 	public <T extends PDDLEffector> void dump(T[] effectors) {
@@ -42,5 +43,21 @@ public abstract class PDDLDomain {
 		}
 		System.out.println();		
 	}
+
+	public abstract PDDLEffector toEffector(PDDLStringInstance se);
+
+	public abstract PDDLEffector[] toEffectors(PDDLStringInstance[] ses);
+
+	public abstract PDDLEffector toAction(PDDLStringInstance se);
+
+	public abstract PDDLEffector[] toActions(PDDLStringInstance[] ses);
+
+	public abstract PDDLEffector toEvent(PDDLStringInstance se);
+
+	public abstract PDDLEffector[] toEvents(PDDLStringInstance[] ses);
+
+	public abstract PDDLPredicate toPredicate(PDDLStringInstance se);
+
+	public abstract PDDLPredicate[] toPredicates(PDDLStringInstance[] ses);
 	
 }

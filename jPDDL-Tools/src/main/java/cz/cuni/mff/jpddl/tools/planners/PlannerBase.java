@@ -3,7 +3,7 @@ package cz.cuni.mff.jpddl.tools.planners;
 import java.io.File;
 import java.util.List;
 
-import cz.cuni.mff.jpddl.PDDLStringEffector;
+import cz.cuni.mff.jpddl.PDDLStringInstance;
 
 public abstract class PlannerBase {
 
@@ -13,6 +13,6 @@ public abstract class PlannerBase {
 	 * @param problemFile
 	 * @return list of actions that solves the problem
 	 */
-	public abstract List<PDDLStringEffector> plan(File domainFile, File problemFile);
+	public abstract List<PDDLStringInstance> plan(File domainFile, File problemFile);
 	
 }

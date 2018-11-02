@@ -10,7 +10,7 @@ import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.io.FileUtils;
 
-import cz.cuni.mff.jpddl.PDDLStringEffector;
+import cz.cuni.mff.jpddl.PDDLStringInstance;
 
 public class Lama extends PlannerBase {
 
@@ -23,7 +23,7 @@ public class Lama extends PlannerBase {
     }
 
 	@Override
-	public List<PDDLStringEffector> plan(File domainFile, File problemFile) {
+	public List<PDDLStringInstance> plan(File domainFile, File problemFile) {
 
 	    try {
             File resultFile = new File(lamaWorkingDir, "plan.sol");
@@ -125,13 +125,13 @@ public class Lama extends PlannerBase {
 		}
 	}
 
-	protected List<PDDLStringEffector> parseLines(String lines) {
+	protected List<PDDLStringInstance> parseLines(String lines) {
 		if (lines == null || lines.trim().length() == 0) {
 			return null;
 		}
 
 		String[] parts = lines.split("\n");
-		List<PDDLStringEffector> result = new ArrayList<PDDLStringEffector>(parts.length);
+		List<PDDLStringInstance> result = new ArrayList<PDDLStringInstance>(parts.length);
 		for (String line : parts) {
 			if (line.endsWith("\r")) line = line.substring(0, line.length()-1);
 			result.add(parseLine(line));
@@ -150,7 +150,7 @@ public class Lama extends PlannerBase {
 	 * 6 : (move r3 r4)
 	 */
 
-	protected PDDLStringEffector parseLine(String line) {
+	protected PDDLStringInstance parseLine(String line) {
 		String action = line.split(":")[1].trim(); 	// split number from action
 		action = action.substring(1, action.length() - 1); 	// remove ()
 		String[] tokens = action.split(" ");
@@ -158,7 +158,7 @@ public class Lama extends PlannerBase {
 		List<String> args = new LinkedList<String>(Arrays.asList(tokens));
 		args.remove(0);
 
-		return new PDDLStringEffector(action_name, args);
+		return new PDDLStringInstance(action_name, args);
 
 
 	}

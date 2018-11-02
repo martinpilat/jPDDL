@@ -12,7 +12,7 @@ import cz.cuni.mff.auv.domain.events.Ev_MoveShipAuv;
 import cz.cuni.mff.auv.domain.events.Ev_MoveShipFree;
 import cz.cuni.mff.jpddl.PDDLEffector;
 import cz.cuni.mff.jpddl.PDDLState;
-import cz.cuni.mff.jpddl.PDDLStringEffector;
+import cz.cuni.mff.jpddl.PDDLStringInstance;
 
 public abstract class Effector extends PDDLEffector {
 		
@@ -29,14 +29,14 @@ public abstract class Effector extends PDDLEffector {
 		}
 	}
 	
-	public static Effector toEffector(PDDLStringEffector se) {
+	public static Effector toEffector(PDDLStringInstance se) {
 		Effector proto = BY_NAME.get(se.name);
 		Effector result = (Effector)proto.create();
 		result.assign(se.args.toArray(new String[0]));
 		return result;		
 	}
 	
-	public static Effector[] toEffectors(PDDLStringEffector[] ses) {
+	public static Effector[] toEffectors(PDDLStringInstance[] ses) {
 		if (ses == null) return null;
 		Effector[] result = new Effector[ses.length];
 		for (int i = 0; i < ses.length; ++i) {
