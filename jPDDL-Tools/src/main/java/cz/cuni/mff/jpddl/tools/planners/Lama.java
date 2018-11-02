@@ -2,6 +2,8 @@ package cz.cuni.mff.jpddl.tools.planners;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.util.*;
 
 import org.apache.commons.exec.CommandLine;
@@ -37,7 +39,7 @@ public class Lama extends PlannerBase {
             config.put("result", "plan.sol");
 
             CommandLine commandLine = new CommandLine("bash");
-            commandLine.addArgument("lama.sh");
+            commandLine.addArgument("../../lama.sh");
             commandLine.addArgument("${domain}");
             commandLine.addArgument("${problem}");
             commandLine.addArgument("${result}");
@@ -64,7 +66,6 @@ public class Lama extends PlannerBase {
             // NOW RESULT FILE SHOULD BE READY
             if (!resultFile.exists()) {
                 // TODO: logging
-                // nplan failed to produce results
                 System.out.println("plan not found");
                 return null;
             }
@@ -72,25 +73,8 @@ public class Lama extends PlannerBase {
             // PROCESS RESULT
             String resultLines = FileUtils.readFileToString(resultFile);
 
-            // add step numbers, lama does not include them
-            String[] lines = resultLines.split("[\n\r]+");
-            StringBuilder resLines = new StringBuilder();
-
-            for (int i = 0; i < lines.length; i++) {
-                if (!lines[i].contains(";"))
-                    resLines.append(i).append(" : ").append(lines[i]).append("\n");
-            }
-
-            resultLines = resLines.toString();
-
-            //rename both moves to "move"
-            resultLines = resultLines.replaceAll("move[12]", "move");
-
-            System.out.println("PLAN");
-            System.out.println(resultLines);
-
             FileUtils.deleteQuietly(new File(lamaWorkingDir, "output.sas"));
-            resultFile.delete();
+            //resultFile.delete();
 
             return parseLines(resultLines);
         }
@@ -105,21 +89,21 @@ public class Lama extends PlannerBase {
 
 	public void prepareEnvironment() {
 
-		lamaWorkingDir = new File(this.fdDir, "tmp");
-		lamaWorkingDir.mkdirs();
-		lamaWorkingDir.deleteOnExit();
-
 		try {
-			File prepareFile = new File(fdDir, "prepare.sh");
-			FileUtils.copyFile(prepareFile, new File(lamaWorkingDir, "prepare.sh"));
+            lamaWorkingDir = Files.createTempDirectory(FileSystems.getDefault().getPath(fdDir, "tmp"), "").toFile();
+            lamaWorkingDir.mkdirs();
+            lamaWorkingDir.deleteOnExit();
 
-			CommandLine commandLine = new CommandLine("bash");
-			commandLine.addArgument("prepare.sh");
-			commandLine.addArgument("../");
+//			File prepareFile = new File(fdDir, "prepare.sh");
+//			FileUtils.copyFile(prepareFile, new File(lamaWorkingDir, "prepare.sh"));
+//
+//			CommandLine commandLine = new CommandLine("bash");
+//			commandLine.addArgument("prepare.sh");
+//			commandLine.addArgument("../../");
 
-			DefaultExecutor executor = new DefaultExecutor();
-			executor.setWorkingDirectory(lamaWorkingDir);
-			executor.execute(commandLine);
+//			DefaultExecutor executor = new DefaultExecutor();
+//			executor.setWorkingDirectory(lamaWorkingDir);
+//			executor.execute(commandLine);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -134,32 +118,27 @@ public class Lama extends PlannerBase {
 		List<PDDLStringInstance> result = new ArrayList<PDDLStringInstance>(parts.length);
 		for (String line : parts) {
 			if (line.endsWith("\r")) line = line.substring(0, line.length()-1);
-			result.add(parseLine(line));
+			PDDLStringInstance step = parseLine(line);
+			if (step != null)
+			    result.add(step);
 		}
 
 		return result;
 	}
 
-	/**
-	 * 0 : (pickup_sword r1)
-	 * 1 : (move r1 r2)
-	 * 2 : (kill r2)
-	 * 3 : (drop_sword r2)
-	 * 4 : (move r2 r3)
-	 * 5 : (disarm r3)
-	 * 6 : (move r3 r4)
-	 */
 
 	protected PDDLStringInstance parseLine(String line) {
-		String action = line.split(":")[1].trim(); 	// split number from action
-		action = action.substring(1, action.length() - 1); 	// remove ()
+		String action = line.trim();
+
+        if (action.startsWith(";"))
+            return null;
+
+        action = action.substring(1, action.length() - 1); 	// remove ()
 		String[] tokens = action.split(" ");
 		String action_name = tokens[0];
-		List<String> args = new LinkedList<String>(Arrays.asList(tokens));
+		List<String> args = new LinkedList<>(Arrays.asList(tokens));
 		args.remove(0);
 
 		return new PDDLStringInstance(action_name, args);
-
-
 	}
 }
