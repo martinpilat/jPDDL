@@ -1,4 +1,4 @@
-﻿package cz.cuni.mff.jpddl.store;
+package cz.cuni.mff.jpddl.store;
 
 import java.lang.reflect.Method;
 
