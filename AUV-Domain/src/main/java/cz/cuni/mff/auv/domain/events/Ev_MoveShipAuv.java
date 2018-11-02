@@ -270,7 +270,7 @@ public final class Ev_MoveShipAuv extends Event {
 			
 			@Override
 			public boolean entry(int key, Boolean data) {
-				effector.s = E_Ship.THIS.getElement(key);
+				effector.l2 = E_Location.THIS.getElement(key);
 				unify_At_3_a();
 				return true;
 			}

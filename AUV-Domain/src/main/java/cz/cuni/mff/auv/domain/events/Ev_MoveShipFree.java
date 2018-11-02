@@ -270,7 +270,7 @@ public final class Ev_MoveShipFree extends Event {
 			
 			@Override
 			public boolean entry(int key, Boolean data) {
-				effector.s = E_Ship.THIS.getElement(key);
+				effector.l2 = E_Location.THIS.getElement(key);
 				unify_Free_3_l2();
 				return true;
 			}
