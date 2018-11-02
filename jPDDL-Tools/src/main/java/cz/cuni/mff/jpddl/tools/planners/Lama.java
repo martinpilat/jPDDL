@@ -16,10 +16,7 @@ import cz.cuni.mff.jpddl.PDDLStringInstance;
 
 public class Lama extends PlannerBase {
 
-	protected String fdDir = "../Planners/fast-downward/";
-	
-	protected String fdExec = "../../lama.sh"; // relative to $fdDir/tmp/dir 
-	
+	protected String fdDir = "../fast-downward/";
 
 	protected File lamaWorkingDir;
 
@@ -42,7 +39,7 @@ public class Lama extends PlannerBase {
             config.put("result", "plan.sol");
 
             CommandLine commandLine = new CommandLine("bash");
-            commandLine.addArgument(fdExec);
+            commandLine.addArgument("../../lama.sh");
             commandLine.addArgument("${domain}");
             commandLine.addArgument("${problem}");
             commandLine.addArgument("${result}");
@@ -91,7 +88,9 @@ public class Lama extends PlannerBase {
 	}
 
 	public void prepareEnvironment() {
-            lamaWorkingDir = new File(fdDir, "tmp/" + System.currentTimeMillis());
+
+		try {
+            lamaWorkingDir = Files.createTempDirectory(FileSystems.getDefault().getPath(fdDir, "tmp"), "").toFile();
             lamaWorkingDir.mkdirs();
             lamaWorkingDir.deleteOnExit();
 
@@ -105,6 +104,9 @@ public class Lama extends PlannerBase {
 //			DefaultExecutor executor = new DefaultExecutor();
 //			executor.setWorkingDirectory(lamaWorkingDir);
 //			executor.execute(commandLine);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	protected List<PDDLStringInstance> parseLines(String lines) {
@@ -134,7 +136,7 @@ public class Lama extends PlannerBase {
         action = action.substring(1, action.length() - 1); 	// remove ()
 		String[] tokens = action.split(" ");
 		String action_name = tokens[0];
-		List<String> args = new LinkedList<String>(Arrays.asList(tokens));
+		List<String> args = new LinkedList<>(Arrays.asList(tokens));
 		args.remove(0);
 
 		return new PDDLStringInstance(action_name, args);
