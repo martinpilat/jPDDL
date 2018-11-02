@@ -7,6 +7,7 @@ import java.util.Random;
 import cz.cuni.mff.jpddl.PDDLApplicables;
 import cz.cuni.mff.jpddl.PDDLDomain;
 import cz.cuni.mff.jpddl.PDDLEffector;
+import cz.cuni.mff.jpddl.PDDLGoal;
 import cz.cuni.mff.jpddl.PDDLState;
 
 public class PlanTester {
@@ -49,7 +50,7 @@ public class PlanTester {
 		this.random = new Random(randomSeed);
 	}
 	
-	public PlanTesterResult check(PDDLState state, SafeStates safeStates, PDDLEffector... plan) {
+	public PlanTesterResult check(PDDLGoal goal, PDDLState state, SafeStates safeStates, PDDLEffector... plan) {
 		PlanTesterResult result = new PlanTesterResult();
 		
 		result.valid = true;
@@ -93,6 +94,11 @@ public class PlanTester {
 				result.lastSafeStateIndex = result.lastExecutableEffectorIndex+1;
 			}
 		}	
+		
+		// CHECK GOAL
+		if (!goal.isAchieved(state)) {
+			result.valid = false;
+		}
 		
 		// ROLLBACK STATE
 		for (int j = result.lastExecutableEffectorIndex; j >= 0; --j) {			
