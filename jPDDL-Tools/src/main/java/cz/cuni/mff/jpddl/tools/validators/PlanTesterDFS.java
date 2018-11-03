@@ -8,7 +8,6 @@ import cz.cuni.mff.jpddl.PDDLDomain;
 import cz.cuni.mff.jpddl.PDDLEffector;
 import cz.cuni.mff.jpddl.PDDLGoal;
 import cz.cuni.mff.jpddl.PDDLState;
-import cz.cuni.mff.jpddl.tools.validators.PlanTester.PlanTesterDFSResult;
 
 /**
  * Depth-first search that tests all sequences of events against the plan.
@@ -102,41 +101,39 @@ public class PlanTesterDFS {
 		List<PDDLEffector> events = new ArrayList<PDDLEffector>();		
 		applicables.collectApplicableEvents(domain, state, events);
 		
-		if (events.size() > 0) {			
-			for (PDDLEffector event : events) {			
-				// MARK EVENT
-				result.events[index] = event;
-				
-				// APPLY EVENT
-				event.apply(state);
-				++result.appliedEvents;
-				
-				// SEARCH NEXT LEVEL
-				if (!dfs(state, safeStates, plan, index+1, result)) {			
-					// WE HAVE FOUND UNFORTUNATE SEQUENCE OF EVENTS
-					if (result.lastSafeStateIndex < 0 && isSafeState) {
-						result.lastSafeStateIndex = index;					
-					}					
-					return false;
-				}
-				
-				// REVERT THE EVENT
-				event.reverse(state);
-				result.events[index] = null;
-				
-				// WE WILL NOT BE USING THIS INSTANCE AGAIN
-				event.recycle();			
-			}	
-		} else {
-			// NO APPLICABLE EVENTS 
-			// => SEARCH NEXT LEVEL
+		for (PDDLEffector event : events) {			
+			// MARK EVENT
+			result.events[index] = event;
+			
+			// APPLY EVENT
+			event.apply(state);
+			++result.appliedEvents;
+			
+			// SEARCH NEXT LEVEL
 			if (!dfs(state, safeStates, plan, index+1, result)) {			
 				// WE HAVE FOUND UNFORTUNATE SEQUENCE OF EVENTS
 				if (result.lastSafeStateIndex < 0 && isSafeState) {
 					result.lastSafeStateIndex = index;					
-				}				
+				}					
 				return false;
 			}
+			
+			// REVERT THE EVENT
+			event.reverse(state);
+			result.events[index] = null;
+			
+			// WE WILL NOT BE USING THIS INSTANCE AGAIN
+			event.recycle();			
+		}	
+		
+		// NO EVENT HAPPENED 
+		// => SEARCH NEXT LEVEL
+		if (!dfs(state, safeStates, plan, index+1, result)) {			
+			// WE HAVE FOUND UNFORTUNATE SEQUENCE OF EVENTS
+			if (result.lastSafeStateIndex < 0 && isSafeState) {
+				result.lastSafeStateIndex = index;					
+			}				
+			return false;
 		}
 		
 		return true;		

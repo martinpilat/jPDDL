@@ -9,6 +9,7 @@ import cz.cuni.mff.auv.domain.Effector;
 import cz.cuni.mff.auv.problem.Problem;
 import cz.cuni.mff.jpddl.PDDLStringInstance;
 import cz.cuni.mff.jpddl.tools.planners.Lama;
+import cz.cuni.mff.jpddl.tools.search.bench.Timed;
 import cz.cuni.mff.jpddl.tools.validators.PlanChecker;
 import cz.cuni.mff.jpddl.tools.validators.PlanChecker.PlanCheckerResult;
 import cz.cuni.mff.jpddl.tools.validators.PlanTester;
@@ -19,9 +20,18 @@ import cz.cuni.mff.jpddl.tools.validators.SafeStates;
 
 public class Test01_LamaTest {
 
-	@Test
+	//@Test
 	public void test() {
+		Timed time = new Timed();
+		time.start();
+		
 		Problem problem = new Problem();
+		
+		time.end();
+		time.reportInline("Domain/Problem init");
+		System.out.println();
+		
+		time.start();
 		
 		File domainFile = problem.getDomain().getDomainPureFile();
 		File problemFile = new File("auv-problem.pddl");
@@ -29,7 +39,17 @@ public class Test01_LamaTest {
 		
 		Lama lama = new Lama();
 		
+		time.end();
+		time.reportInline("Lama and inputs init");
+		System.out.println();
+		
+		time.start();
+		
 		List<PDDLStringInstance> lamaPlan = lama.plan(domainFile, problemFile);
+		
+		time.end();
+		time.reportInline("Lama planning");
+		System.out.println();
 		
 		if (lamaPlan == null) {
 			System.out.println("NO PLAN FOUND!");
@@ -46,8 +66,15 @@ public class Test01_LamaTest {
 			System.out.println();
 			
 			// CHECK THE PLAN
+			
+			time.start();
+			
 			PlanChecker planChecker = new PlanChecker(problem.getDomain());
 			PlanCheckerResult planCheckerResult = planChecker.check(problem.getGoal(), problem.getState(), plan);
+			
+			time.end();
+			System.out.println();
+			time.reportInline("Plan checking");			
 			
 			if (planCheckerResult.valid) {
 				System.out.println("PLAN CHECKER: plan is valid!");
@@ -56,9 +83,14 @@ public class Test01_LamaTest {
 			}
 			
 			// TEST THE PLAN - OPPORTUNISTIC
+			time.start();
 			PlanTester planTester = new PlanTester(problem.getDomain(), problem.getApplicables());
 			SafeStates safeStates = new SafeStates(problem.getDomain(), new File("safe_states"));
 			PlanTesterResult planTesterResult = planTester.check(problem.getGoal(), problem.getState(), safeStates, plan);
+			time.end();
+			System.out.println();
+			time.reportInline("Plan testing");
+			
 			if (planTesterResult.valid) {
 				System.out.println("PLAN TESTER: plan is valid!");
 			} else {
@@ -74,8 +106,12 @@ public class Test01_LamaTest {
 			
 			// TEST THE PLAN - EXHAUSTIVE
 			if (planTesterResult.valid) {
+				time.start();
 				PlanTesterDFS planTesterDFS = new PlanTesterDFS(problem.getDomain(), problem.getApplicables());
 				PlanTesterDFSResult planTesterDFSResult = planTesterDFS.check(problem.getGoal(), problem.getState(), safeStates, plan);
+				time.end();
+				System.out.println();
+				time.reportInline("Plan testign DFS");				
 				if (planTesterResult.valid) {
 					System.out.println("PLAN TESTER DFS: plan is valid!");
 					System.out.println("  +-- applied events " + planTesterDFSResult.appliedEvents);
@@ -99,9 +135,15 @@ public class Test01_LamaTest {
 	}
 	
 	public static void main(String[] args) {
+		Timed t = new Timed();
+		t.start();
+		
 		Test01_LamaTest test = new Test01_LamaTest();
 		
 		test.test();
+		
+		t.end();
+		t.reportInline("TEST TIME");
 	}
 	
 }
