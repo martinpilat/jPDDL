@@ -70,7 +70,7 @@ public class Test01_LamaTest {
 			
 			// CHECK THE PLAN
 			{
-														time.start();
+				time.start();
 				
 				PlanChecker planChecker = new PlanChecker(problem.getDomain());
 				PlanCheckerResult planCheckerResult = planChecker.check(problem.getGoal(), problem.getState(), plan);

@@ -105,7 +105,7 @@ public class PlanTesterBFS {
 		// SAVE STATE
 		StateCompact dynamic = state.getDynamic().clone();
 		
-		if (bfs(state, safeStates, plan, result, levelLimit)) {
+		if (bfs(goal, state, safeStates, plan, result, levelLimit)) {
 			result.valid = true;
 		} else {
 			result.valid = false;
@@ -119,14 +119,21 @@ public class PlanTesterBFS {
 		
 	}
 	
-	public boolean bfs(PDDLState state, SafeStates safeStates, PDDLEffector[] plan, PlanTesterBFSResult result, int levelLimit) {
+	public boolean bfs(PDDLGoal goal, PDDLState state, SafeStates safeStates, PDDLEffector[] plan, PlanTesterBFSResult result, int levelLimit) {
+		// GOAL ACHIEVED?
+		if (goal.isAchieved(state)) {
+			// WE'RE DONE
+			return true;
+		}
+		
 		ArrayDeque<BFSState> queue = new ArrayDeque<BFSState>();
 
 		// ADD THE FIRST STATE
 		queue.add(new BFSState(0, state.getDynamic().clone(), null, null));
 		
 		// LAST CONFIRMED SAFE STATE INDEX
-		boolean currIndexLevelSafe = safeStates.isSafe(state);
+		boolean initialStateSafe = safeStates.isSafe(state);
+		boolean[] currIndexLevelSafe = new boolean[] {initialStateSafe, initialStateSafe};
 		int currIndexLevel = -1;
 		
 		// UTILS
@@ -141,18 +148,23 @@ public class PlanTesterBFS {
 			if (s.index > currIndexLevel) {
 				// WE HAVE JUST FINISHED EVALUATING NEXT BFS LAYER
 				//System.out.println("PlanTesterBFS: reached layer " + s.index + ", queue size = " + queue.size());
-				
-				if (currIndexLevelSafe) {
-					result.lastSafeStateIndex = s.index;
+
+				// s => state after applying action[0],any-event[0],...,action[s.index-1],any-event[s.index-1]
+				//   => all sequence of events events [0]-[s.index-1] were checked not to mess up the plan
+				//   => we have checked that under all circumstances action[s.index-1] is applicable				
+				if (currIndexLevelSafe[0]) {
+					result.lastSafeStateIndex = s.index-1;
 				}
+				
 				// RESTART SAFE STATE CHECKING
-				currIndexLevelSafe = true;
+				currIndexLevelSafe[0] = currIndexLevelSafe[1];
+				currIndexLevelSafe[1] = true;
 				currIndexLevel = s.index;
 			}
 			
 			// IS SAFE STATE?
 			boolean isSafeState = safeStates.isSafe(state);
-			currIndexLevelSafe = currIndexLevelSafe && isSafeState;
+			currIndexLevelSafe[1] = currIndexLevelSafe[1] && isSafeState;
 			
 			// RESET THE STATE
 			state.setDynamic(s.state);
@@ -174,12 +186,16 @@ public class PlanTesterBFS {
 			}
 			
 			// ACTION STILL EXECUTABLE
-			
-			
 			if (s.index < levelLimit) {
 				// APPLY ACTION
 				plan[s.index].apply(state);
-			
+				
+				// GOAL ACHIEVED?
+				if (goal.isAchieved(state)) {
+					// WE'RE DONE
+					return true;
+				}
+							
 				// COLLECT APPLICABLE EVENTS
 				events.clear();
 				events.add(null); // add NO-EVENT
@@ -187,9 +203,15 @@ public class PlanTesterBFS {
 				Collections.shuffle(events); // randomize
 				
 				// CONSTRUCT OFFSPRING BFS STATES
-				StateCompact newState = state.getDynamic().clone();
-				for (PDDLEffector event : events) {		
+				for (PDDLEffector event : events) {
+					if (event != null) {
+						event.apply(state);
+					}
+					StateCompact newState = state.getDynamic().clone();					
 					queue.add(new BFSState(s.index+1, newState, event, s));
+					if (event != null) {
+						event.reverse(state);
+					}
 				}
 			}
 				
@@ -198,6 +220,11 @@ public class PlanTesterBFS {
 		}
 		
 		// NO SEQUENCE OF EVENTS PREVENT THE PLAN FROM APPLICATION
+		if (currIndexLevelSafe[1]) {
+			// LAST LEVEL CHECKED OK
+			result.lastSafeStateIndex = levelLimit;
+		}
+		
 		return true;		
 	}
 	
