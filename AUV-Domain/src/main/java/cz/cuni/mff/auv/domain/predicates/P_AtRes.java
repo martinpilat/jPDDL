@@ -134,8 +134,8 @@ public final class P_AtRes extends Predicate {
 			return containsKey(T_Location.getIndex(obj));
 		}
 		
-		public void put(T_Location key, Boolean value) {
-			put(T_Location.getIndex(key), value);
+		public boolean put(T_Location key, Boolean value) {
+			return put(T_Location.getIndex(key), value);
 		}
 		
 		public Boolean remove(T_Location key) {
@@ -177,19 +177,19 @@ public final class P_AtRes extends Predicate {
 			return map_t_location_2.containsKey(l);
 		}
 		
-		public void set(T_Resource r, T_Location l) {
+		public boolean set(T_Resource r, T_Location l) {
 			Map_T_Location_2 map_t_location_2 = storage.get(r);
 			if (map_t_location_2 == null) {
 				map_t_location_2 = new Map_T_Location_2(T_Location.getCount());
 				storage.put(r, map_t_location_2);
 			}			
-			map_t_location_2.put(l, true);
+			return map_t_location_2.put(l, true);
 		}
 		
-		public void clear(T_Resource r, T_Location l) {
+		public boolean clear(T_Resource r, T_Location l) {
 			Map_T_Location_2 map_t_location_2 = storage.get(r);
-			if (map_t_location_2 == null) return;
-			map_t_location_2.remove(l);
+			if (map_t_location_2 == null) return false;
+			return map_t_location_2.remove(l) != null;
 		}
 	 
 		@Override
@@ -198,13 +198,13 @@ public final class P_AtRes extends Predicate {
 		}
 
 		@Override
-		public void set(P_AtRes p) {
-			set(p.r, p.l);
+		public boolean set(P_AtRes p) {
+			return set(p.r, p.l);
 		}
 
 		@Override
-		public void clear(P_AtRes p) {
-			clear(p.r, p.l);
+		public boolean clear(P_AtRes p) {
+			return clear(p.r, p.l);
 		}
 		
 		@Override

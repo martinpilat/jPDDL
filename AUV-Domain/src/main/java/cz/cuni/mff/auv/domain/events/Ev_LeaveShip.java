@@ -30,6 +30,8 @@ public final class Ev_LeaveShip extends Event {
 	public T_Ship s;
 	public T_Location l;
 	
+	public boolean[] applied = new boolean[] { false, false, false, false };
+	
 	public Ev_LeaveShip() {
 	}
 	
@@ -152,17 +154,17 @@ public final class Ev_LeaveShip extends Event {
 	 */
 	@Override
 	public void apply(State state) {
-		state.p_At.clear(s, l);
-		state.p_Free.set(l);
-		state.p_DupFree.set(l);
-		state.p_Outside.set(s);
+		applied[0] = state.p_At.clear(s, l);
+		applied[1] = state.p_Free.set(l);
+		applied[2] = state.p_DupFree.set(l);
+		applied[3] = state.p_Outside.set(s);
 	}
 	
 	public void reverse(State state) {
-		state.p_At.set(s, l);
-		state.p_Free.clear(l);
-		state.p_DupFree.clear(l);
-		state.p_Outside.clear(s);
+		if (applied[0]) state.p_At.set(s, l);
+		if (applied[1]) state.p_Free.clear(l);
+		if (applied[2]) state.p_DupFree.clear(l);
+		if (applied[3]) state.p_Outside.clear(s);
 	}
 	
 	// ===================================================

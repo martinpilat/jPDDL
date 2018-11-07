@@ -95,7 +95,14 @@ public class Test01_LamaTest {
 				System.out.println("PLAN TESTER: plan is valid!");
 			} else {
 				System.out.println("PLAN TESTER: plan is INvalid! Last executable action index is " + planTesterResult.lastExecutableEffectorIndex + ".");
-				System.out.println("PLAN TESTER: Last safe state index is " + planTesterResult.lastSafeStateIndex + ".");
+				
+				System.out.print("  +-- Events: ");
+				for (int i = 0; i < planTesterResult.events.length; ++i) {
+					if (i != 0) System.out.print(" -> ");
+					System.out.print(planTesterResult.events[i] == null ? "null" : planTesterResult.events[i].toEffector());
+				}
+				System.out.println();				
+				System.out.println("  +-- Last safe state index is " + planTesterResult.lastSafeStateIndex + ".");
 				System.out.println("SAFE STATE");
 				for (int i = 0; i < planTesterResult.lastSafeStateIndex; ++i) {
 					planTesterResult.plan[i].apply(planTesterResult.state);
@@ -105,7 +112,7 @@ public class Test01_LamaTest {
 			}
 			
 			// TEST THE PLAN - EXHAUSTIVE
-			if (planTesterResult.valid) {
+			if (true || planTesterResult.valid) {
 				time.start();
 				PlanTesterDFS planTesterDFS = new PlanTesterDFS(problem.getDomain(), problem.getApplicables());
 				PlanTesterDFSResult planTesterDFSResult = planTesterDFS.check(problem.getGoal(), problem.getState(), safeStates, plan);
@@ -118,7 +125,13 @@ public class Test01_LamaTest {
 				} else {
 					System.out.println("PLAN TESTER DFS: plan is INvalid! Last executable action index is " + planTesterResult.lastExecutableEffectorIndex + ".");
 					System.out.println("  +-- applied events " + planTesterDFSResult.appliedEvents);
-					System.out.println("PLAN TESTER DFS: Last safe state index is " + planTesterResult.lastSafeStateIndex + ".");
+					System.out.print("  +-- Events: ");
+					for (int i = 0; i < planTesterResult.events.length; ++i) {
+						if (i != 0) System.out.print(" -> ");
+						System.out.print(planTesterResult.events[i] == null ? "null" : planTesterResult.events[i].toEffector());
+					}
+					System.out.println();	
+					System.out.println("  +-- Last safe state index is " + planTesterDFSResult.lastSafeStateIndex + ".");
 					System.out.println("SAFE STATE");
 					for (int i = 0; i < planTesterResult.lastSafeStateIndex; ++i) {
 						planTesterResult.plan[i].apply(planTesterResult.state);

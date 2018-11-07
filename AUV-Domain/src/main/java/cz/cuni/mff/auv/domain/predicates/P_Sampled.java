@@ -92,8 +92,8 @@ public class P_Sampled extends Predicate {
 			return containsKey(T_Resource.getIndex(obj));
 		}
 		
-		public void put(T_Resource key, Boolean value) {
-			put(T_Resource.getIndex(key), value);
+		public boolean put(T_Resource key, Boolean value) {
+			return put(T_Resource.getIndex(key), value);
 		}
 		
 		public Boolean remove(T_Resource key) {
@@ -134,12 +134,12 @@ public class P_Sampled extends Predicate {
 			return storage.containsKey(r);
 		}
 		
-		public void set(T_Resource r) {
-			storage.put(r, true);
+		public boolean set(T_Resource r) {
+			return storage.put(r, true);
 		}
 		
-		public void clear(T_Resource r) {
-			storage.remove(r);
+		public boolean clear(T_Resource r) {
+			return storage.remove(r) != null;
 		}
 		
 		@Override
@@ -148,13 +148,13 @@ public class P_Sampled extends Predicate {
 		}
 
 		@Override
-		public void set(P_Sampled p) {
-			set(p.r);
+		public boolean set(P_Sampled p) {
+			return set(p.r);
 		}
 
 		@Override
-		public void clear(P_Sampled p) {
-			clear(p.r);
+		public boolean clear(P_Sampled p) {
+			return clear(p.r);
 		}
 		
 		@Override

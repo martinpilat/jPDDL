@@ -133,8 +133,8 @@ public final class P_Exit extends Predicate {
 			return containsKey(T_Location.getIndex(obj));
 		}
 		
-		public void put(T_Location key, Boolean value) {
-			put(T_Location.getIndex(key), value);
+		public boolean put(T_Location key, Boolean value) {
+			return put(T_Location.getIndex(key), value);
 		}
 		
 		public Boolean remove(T_Location key) {
@@ -176,19 +176,19 @@ public final class P_Exit extends Predicate {
 			return map_t_location_2.containsKey(l);
 		}
 		
-		public void set(T_Ship s, T_Location l) {
+		public boolean set(T_Ship s, T_Location l) {
 			Map_T_Location_2 map_t_location_2 = storage.get(s);
 			if (map_t_location_2 == null) {
 				map_t_location_2 = new Map_T_Location_2(T_Location.getCount());
 				storage.put(s, map_t_location_2);
 			}			
-			map_t_location_2.put(l, true);
+			return map_t_location_2.put(l, true);
 		}
 		
-		public void clear(T_Ship s, T_Location l) {
+		public boolean clear(T_Ship s, T_Location l) {
 			Map_T_Location_2 map_t_location_2 = storage.get(s);
-			if (map_t_location_2 == null) return;
-			map_t_location_2.remove(l);
+			if (map_t_location_2 == null) return false;
+			return map_t_location_2.remove(l) != null;
 		}
 	 
 		
@@ -198,13 +198,13 @@ public final class P_Exit extends Predicate {
 		}
 
 		@Override
-		public void set(P_Exit p) {
-			set(p.s, p.l);
+		public boolean set(P_Exit p) {
+			return set(p.s, p.l);
 		}
 
 		@Override
-		public void clear(P_Exit p) {
-			clear(p.s, p.l);
+		public boolean clear(P_Exit p) {
+			return clear(p.s, p.l);
 		}
 		
 		@Override

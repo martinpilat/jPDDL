@@ -98,8 +98,8 @@ public class P_Operational extends Predicate {
 			return containsKey(T_Auv.getIndex(obj));
 		}
 		
-		public void put(T_Auv key, Boolean value) {
-			put(T_Auv.getIndex(key), value);
+		public boolean put(T_Auv key, Boolean value) {
+			return put(T_Auv.getIndex(key), value);
 		}
 		
 		public Boolean remove(T_Auv key) {
@@ -140,12 +140,12 @@ public class P_Operational extends Predicate {
 			return storage.containsKey(a);
 		}
 		
-		public void set(T_Auv a) {
-			storage.put(a, true);
+		public boolean set(T_Auv a) {
+			return storage.put(a, true);
 		}
 		
-		public void clear(T_Auv a) {
-			storage.remove(a);
+		public boolean clear(T_Auv a) {
+			return storage.remove(a) != null;
 		}
 	 
 		
@@ -155,13 +155,13 @@ public class P_Operational extends Predicate {
 		}
 
 		@Override
-		public void set(P_Operational p) {
-			set(p.a);
+		public boolean set(P_Operational p) {
+			return set(p.a);
 		}
 
 		@Override
-		public void clear(P_Operational p) {
-			clear(p.a);
+		public boolean clear(P_Operational p) {
+			return clear(p.a);
 		}
 		
 		@Override

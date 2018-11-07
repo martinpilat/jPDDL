@@ -8,7 +8,7 @@ import cz.cuni.mff.jpddl.store.ICloneable;
 public interface IStorage<P extends PDDLPredicate> extends ICloneable {
 
 	/**
-	 * Returns PDDL name of the predicate this is storing.
+	 * Returns PDDL name of the predicate this storage is storing.
 	 * @return
 	 */
 	String getName();
@@ -29,14 +29,16 @@ public interface IStorage<P extends PDDLPredicate> extends ICloneable {
 	/**
 	 * Sets predicate 'p' to hold.
 	 * @param p
+	 * @returns whether storage has changed, i.e., whether 'p' was entered as a new predicate into the storage, i.e., it did not hold before
 	 */
-	void set(P p);
+	boolean set(P p);
 	
 	/**
 	 * Ceases 'p' to hold, invalidates it.
 	 * @param p
+	 * @returns whether storage has changes, i.e., whether 'p' was part of the storage, i.e., it did hold before 
 	 */
-	void clear(P p);
+	boolean clear(P p);
 	
 	/**
 	 * Populates 'predicates' with all predicates that hold; non-trivial operation should be used for dumping/displaying the domain only.
@@ -47,7 +49,7 @@ public interface IStorage<P extends PDDLPredicate> extends ICloneable {
 	void getAll(Collection<P> predicates);
 	
 	/**
-	 * Returns underlaying map holding the predicate tree.
+	 * Returns underlying map holding the predicate tree.
 	 * @return
 	 */
 	@SuppressWarnings("rawtypes")

@@ -26,6 +26,8 @@ public final class Ac_Move extends Action {
 	public T_Location l1;
 	public T_Location l2;
 	
+	public boolean[] applied = new boolean[] { false, false, false, false, false, false };
+	
 	public Ac_Move() {		
 	}
 	
@@ -178,22 +180,22 @@ public final class Ac_Move extends Action {
 	 */
 	@Override
 	public void apply(State state) {
-		state.p_At.clear(a, l1);
-		state.p_At.set(a, l2);
-		state.p_Free.set(l1);
-		state.p_DupFree.set(l1);
-		state.p_Free.clear(l2);
-		state.p_DupFree.clear(l2);
+		applied[0] = state.p_At.clear(a, l1);
+		applied[1] = state.p_At.set(a, l2);
+		applied[2] = state.p_Free.set(l1);
+		applied[3] = state.p_DupFree.set(l1);
+		applied[4] = state.p_Free.clear(l2);
+		applied[5] = state.p_DupFree.clear(l2);
 	}
 	
 	@Override
 	public void reverse(State state) {
-		state.p_At.set(a, l1);
-		state.p_At.clear(a, l2);
-		state.p_Free.clear(l1);
-		state.p_DupFree.clear(l1);
-		state.p_Free.set(l2);
-		state.p_DupFree.set(l2);
+		if (applied[0]) state.p_At.set(a, l1);
+		if (applied[1]) state.p_At.clear(a, l2);
+		if (applied[2]) state.p_Free.clear(l1);
+		if (applied[3]) state.p_DupFree.clear(l1);
+		if (applied[4]) state.p_Free.set(l2);
+		if (applied[5]) state.p_DupFree.set(l2);
 	}
 	
 	// ===================================================

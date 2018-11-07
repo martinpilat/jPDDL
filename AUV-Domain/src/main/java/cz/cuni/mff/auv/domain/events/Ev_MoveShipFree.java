@@ -30,6 +30,8 @@ public final class Ev_MoveShipFree extends Event {
 	public T_Location l1;
 	public T_Location l2;
 	
+	public boolean[] applied = new boolean[] { false, false, false, false, false, false };
+	
 	public Ev_MoveShipFree() {
 	}
 	
@@ -174,21 +176,21 @@ public final class Ev_MoveShipFree extends Event {
 	 */
 	@Override
 	public void apply(State state) {
-		state.p_At.set(s, l2);
-		state.p_At.clear(s, l1);
-		state.p_Free.set(l1);
-		state.p_DupFree.set(l1);
-		state.p_Free.clear(l2);
-		state.p_DupFree.clear(l2);
+		applied[0] = state.p_At.set(s, l2);
+		applied[1] = state.p_At.clear(s, l1);
+		applied[2] = state.p_Free.set(l1);
+		applied[3] = state.p_DupFree.set(l1);
+		applied[4] = state.p_Free.clear(l2);
+		applied[5] = state.p_DupFree.clear(l2);
 	}
 	
 	public void reverse(State state) {
-		state.p_At.clear(s, l2);
-		state.p_At.set(s, l1);
-		state.p_Free.clear(l1);
-		state.p_DupFree.clear(l1);
-		state.p_Free.set(l2);
-		state.p_DupFree.set(l2);
+		if (applied[0]) state.p_At.clear(s, l2);
+		if (applied[1]) state.p_At.set(s, l1);
+		if (applied[2]) state.p_Free.clear(l1);
+		if (applied[3]) state.p_DupFree.clear(l1);
+		if (applied[4]) state.p_Free.set(l2);
+		if (applied[5]) state.p_DupFree.set(l2);
 	}
 	
 	// ===================================================

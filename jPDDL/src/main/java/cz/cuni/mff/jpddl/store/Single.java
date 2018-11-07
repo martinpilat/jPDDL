@@ -14,24 +14,30 @@ public abstract class Single<P extends PDDLPredicate> implements IStorage<P> {
 		return value;
 	}
 	
-	public void set() {
-		value = true;
+	public boolean set() {
+		if (value) return false;
+		return value = true;
 	}
 	
-	public void clear() {
+	public boolean clear() {
+		if (!value) return false;
 		value = false;
+		return true;
 	}
 	
+	@Override
 	public boolean isSet(final P p) {
 		return value;
 	}
 	
-	public void set(final P p) {
-		value = true;
+	@Override
+	public boolean set(final P p) {
+		return set();
 	}
 
-	public void clear(final P p) {
-		value = false;
+	@Override
+	public boolean clear(final P p) {
+		return clear();
 	}	
 	
 }

@@ -130,8 +130,8 @@ public class P_Connected extends Predicate {
 			return containsKey(T_Location.getIndex(obj));
 		}
 		
-		public void put(T_Location key, Boolean value) {
-			put(T_Location.getIndex(key), value);
+		public boolean put(T_Location key, Boolean value) {
+			return put(T_Location.getIndex(key), value);
 		}
 		
 		public Boolean remove(T_Location key) {
@@ -173,19 +173,19 @@ public class P_Connected extends Predicate {
 			return map_t_location_2.containsKey(l2);
 		}
 		
-		public void set(T_Location l1, T_Location l2) {
+		public boolean set(T_Location l1, T_Location l2) {
 			Map_T_Location_2 map_t_location_2 = storage.get(l1);
 			if (map_t_location_2 == null) {
 				map_t_location_2 = new Map_T_Location_2(T_Location.getCount());
 				storage.put(l1, map_t_location_2);
 			}			
-			map_t_location_2.put(l2, true);
+			return map_t_location_2.put(l2, true);
 		}
 		
-		public void clear(T_Location l1, T_Location l2) {
+		public boolean clear(T_Location l1, T_Location l2) {
 			Map_T_Location_2 map_t_location_2 = storage.get(l1);
-			if (map_t_location_2 == null) return;
-			map_t_location_2.remove(l2);
+			if (map_t_location_2 == null) return false;
+			return map_t_location_2.remove(l2) != null;
 		}
 	 
 		
@@ -195,13 +195,13 @@ public class P_Connected extends Predicate {
 		}
 
 		@Override
-		public void set(P_Connected p) {
-			set(p.l1, p.l2);
+		public boolean set(P_Connected p) {
+			return set(p.l1, p.l2);
 		}
 
 		@Override
-		public void clear(P_Connected p) {
-			clear(p.l1, p.l2);
+		public boolean clear(P_Connected p) {
+			return clear(p.l1, p.l2);
 		}
 		
 		@Override

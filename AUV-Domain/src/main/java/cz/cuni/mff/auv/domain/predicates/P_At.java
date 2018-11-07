@@ -136,8 +136,8 @@ public final class P_At extends Predicate {
 			return containsKey(T_Location.getIndex(obj));
 		}
 		
-		public void put(T_Location key, Boolean value) {
-			put(T_Location.getIndex(key), value);
+		public boolean put(T_Location key, Boolean value) {
+			return put(T_Location.getIndex(key), value);
 		}
 		
 		public Boolean remove(T_Location key) {
@@ -179,19 +179,31 @@ public final class P_At extends Predicate {
 			return map_t_location_2.containsKey(l);
 		}
 		
-		public void set(T_Vehicle v, T_Location l) {
+		/**
+		 * Returns TRUE if a NEW predicate was set; false if the predicate was already stored.
+		 * @param v
+		 * @param l
+		 * @return
+		 */
+		public boolean set(T_Vehicle v, T_Location l) {
 			Map_T_Location_2 map_t_location_2 = storage.get(v);
 			if (map_t_location_2 == null) {
 				map_t_location_2 = new Map_T_Location_2(T_Location.getCount());
 				storage.put(v, map_t_location_2);
 			}			
-			map_t_location_2.put(l, true);
+			return map_t_location_2.put(l, true);
 		}
 		
-		public void clear(T_Vehicle v, T_Location l) {
+		/**
+		 * Returns TRUE if a predicate was removed (i.e. was previously set within the storage)
+		 * @param v
+		 * @param l
+		 * @return
+		 */
+		public boolean clear(T_Vehicle v, T_Location l) {
 			Map_T_Location_2 map_t_location_2 = storage.get(v);
-			if (map_t_location_2 == null) return;
-			map_t_location_2.remove(l);
+			if (map_t_location_2 == null) return false;
+			return map_t_location_2.remove(l) != null;
 		}
 	 
 		
@@ -201,13 +213,13 @@ public final class P_At extends Predicate {
 		}
 
 		@Override
-		public void set(P_At p) {
-			set(p.v, p.l);
+		public boolean set(P_At p) {
+			return set(p.v, p.l);
 		}
 
 		@Override
-		public void clear(P_At p) {
-			clear(p.v, p.l);
+		public boolean clear(P_At p) {
+			return clear(p.v, p.l);
 		}
 				
 		@Override

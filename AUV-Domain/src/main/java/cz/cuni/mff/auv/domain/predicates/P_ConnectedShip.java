@@ -171,8 +171,8 @@ public class P_ConnectedShip extends Predicate {
 			return containsKey(T_Location.getIndex(obj));
 		}
 		
-		public void put(T_Location key, Boolean value) {
-			put(T_Location.getIndex(key), value);
+		public boolean put(T_Location key, Boolean value) {
+			return put(T_Location.getIndex(key), value);
 		}
 		
 		public Boolean remove(T_Location key) {
@@ -216,7 +216,7 @@ public class P_ConnectedShip extends Predicate {
 			return map_t_location_3.containsKey(l2);
 		}
 		
-		public void set(T_Ship s, T_Location l1, T_Location l2) {
+		public boolean set(T_Ship s, T_Location l1, T_Location l2) {
 			Map_T_Location_2 map_t_location_2 = storage.get(s);
 			if (map_t_location_2 == null) {
 				map_t_location_2 = new Map_T_Location_2(T_Location.getCount());
@@ -227,15 +227,15 @@ public class P_ConnectedShip extends Predicate {
 				map_t_location_3 = new Map_T_Location_3(T_Location.getCount());
 				map_t_location_2.put(l1, map_t_location_3);
 			}			
-			map_t_location_3.put(l2, true);
+			return map_t_location_3.put(l2, true);
 		}
 		
-		public void clear(T_Ship s, T_Location l1, T_Location l2) {
+		public boolean clear(T_Ship s, T_Location l1, T_Location l2) {
 			Map_T_Location_2 map_t_location_2 = storage.get(s);
-			if (map_t_location_2 == null) return;			
+			if (map_t_location_2 == null) return false;			
 			Map_T_Location_3 map_t_location_3 = map_t_location_2.get(l1);
-			if (map_t_location_3 == null) return;
-			map_t_location_3.remove(l2);
+			if (map_t_location_3 == null) return false;
+			return map_t_location_3.remove(l2) != null;
 		}
 	 
 		
@@ -245,13 +245,13 @@ public class P_ConnectedShip extends Predicate {
 		}
 
 		@Override
-		public void set(P_ConnectedShip p) {
-			set(p.s, p.l1, p.l2);
+		public boolean set(P_ConnectedShip p) {
+			return set(p.s, p.l1, p.l2);
 		}
 
 		@Override
-		public void clear(P_ConnectedShip p) {
-			clear(p.s, p.l1, p.l2);
+		public boolean clear(P_ConnectedShip p) {
+			return clear(p.s, p.l1, p.l2);
 		}
 		
 		public Map_T_Ship_1 internal() {

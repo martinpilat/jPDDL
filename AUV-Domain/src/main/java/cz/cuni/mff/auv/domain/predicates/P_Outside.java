@@ -92,8 +92,8 @@ public class P_Outside extends Predicate {
 			return containsKey(T_Ship.getIndex(obj));
 		}
 		
-		public void put(T_Ship key, Boolean value) {
-			put(T_Ship.getIndex(key), value);
+		public boolean put(T_Ship key, Boolean value) {
+			return put(T_Ship.getIndex(key), value);
 		}
 		
 		public Boolean remove(T_Ship key) {
@@ -133,12 +133,12 @@ public class P_Outside extends Predicate {
 			return storage.containsKey(s);
 		}
 		
-		public void set(T_Ship s) {
-			storage.put(s, true);
+		public boolean set(T_Ship s) {
+			return storage.put(s, true);
 		}
 		
-		public void clear(T_Ship s) {
-			storage.remove(s);
+		public boolean clear(T_Ship s) {
+			return storage.remove(s) != null;
 		}
 	 
 		
@@ -148,13 +148,13 @@ public class P_Outside extends Predicate {
 		}
 
 		@Override
-		public void set(P_Outside p) {
-			set(p.s);
+		public boolean set(P_Outside p) {
+			return set(p.s);
 		}
 
 		@Override
-		public void clear(P_Outside p) {
-			clear(p.s);
+		public boolean clear(P_Outside p) {
+			return clear(p.s);
 		}
 		
 		@Override

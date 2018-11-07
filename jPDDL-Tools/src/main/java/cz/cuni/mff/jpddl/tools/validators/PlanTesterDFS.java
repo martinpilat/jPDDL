@@ -64,9 +64,9 @@ public class PlanTesterDFS {
 		
 		if (dfs(state, safeStates, plan, 0, result)) {
 			// CHECK GOAL
-			if (!goal.isAchieved(state)) {
-				result.valid = false;
-			}
+			result.valid = goal.isAchieved(state);
+		} else {
+			result.valid = false;
 		}
 		
 		// ROLLBACK STATE

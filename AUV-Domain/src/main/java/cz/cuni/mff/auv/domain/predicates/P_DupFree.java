@@ -92,12 +92,12 @@ public class P_DupFree extends Predicate {
 			return containsKey(T_Location.getIndex(obj));
 		}
 		
-		public void put(T_Location key, Boolean value) {
-			put(T_Location.getIndex(key), value);
+		public boolean put(T_Location key, Boolean value) {
+			return put(T_Location.getIndex(key), value);
 		}
 		
 		public Boolean remove(T_Location key) {
-			return remove(T_Location.getIndex(key));
+			return remove(T_Location.getIndex(key)) != null;
 		}
 		
 	}
@@ -133,12 +133,12 @@ public class P_DupFree extends Predicate {
 			return storage.containsKey(l);
 		}
 		
-		public void set(T_Location l) {
-			storage.put(l, true);
+		public boolean set(T_Location l) {
+			return storage.put(l, true);
 		}
 		
-		public void clear(T_Location l) {
-			storage.remove(l);
+		public boolean clear(T_Location l) {
+			return storage.remove(l);
 		}
 		
 		@Override
@@ -147,13 +147,13 @@ public class P_DupFree extends Predicate {
 		}
 
 		@Override
-		public void set(P_DupFree p) {
-			set(p.l);
+		public boolean set(P_DupFree p) {
+			return set(p.l);
 		}
 
 		@Override
-		public void clear(P_DupFree p) {
-			clear(p.l);
+		public boolean clear(P_DupFree p) {
+			return clear(p.l);
 		}
 		
 		@Override

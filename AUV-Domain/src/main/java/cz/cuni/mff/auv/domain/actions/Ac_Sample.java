@@ -28,6 +28,8 @@ public final class Ac_Sample extends Action {
 	public T_Resource r;
 	public T_Location l;
 	
+	public boolean[] applied = new boolean[] { false, false };
+	
 	public Ac_Sample() {		
 	}
 	
@@ -160,14 +162,14 @@ public final class Ac_Sample extends Action {
 	 */
 	@Override
 	public void apply(State state) {
-		state.p_Sampled.set(r);
-		state.p_AtRes.clear(r, l);
+		applied[0] = state.p_Sampled.set(r);
+		applied[1] = state.p_AtRes.clear(r, l);
 	}
 	
 	@Override
 	public void reverse(State state) {
-		state.p_Sampled.clear(r);
-		state.p_AtRes.set(r, l);
+		if (applied[0]) state.p_Sampled.clear(r);
+		if (applied[1]) state.p_AtRes.set(r, l);
 	}
 	
 	// ===================================================
