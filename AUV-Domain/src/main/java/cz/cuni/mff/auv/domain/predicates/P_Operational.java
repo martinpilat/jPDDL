@@ -3,6 +3,7 @@ package cz.cuni.mff.auv.domain.predicates;
 import java.util.Collection;
 
 import cz.cuni.mff.auv.domain.Predicate;
+import cz.cuni.mff.auv.domain.predicates.P_Entry.Map_T_Location_2;
 import cz.cuni.mff.auv.domain.types.T_Auv;
 import cz.cuni.mff.auv.problem.E_Auv;
 import cz.cuni.mff.jpddl.IStorage;
@@ -10,13 +11,16 @@ import cz.cuni.mff.jpddl.PDDLPredicate;
 import cz.cuni.mff.jpddl.store.FastIntMap;
 import cz.cuni.mff.jpddl.store.FastIntMap.ForEachEntry;
 import cz.cuni.mff.jpddl.store.Pool;
+import cz.cuni.mff.jpddl.utils.StateCompact;
 
 /**
  * PREDICATE
  * (operational ?a - auv)
  */
 public class P_Operational extends Predicate {
-
+	
+	public static final int FLAG_TYPE = 10;
+	
 	public T_Auv a;
 	
 	public P_Operational() {
@@ -66,8 +70,27 @@ public class P_Operational extends Predicate {
 	}
 	
 	@Override
+	public boolean isStatic() {
+		return false;
+	}
+	
+	@Override
 	public String toPredicate() {
 		return "(operational " + a.name + ")";
+	}
+	
+	@Override
+	public int toInteger() {
+		return toInt(a);
+	}
+	
+	public static int toInt(T_Auv a) {
+		return    (T_Auv.getIndex(a) << (Predicate.MASK_TYPE_BIT_COUNT))
+			    | FLAG_TYPE;
+	}
+	
+	public static T_Auv fromInt_a(int predicate) {
+		return E_Auv.THIS.getElement( (predicate >> (Predicate.MASK_TYPE_BIT_COUNT)) & T_Auv.bitMask );
 	}
 	
 	// =======
@@ -112,6 +135,8 @@ public class P_Operational extends Predicate {
 		
 		private final Map_T_AUV_1 storage;
 		
+		public StateCompact compact;
+		
 		public Storage_P_Operational() {
 			storage = new Map_T_AUV_1(T_Auv.getCount());
 		}
@@ -124,8 +149,7 @@ public class P_Operational extends Predicate {
 		public Storage_P_Operational clone() {
 			return new Storage_P_Operational(storage.clone());
 		}
-		
-		
+				
 		@Override
 		public String getName() {
 			return "operational";
@@ -141,11 +165,19 @@ public class P_Operational extends Predicate {
 		}
 		
 		public boolean set(T_Auv a) {
-			return storage.put(a, true);
+			if (storage.put(a, true)) {
+				compact.set(P_Operational.toInt(a));
+				return true;
+			}
+			return false;
 		}
 		
 		public boolean clear(T_Auv a) {
-			return storage.remove(a) != null;
+			if (storage.remove(a) != null) {
+				compact.clear(P_Operational.toInt(a));
+				return true;
+			}
+			return false;
 		}
 	 
 		
@@ -185,6 +217,13 @@ public class P_Operational extends Predicate {
 				}						
 			});			
 		}
+		
+		/**
+		 * Warning, this does not affect dynamic StateCompact of the state!
+		 */
+		public void clearAll() {
+			storage.clear();
+		}	
 		
 	}
 	

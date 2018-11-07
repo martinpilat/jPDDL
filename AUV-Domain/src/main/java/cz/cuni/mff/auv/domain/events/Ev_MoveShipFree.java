@@ -53,12 +53,12 @@ public final class Ev_MoveShipFree extends Event {
 	
 	@Override
 	public String getName() {
-		return "move-ship-auv";		
+		return "move-ship-free";		
 	}
 	
 	@Override
 	public String toEffector() {
-		return "(move-ship-auv " + s.name + " " + l1.name + " " + l2.name + ")";
+		return "(move-ship-free " + s.name + " " + l1.name + " " + l2.name + ")";
 	}
 	
 	@Override

@@ -3,6 +3,7 @@ package cz.cuni.mff.auv.domain.predicates;
 import java.util.Collection;
 
 import cz.cuni.mff.auv.domain.Predicate;
+import cz.cuni.mff.auv.domain.predicates.P_Connected.Map_T_Location_2;
 import cz.cuni.mff.auv.domain.types.T_Location;
 import cz.cuni.mff.auv.domain.types.T_Ship;
 import cz.cuni.mff.auv.problem.E_Location;
@@ -18,6 +19,8 @@ import cz.cuni.mff.jpddl.store.Pool;
  */
 public class P_ConnectedShip extends Predicate {
 
+	public static final int FLAG_TYPE = 5;
+	
 	public T_Ship s;
 	public T_Location l1;
 	public T_Location l2;
@@ -71,8 +74,37 @@ public class P_ConnectedShip extends Predicate {
 	}
 	
 	@Override
+	public boolean isStatic() {
+		return true;
+	}
+	
+	@Override
 	public String toPredicate() {
 		return "(connected-ship " + s.name + " " + l1.name + " " + l2.name + ")";
+	}
+	
+	@Override
+	public int toInteger() {
+		return toInt(s, l1, l2);
+	}
+	
+	public static int toInt(T_Ship s, T_Location l1, T_Location l2) {
+		return    (T_Ship.getIndex(s) << (T_Location.bitCount + T_Location.bitCount + Predicate.MASK_TYPE_BIT_COUNT))
+			    | (T_Location.getIndex(l1) << (T_Location.bitCount + Predicate.MASK_TYPE_BIT_COUNT))
+			    | (T_Location.getIndex(l2) << (Predicate.MASK_TYPE_BIT_COUNT))
+			    | FLAG_TYPE;
+	}
+	
+	public static T_Ship fromInt_s(int predicate) {
+		return E_Ship.THIS.getElement( (predicate >> (T_Location.bitCount + T_Location.bitCount + Predicate.MASK_TYPE_BIT_COUNT)) & T_Ship.bitMask );
+	}
+	
+	public static T_Location fromInt_l1(int predicate) {
+		return E_Location.THIS.getElement( (predicate >> (T_Location.bitCount + Predicate.MASK_TYPE_BIT_COUNT)) & T_Location.bitMask );
+	}
+	
+	public static T_Location fromInt_l2(int predicate) {
+		return E_Location.THIS.getElement( (predicate >> (Predicate.MASK_TYPE_BIT_COUNT)) & T_Location.bitMask );
 	}
 	
 	// =======
@@ -295,6 +327,31 @@ public class P_ConnectedShip extends Predicate {
 				}
 			);			
 		}
+		
+		/**
+		 * Warning, this does not affect dynamic StateCompact of the state!
+		 */
+		public void clearAll() {
+			storage.forEachEntry(
+					new ForEachEntry<Map_T_Location_2>() {
+						@Override
+						public boolean entry(int key, Map_T_Location_2 data) {
+							final T_Ship s = E_Ship.THIS.getElement(key);
+							data.forEachEntry(
+								new ForEachEntry<Map_T_Location_3>() {
+									@Override
+									public boolean entry(final int key, final Map_T_Location_3 data) {
+										data.clear();
+										return true;
+									}									
+								}
+							);
+							return true;
+						}
+						
+					}
+				);		
+		}	
 		
 	}
 	

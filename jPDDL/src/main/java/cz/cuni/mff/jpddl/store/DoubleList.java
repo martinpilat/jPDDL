@@ -126,14 +126,17 @@ public final class DoubleList<DATA> implements Cloneable
 
         list[firstIndex].next = firstIndex+1;
         list[firstIndex].prev = -1;
+        list[firstIndex].data = null;
         
         for (int i = firstIndex+1; i < lastIndex; ++i) {
             list[i].prev = i-1;
             list[i].next = i+1;
+            list[i].data = null;
         }
         
         list[lastIndex].next = -1;
         list[lastIndex].prev = lastIndex-1;
+        list[lastIndex].data = null;
         
         deads = lastIndex - firstIndex + 1;
     }
@@ -213,6 +216,11 @@ public final class DoubleList<DATA> implements Cloneable
      */
     public void set(int index, DATA data) {
     	list[index].data = data;
+    }
+    
+    public DATA removeFirst() {
+    	if (firstAlive < 0) return null;
+    	return remove(firstAlive);
     }
 
     protected void removeFirstDead()
@@ -457,6 +465,18 @@ public final class DoubleList<DATA> implements Cloneable
     public int capacityLeft() {
     	return deads;
     }
+    
+    /**
+     * Clears the list.
+     */
+    public void clear() {
+    	firstAlive = -1;
+        lastAlive  = -1;
+        initDead(0, capacity - 1);
+
+        alives = 0;
+        deads = capacity;
+	}
 
     // =====
     // DEBUG
@@ -485,6 +505,6 @@ public final class DoubleList<DATA> implements Cloneable
         }
 
         return result.toString();
-    }
+    }	
 	
 }

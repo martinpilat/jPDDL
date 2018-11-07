@@ -3,6 +3,7 @@ package cz.cuni.mff.auv.domain.predicates;
 import java.util.Collection;
 
 import cz.cuni.mff.auv.domain.Predicate;
+import cz.cuni.mff.auv.domain.predicates.P_At.Map_T_Location_2;
 import cz.cuni.mff.auv.domain.types.T_Location;
 import cz.cuni.mff.auv.domain.types.T_Resource;
 import cz.cuni.mff.auv.problem.E_Location;
@@ -11,12 +12,15 @@ import cz.cuni.mff.jpddl.IStorage;
 import cz.cuni.mff.jpddl.store.FastIntMap;
 import cz.cuni.mff.jpddl.store.FastIntMap.ForEachEntry;
 import cz.cuni.mff.jpddl.store.Pool;
+import cz.cuni.mff.jpddl.utils.StateCompact;
 
 /**
  * PREDICATE
  * (at-res ?r - resource ?l - location)
  */
 public final class P_AtRes extends Predicate {
+	
+	public static final int FLAG_TYPE = 3;
 	
 	public T_Resource r;
 	public T_Location l;
@@ -68,8 +72,32 @@ public final class P_AtRes extends Predicate {
 	}
 	
 	@Override
+	public boolean isStatic() {
+		return false;
+	}
+	
+	@Override
 	public String toPredicate() {
 		return "(at-res " + r.name + " " + l.name + ")";
+	}
+	
+	@Override
+	public int toInteger() {
+		return toInt(r, l);
+	}
+	
+	public static int toInt(T_Resource r, T_Location l) {
+		return   (T_Resource.getIndex(r) << (T_Location.bitCount + Predicate.MASK_TYPE_BIT_COUNT))
+			   | (T_Location.getIndex(l) << (Predicate.MASK_TYPE_BIT_COUNT))
+			   | FLAG_TYPE;
+	}
+	
+	public static T_Resource fromInt_r(int predicate) {
+		return E_Resource.THIS.getElement( (predicate >> (T_Location.bitCount + Predicate.MASK_TYPE_BIT_COUNT)) & T_Resource.bitMask );
+	}
+	
+	public static T_Location fromInt_l(int predicate) {
+		return E_Location.THIS.getElement( (predicate >> (Predicate.MASK_TYPE_BIT_COUNT)) & T_Location.bitMask );
 	}
 	
 	// =======
@@ -148,6 +176,8 @@ public final class P_AtRes extends Predicate {
 		
 		private final Map_T_Resource_1 storage;
 		
+		public StateCompact compact;
+		
 		public Storage_P_AtRes() {
 			storage = new Map_T_Resource_1(T_Resource.getCount());
 		}
@@ -183,13 +213,21 @@ public final class P_AtRes extends Predicate {
 				map_t_location_2 = new Map_T_Location_2(T_Location.getCount());
 				storage.put(r, map_t_location_2);
 			}			
-			return map_t_location_2.put(l, true);
+			if (map_t_location_2.put(l, true)) {
+				compact.set(P_AtRes.toInt(r, l));
+				return true;
+			}
+			return false;
 		}
 		
 		public boolean clear(T_Resource r, T_Location l) {
 			Map_T_Location_2 map_t_location_2 = storage.get(r);
 			if (map_t_location_2 == null) return false;
-			return map_t_location_2.remove(l) != null;
+			if (map_t_location_2.remove(l) != null) {
+				compact.clear(P_AtRes.toInt(r, l));
+				return true;
+			}
+			return false;
 		}
 	 
 		@Override
@@ -237,6 +275,20 @@ public final class P_AtRes extends Predicate {
 				
 			});			
 		}
+		
+		/**
+		 * Warning, this does not affect dynamic StateCompact of the state!
+		 */
+		public void clearAll() {
+			storage.forEachEntry(new ForEachEntry<Map_T_Location_2>() {
+				@Override
+				public boolean entry(final int key, final Map_T_Location_2 data) {
+					data.clear();
+					return true;
+				}
+				
+			});	
+		}	
 				
 	}
 	

@@ -13,12 +13,15 @@ import cz.cuni.mff.jpddl.IStorage;
 import cz.cuni.mff.jpddl.store.FastIntMap;
 import cz.cuni.mff.jpddl.store.FastIntMap.ForEachEntry;
 import cz.cuni.mff.jpddl.store.Pool;
+import cz.cuni.mff.jpddl.utils.StateCompact;
 
 /**
  * PREDICATE
  * (at ?v - vehicle ?l - location)
  */
 public final class P_At extends Predicate {
+	
+	public static final int FLAG_TYPE = 2;
 	
 	public T_Vehicle v;
 	public T_Location l;
@@ -70,8 +73,32 @@ public final class P_At extends Predicate {
 	}
 	
 	@Override
+	public boolean isStatic() {
+		return false;
+	}
+	
+	@Override
 	public String toPredicate() {
 		return "(at " + v.name + " " + l.name + ")";
+	}
+	
+	@Override
+	public int toInteger() {
+		return toInt(v, l);
+	}
+	
+	public static int toInt(T_Vehicle v, T_Location l) {
+		return   (T_Vehicle.getIndex(v) << (T_Location.bitCount + Predicate.MASK_TYPE_BIT_COUNT))
+			   | (T_Location.getIndex(l) << (Predicate.MASK_TYPE_BIT_COUNT))
+			   | FLAG_TYPE;
+	}
+	
+	public static T_Vehicle fromInt_v(int predicate) {
+		return E_Vehicle.THIS.getElement( (predicate >> (T_Location.bitCount + Predicate.MASK_TYPE_BIT_COUNT)) & T_Vehicle.bitMask );
+	}
+	
+	public static T_Location fromInt_l(int predicate) {
+		return E_Location.THIS.getElement( (predicate >> (Predicate.MASK_TYPE_BIT_COUNT)) & T_Location.bitMask );
 	}
 	
 	// =======
@@ -150,6 +177,8 @@ public final class P_At extends Predicate {
 		
 		private final Map_T_Vehicle_1 storage;
 		
+		public StateCompact compact;
+		
 		public Storage_P_At() {
 			storage = new Map_T_Vehicle_1(T_Vehicle.getCount());
 		}
@@ -191,7 +220,11 @@ public final class P_At extends Predicate {
 				map_t_location_2 = new Map_T_Location_2(T_Location.getCount());
 				storage.put(v, map_t_location_2);
 			}			
-			return map_t_location_2.put(l, true);
+			if (map_t_location_2.put(l, true)) {
+				compact.set(P_At.toInt(v, l));
+				return true;
+			}
+			return false;
 		}
 		
 		/**
@@ -203,7 +236,11 @@ public final class P_At extends Predicate {
 		public boolean clear(T_Vehicle v, T_Location l) {
 			Map_T_Location_2 map_t_location_2 = storage.get(v);
 			if (map_t_location_2 == null) return false;
-			return map_t_location_2.remove(l) != null;
+			if (map_t_location_2.remove(l) != null) {
+				compact.clear(P_At.toInt(v, l));
+				return true;
+			}
+			return false;
 		}
 	 
 		
@@ -253,6 +290,19 @@ public final class P_At extends Predicate {
 			});			
 		}
 		
+		/**
+		 * Warning, this does not affect dynamic StateCompact of the state!
+		 */
+		public void clearAll() {
+			storage.forEachEntry(new ForEachEntry<Map_T_Location_2>() {
+				@Override
+				public boolean entry(final int key, final Map_T_Location_2 data) {
+					data.clear();
+					return true;
+				}
+				
+			});	
+		}		
 		
 	}
 	

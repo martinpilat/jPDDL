@@ -30,6 +30,8 @@ import cz.cuni.mff.auv.domain.predicates.P_Sampled.Storage_P_Sampled;
 import cz.cuni.mff.jpddl.IStorage;
 import cz.cuni.mff.jpddl.PDDLPredicate;
 import cz.cuni.mff.jpddl.PDDLState;
+import cz.cuni.mff.jpddl.utils.StateCompact;
+import gnu.trove.procedure.TIntProcedure;
 
 public class State extends PDDLState {
 	
@@ -46,6 +48,8 @@ public class State extends PDDLState {
 	public Storage_P_Outside p_Outside;
 	public Storage_P_Sampled p_Sampled;
 	
+	public StateCompact compact;
+	
 	private Map<Class, IStorage> predicate2storage;
 	
 	public State() {
@@ -54,18 +58,26 @@ public class State extends PDDLState {
 	
 	protected State(boolean init) {
 		if (init) {
+			compact = new StateCompact();
 			p_ActTurn = new Storage_P_ActTurn();
 			p_At = new Storage_P_At();
+			p_At.compact = compact;
 			p_AtRes = new Storage_P_AtRes();
+			p_AtRes.compact = compact;
 			p_Connected = new Storage_P_Connected();
 			p_ConnectedShip = new Storage_P_ConnectedShip();
 			p_DupFree = new Storage_P_DupFree();
+			p_DupFree.compact = compact;
 			p_Entry = new Storage_P_Entry();
 			p_Exit = new Storage_P_Exit();
 			p_Free = new Storage_P_Free();
+			p_Free.compact = compact;
 			p_Operational = new Storage_P_Operational();
+			p_Operational.compact = compact;
 			p_Outside = new Storage_P_Outside();
+			p_Outside.compact = compact;
 			p_Sampled = new Storage_P_Sampled();
+			p_Sampled.compact = compact;
 		}
 	}
 	
@@ -102,18 +114,26 @@ public class State extends PDDLState {
 	@Override
 	public State clone() {
 		State result = new State(false);
-		result.p_ActTurn = p_ActTurn.clone();
+		result.compact = compact.clone();
+		result.p_ActTurn = p_ActTurn;
 		result.p_At = p_At.clone();
+		result.p_At.compact = result.compact;
 		result.p_AtRes = p_AtRes.clone();
-		result.p_Connected = p_Connected.clone();
-		result.p_ConnectedShip = p_ConnectedShip.clone();
+		result.p_AtRes.compact = result.compact;
+		result.p_Connected = p_Connected;
+		result.p_ConnectedShip = p_ConnectedShip;
 		result.p_DupFree = p_DupFree.clone();
-		result.p_Entry = p_Entry.clone();
-		result.p_Exit = p_Exit.clone();
-		result.p_Free = p_Free.clone();
+		result.p_DupFree.compact = result.compact;
+		result.p_Entry = p_Entry;
+		result.p_Exit = p_Exit;
+		result.p_Free = p_Free;
+		result.p_Free.compact = result.compact;
 		result.p_Operational = p_Operational.clone();
+		result.p_Operational.compact = result.compact;
 		result.p_Outside = p_Outside.clone();
+		result.p_Outside.compact = result.compact;
 		result.p_Sampled = p_Sampled.clone();
+		result.p_Sampled.compact = result.compact;
 		return result;
 	}
 	
@@ -125,15 +145,15 @@ public class State extends PDDLState {
 	}
 
 	@Override
-	public void dump(boolean includeEmpty, int maxLineLength) {
-		dumpStorage(p_ActTurn, includeEmpty, maxLineLength);
+	public void dump(boolean includeStatic, boolean includeEmpty, int maxLineLength) {
+		if (includeStatic) dumpStorage(p_ActTurn, includeEmpty, maxLineLength);
 		dumpStorage(p_At, includeEmpty, maxLineLength);
 		dumpStorage(p_AtRes, includeEmpty, maxLineLength);
-		dumpStorage(p_Connected, includeEmpty, maxLineLength);
-		dumpStorage(p_ConnectedShip, includeEmpty, maxLineLength);
+		if (includeStatic) dumpStorage(p_Connected, includeEmpty, maxLineLength);
+		if (includeStatic) dumpStorage(p_ConnectedShip, includeEmpty, maxLineLength);
 		dumpStorage(p_DupFree, includeEmpty, maxLineLength);
-		dumpStorage(p_Entry, includeEmpty, maxLineLength);
-		dumpStorage(p_Exit, includeEmpty, maxLineLength);
+		if (includeStatic) dumpStorage(p_Entry, includeEmpty, maxLineLength);
+		if (includeStatic) dumpStorage(p_Exit, includeEmpty, maxLineLength);
 		dumpStorage(p_Free, includeEmpty, maxLineLength);
 		dumpStorage(p_Operational, includeEmpty, maxLineLength);
 		dumpStorage(p_Outside, includeEmpty, maxLineLength);
@@ -153,5 +173,128 @@ public class State extends PDDLState {
 			80
 		);
 	}
+	
+	// =====================
+	// SETTING COMPACT STATE
+	// =====================
+	
+	@Override
+	public StateCompact getDynamic() {
+		return compact;
+	}
+	
+	@Override
+	public void setDynamic(StateCompact compact) {
+		// CLEAR DYNAMIC PART OF THE STATE
+		p_At.clearAll();
+		p_AtRes.clearAll();
+		p_DupFree.clearAll();
+		p_Free.clearAll();
+		p_Operational.clearAll();
+		p_Outside.clearAll();
+		p_Sampled.clearAll();
+		this.compact.reset();
+		
+		// ADD DYNAMIC STATE FROM compact
+		compact.forEach(forEachPredicateAdd); // this automatically affects this.compact as well!
+	}
+	
+	
+	private TIntProcedure forEachPredicateAdd = new TIntProcedure() {
+
+		@Override
+		public boolean execute(int predicate) {
+			int predicateType = predicate & Predicate.MASK_TYPE;
+			predicateConvertors[predicateType].execute(predicate);
+			return true;
+		}
+		
+	};
+	
+	private TIntProcedure addAt = new TIntProcedure() {
+
+		@Override
+		public boolean execute(int predicate) {
+			p_At.set(P_At.fromInt_v(predicate), P_At.fromInt_l(predicate));
+			return true;
+		}
+		
+	};
+	
+	private TIntProcedure addAtRes = new TIntProcedure() {
+
+		@Override
+		public boolean execute(int predicate) {
+			p_AtRes.set(P_AtRes.fromInt_r(predicate), P_At.fromInt_l(predicate));
+			return true;
+		}
+		
+	};
+	
+	private TIntProcedure addDupFree = new TIntProcedure() {
+
+		@Override
+		public boolean execute(int predicate) {
+			p_DupFree.set(P_DupFree.fromInt_l(predicate));
+			return true;
+		}
+		
+	};
+	
+	private TIntProcedure addFree = new TIntProcedure() {
+
+		@Override
+		public boolean execute(int predicate) {
+			p_Free.set(P_Free.fromInt_l(predicate));
+			return true;
+		}
+		
+	};
+	
+	private TIntProcedure addOperational = new TIntProcedure() {
+
+		@Override
+		public boolean execute(int predicate) {
+			p_Operational.set(P_Operational.fromInt_a(predicate));
+			return true;
+		}
+		
+	};
+	
+	private TIntProcedure addOutside = new TIntProcedure() {
+
+		@Override
+		public boolean execute(int predicate) {
+			p_Outside.set(P_Outside.fromInt_s(predicate));
+			return true;
+		}
+		
+	};
+	
+	private TIntProcedure addSampled = new TIntProcedure() {
+
+		@Override
+		public boolean execute(int predicate) {
+			p_Sampled.set(P_Sampled.fromInt_r(predicate));
+			return true;
+		}
+		
+	};
+	
+	private TIntProcedure[] predicateConvertors = new TIntProcedure[] {
+			null,
+			null,
+			addAt,
+			addAtRes,
+			null,
+			null,
+			addDupFree,
+			null,
+			null,
+			addFree,
+			addOperational,
+			addOutside,
+			addSampled			
+	};	
 	
 }

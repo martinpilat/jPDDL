@@ -9,6 +9,7 @@ import cz.cuni.mff.jpddl.IStorage;
 import cz.cuni.mff.jpddl.store.FastIntMap;
 import cz.cuni.mff.jpddl.store.FastIntMap.ForEachEntry;
 import cz.cuni.mff.jpddl.store.Pool;
+import cz.cuni.mff.jpddl.utils.StateCompact;
 
 /**
  * PREDICATE
@@ -16,6 +17,8 @@ import cz.cuni.mff.jpddl.store.Pool;
  */
 public class P_Free extends Predicate {
 
+	public static final int FLAG_TYPE = 9;
+	
 	public T_Location l;
 	
 	public P_Free() {
@@ -59,8 +62,27 @@ public class P_Free extends Predicate {
 	}
 	
 	@Override
+	public boolean isStatic() {
+		return false;
+	}
+	
+	@Override
 	public String toPredicate() {
 		return "(free " + l.name + ")";
+	}
+	
+	@Override
+	public int toInteger() {
+		return toInt(l);
+	}
+	
+	public static int toInt(T_Location l) {
+		return    (T_Location.getIndex(l) << (Predicate.MASK_TYPE_BIT_COUNT))
+			    | FLAG_TYPE;
+	}
+	
+	public static T_Location fromInt_l(int predicate) {
+		return E_Location.THIS.getElement( (predicate >> (Predicate.MASK_TYPE_BIT_COUNT)) & T_Location.bitMask );
 	}
 	
 	// =======
@@ -105,6 +127,8 @@ public class P_Free extends Predicate {
 		
 		private final Map_T_Location_1 storage;
 		
+		public StateCompact compact;
+		
 		public Storage_P_Free() {
 			storage = new Map_T_Location_1(T_Location.getCount());
 		}
@@ -133,13 +157,20 @@ public class P_Free extends Predicate {
 		}
 		
 		public boolean set(T_Location l) {
-			return storage.put(l, true);
+			if (storage.put(l, true)) {
+				compact.set(P_Free.toInt(l));
+				return true;
+			}
+			return false;
 		}
 		
 		public boolean clear(T_Location l) {
-			return storage.remove(l);
-		}
-	 
+			if (storage.remove(l) != null) {
+				compact.clear(P_Free.toInt(l));
+				return true;
+			}
+			return false;
+		}	 
 		
 		@Override
 		public boolean isSet(P_Free p) {
@@ -177,6 +208,13 @@ public class P_Free extends Predicate {
 				}						
 			});			
 		}
+		
+		/**
+		 * Warning, this does not affect dynamic StateCompact of the state!
+		 */
+		public void clearAll() {
+			storage.clear();	
+		}	
 		
 	}
 	

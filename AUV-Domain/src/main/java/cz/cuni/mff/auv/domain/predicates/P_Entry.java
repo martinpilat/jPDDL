@@ -4,8 +4,10 @@ import java.util.Collection;
 
 import cz.cuni.mff.auv.domain.Predicate;
 import cz.cuni.mff.auv.domain.types.T_Location;
+import cz.cuni.mff.auv.domain.types.T_Resource;
 import cz.cuni.mff.auv.domain.types.T_Ship;
 import cz.cuni.mff.auv.problem.E_Location;
+import cz.cuni.mff.auv.problem.E_Resource;
 import cz.cuni.mff.auv.problem.E_Ship;
 import cz.cuni.mff.jpddl.IStorage;
 import cz.cuni.mff.jpddl.store.FastIntMap;
@@ -17,6 +19,8 @@ import cz.cuni.mff.jpddl.store.Pool;
  * (entry ?s - ship ?l - location)
  */
 public final class P_Entry extends Predicate {
+	
+	public static final int FLAG_TYPE = 7;
 	
 	public T_Ship s;
 	public T_Location l;
@@ -67,8 +71,32 @@ public final class P_Entry extends Predicate {
 	}
 	
 	@Override
+	public boolean isStatic() {
+		return true;
+	}
+	
+	@Override
 	public String toPredicate() {
 		return "(entry " + s.name + " " + l.name + ")";
+	}
+	
+	@Override
+	public int toInteger() {
+		return toInt(s, l);
+	}
+	
+	public static int toInt(T_Ship s, T_Location l) {
+		return   (T_Ship.getIndex(s) << (T_Location.bitCount + Predicate.MASK_TYPE_BIT_COUNT))
+			   | (T_Location.getIndex(l) << (Predicate.MASK_TYPE_BIT_COUNT))
+			   | FLAG_TYPE;
+	}
+	
+	public static T_Ship fromInt_s(int predicate) {
+		return E_Ship.THIS.getElement( (predicate >> (T_Location.bitCount + Predicate.MASK_TYPE_BIT_COUNT)) & T_Ship.bitMask );
+	}
+	
+	public static T_Location fromInt_l(int predicate) {
+		return E_Location.THIS.getElement( (predicate >> (Predicate.MASK_TYPE_BIT_COUNT)) & T_Location.bitMask );
 	}
 	
 	// =======
@@ -237,6 +265,19 @@ public final class P_Entry extends Predicate {
 				
 			});			
 		}
+		
+		/**
+		 * Warning, this does not affect dynamic StateCompact of the state!
+		 */
+		public void clearAll() {
+			storage.forEachEntry(new ForEachEntry<Map_T_Location_2>() {
+				@Override
+				public boolean entry(final int key, final Map_T_Location_2 data) {
+					data.clear();
+					return true;
+				}				
+			});	
+		}	
 		
 	}
 	

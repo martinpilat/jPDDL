@@ -68,13 +68,7 @@ public class PlanTesterDFS {
 		} else {
 			result.valid = false;
 		}
-		
-		// ROLLBACK STATE
-		for (int j = result.lastExecutableEffectorIndex; j >= 0; --j) {			
-			if (result.events[j] != null) result.events[j].reverse(state);
-			plan[j].reverse(state);			
-		}		
-
+				
 		// RETURN RESULT
 		return result;
 		
@@ -114,7 +108,13 @@ public class PlanTesterDFS {
 				// WE HAVE FOUND UNFORTUNATE SEQUENCE OF EVENTS
 				if (result.lastSafeStateIndex < 0 && isSafeState) {
 					result.lastSafeStateIndex = index;					
-				}					
+				}	
+				
+				// REVERT EVENT
+				event.reverse(state);
+				// REVERT ACTION
+				plan[index].reverse(state);
+				
 				return false;
 			}
 			
@@ -133,8 +133,15 @@ public class PlanTesterDFS {
 			if (result.lastSafeStateIndex < 0 && isSafeState) {
 				result.lastSafeStateIndex = index;					
 			}				
+			
+			// REVERT ACTION
+			plan[index].reverse(state);
+			
 			return false;
 		}
+		
+		// REVERT ACTION
+		plan[index].reverse(state);
 		
 		return true;		
 	}

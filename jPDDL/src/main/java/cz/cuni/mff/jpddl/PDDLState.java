@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import cz.cuni.mff.jpddl.store.ICloneable;
+import cz.cuni.mff.jpddl.utils.StateCompact;
 
 /**
  * State of the domain; to be subclassed and filled by respective domains.
@@ -17,12 +18,24 @@ public abstract class PDDLState implements ICloneable {
 	public abstract PDDLState clone();	
 	
 	public void dump() {
-		dump(false, 80);
+		dump(false);
+	}
+	
+	public void dump(boolean includeStatic) {
+		dump(includeStatic, false, 80);
 	}
 	
 	public abstract boolean isSet(PDDLPredicate predicate);
 	
-	public abstract void dump(boolean includeEmpty, int maxLineLength);
+	public abstract void setDynamic(StateCompact dynamicPartOfTheState);
+	
+	/**
+	 * NOT A CLONE, if you want to persist the state, you have to  {@link StateCompact#clone()} it!
+	 * @return
+	 */
+	public abstract StateCompact getDynamic();
+	
+	public abstract void dump(boolean includeStatic, boolean includeEmpty, int maxLineLength);
 	
 	public static <T extends PDDLPredicate> void dumpStorage(IStorage<T> storage, boolean includeEmpty, int maxLineLength) {
 		List<T> predicates = new ArrayList<T>();

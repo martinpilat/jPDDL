@@ -50,7 +50,7 @@ public final class Ev_MoveShipAuv extends Event {
 
 	@Override
 	public String toString() {
-		return "Ev_MoveShipFree[s - ship = " + s + ", l1 - location = " + l1 + ", l2 - location = " + l1 + ", a - auv = " + a + "]";
+		return "Ev_MoveShipAuv[s - ship = " + s + ", l1 - location = " + l1 + ", l2 - location = " + l1 + ", a - auv = " + a + "]";
 	}
 	
 	@Override

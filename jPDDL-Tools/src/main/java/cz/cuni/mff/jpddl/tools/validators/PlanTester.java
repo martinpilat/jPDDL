@@ -62,10 +62,8 @@ public class PlanTester {
 		result.lastSafeStateIndex = -1;
 		
 		for (int i = 0; i < plan.length; ++i) {
-			if (safeStates != null && result.lastSafeStateIndex < 0) {
-				if (safeStates.isSafe(state)) {
-					result.lastSafeStateIndex = i;
-				}
+			if (safeStates != null && safeStates.isSafe(state)) {
+				result.lastSafeStateIndex = i;
 			}
 			
 			if (plan[i].isApplicable(state)) {
@@ -88,12 +86,6 @@ public class PlanTester {
 				break;
 			}
 		}
-		
-		if (safeStates != null && result.lastSafeStateIndex < 0) {
-			if (safeStates.isSafe(state)) {
-				result.lastSafeStateIndex = result.lastExecutableEffectorIndex+1;
-			}
-		}	
 		
 		// CHECK GOAL
 		if (!goal.isAchieved(state)) {

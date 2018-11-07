@@ -112,6 +112,12 @@ public class FastIntMap<DATA> implements Cloneable {
 		return removed;
 	}
 	
+	public void clear() {
+		Arrays.fill(indices, -1);
+		Arrays.fill(keys, -1);
+		list.clear();
+	}
+	
 	public boolean containsKey(int key) {
 		return indices[key] >= 0;
 	}
