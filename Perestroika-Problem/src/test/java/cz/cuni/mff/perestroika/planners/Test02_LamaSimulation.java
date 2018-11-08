@@ -62,7 +62,7 @@ public class Test02_LamaSimulation {
 			
 			// PLAN
 			System.out.println("  +-- Planning...");
-			File problemFile = new File("auv-problem.pddl");
+			File problemFile = new File("perestroika-problem.pddl");
 			problem.createProblemFile(problemFile, problem.getState());
 			List<PDDLStringInstance> lamaPlan = lama.plan(domainFile, problemFile);
 			problemFile.delete();
