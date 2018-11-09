@@ -55,39 +55,44 @@ public class Test02_LamaSimulation {
 			iteration++;
 			System.out.println("ITERATION " + iteration);
 			
+			if (!problem.getState().p_Alive.isSet()) {
+				System.out.println("  +-- AGENT IS DEAD !!!");
+				break;
+			}
+			
 			// PLAN
 			System.out.println("  +-- Planning...");
-			File problemFile = new File("auv-problem.pddl");
+			File problemFile = new File("perestroika-problem.pddl");
 			problem.createProblemFile(problemFile, problem.getState());
 			List<PDDLStringInstance> lamaPlan = lama.plan(domainFile, problemFile);
 			problemFile.delete();
 			if (lamaPlan == null) {
 				System.out.println("  +-- LAMA FAILED TO FIND THE PLAN!");
-				return false;
 			}
 			
 			// TRANSLATE PLAN
-			Effector[] plan = Effector.toEffectors(lamaPlan.toArray(new PDDLStringInstance[0]));			
+			Effector[] plan = Effector.toEffectors(lamaPlan == null ? new PDDLStringInstance[0] : lamaPlan.toArray(new PDDLStringInstance[0]));			
 			System.out.println("  +-- Plan has " + plan.length + " steps");
-			
-			System.out.println("  +-- Checking with lookahead " + LOOKAHEAD + "...");
-					
+								
 			int toExecuteActions = 0;
 			
-			PlanTesterBFSResult planTesterBFSResult = planTesterBFS.check(problem.getGoal(), problem.getState(), safeStates, LOOKAHEAD, plan);
-			if (planTesterBFSResult.valid) {
-				if (planTesterBFSResult.bfsLimit > plan.length) {
-					System.out.println("  +-- Plan cannot be interrupted, simulating it all...");
-					toExecuteActions = plan.length;
+			if (plan.length > 0) {
+				System.out.println("  +-- Checking with lookahead " + LOOKAHEAD + "...");			
+				PlanTesterBFSResult planTesterBFSResult = planTesterBFS.check(problem.getGoal(), problem.getState(), safeStates, LOOKAHEAD, plan);
+				if (planTesterBFSResult.valid) {
+					if (planTesterBFSResult.bfsLimit > plan.length) {
+						System.out.println("  +-- Plan cannot be interrupted, simulating it all...");
+						toExecuteActions = plan.length;
+					} else {
+						System.out.println("  +-- Plan cannot be interrupted in " + LOOKAHEAD + " steps");
+						toExecuteActions = planTesterBFSResult.lastSafeStateIndex;
+						System.out.println("  +-- The furthest safe state is in " + toExecuteActions + " actions");
+					}
 				} else {
-					System.out.println("  +-- Plan cannot be interrupted in " + LOOKAHEAD + " steps");
+					System.out.println("  +-- Plan can be interrupted by events");
 					toExecuteActions = planTesterBFSResult.lastSafeStateIndex;
 					System.out.println("  +-- The furthest safe state is in " + toExecuteActions + " actions");
 				}
-			} else {
-				System.out.println("  +-- Plan can be interrupted by events");
-				toExecuteActions = planTesterBFSResult.lastSafeStateIndex;
-				System.out.println("  +-- The furthest safe state is in " + toExecuteActions + " actions");
 			}
 			
 			if (toExecuteActions > 0) {
@@ -110,7 +115,11 @@ public class Test02_LamaSimulation {
 			}			
 		}
 		
-		System.out.println("GOAL ACHIEVED");
+		if (problem.getGoal().isAchieved(problem.state)) {
+			System.out.println("GOAL ACHIEVED");
+		} else {
+			System.out.println("AGENT DIED");
+		}
 		System.out.println("  +-- iterations " + iteration);
 		System.out.println("  +-- total actions " + action);
 		
