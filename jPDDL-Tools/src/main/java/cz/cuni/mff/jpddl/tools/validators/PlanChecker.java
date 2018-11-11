@@ -2,6 +2,7 @@ package cz.cuni.mff.jpddl.tools.validators;
 
 import cz.cuni.mff.jpddl.PDDLDomain;
 import cz.cuni.mff.jpddl.PDDLEffector;
+import cz.cuni.mff.jpddl.PDDLGoal;
 import cz.cuni.mff.jpddl.PDDLState;
 
 public class PlanChecker {
@@ -23,7 +24,7 @@ public class PlanChecker {
 		this.domain = domain;
 	}
 	
-	public PlanCheckerResult check(PDDLState state, PDDLEffector... plan) {
+	public PlanCheckerResult check(PDDLGoal goal, PDDLState state, PDDLEffector... plan) {
 		PlanCheckerResult result = new PlanCheckerResult();
 		
 		result.valid = true;
@@ -41,6 +42,11 @@ public class PlanChecker {
 			}
 		}
 		
+		// CHECK GOAL
+		if (!goal.isAchieved(state)) {
+			result.valid = false;
+		}
+ 		
 		// ROLLBACK STATE
 		for (int j = result.lastExecutableEffectorIndex; j >= 0; --j) {
 			plan[j].reverse(state);

@@ -2,6 +2,10 @@ package cz.cuni.mff.auv.domain.types;
 
 public class T_Auv extends T_Vehicle {
 	
+	public static int count = 0;
+	public static int bitCount = 0;
+	public static int bitMask = 0;
+	
 	public static int lastPos = 0;
 	public static int lastCount = 0;
 	public static long lastFlag = 0;
@@ -12,6 +16,13 @@ public class T_Auv extends T_Vehicle {
 	
 	public T_Auv(String name) {
 		super(name);
+		
+		++count;
+		while (count > Math.pow(bitCount, 2)) {
+			bitCount += 1;
+			bitMask <<= 1;
+			bitMask |= 1;
+		}
 		
 		if (lastCount == 0) {
 			pos = 0;

@@ -74,15 +74,22 @@ public class FastIntMap<DATA> implements Cloneable {
 		result.keys = Arrays.copyOf(keys, keys.length);
 	}
 	
-	public void put(int key, DATA data) {
+	/**
+	 * @param key
+	 * @param data
+	 * @return whether the container has changed, i.e., whether we have inserted the 'data' under the new key, i.e., no 'data' has been previously associated with 'key'
+	 */
+	public boolean put(int key, DATA data) {
 		if (indices[key] >= 0) {
 			// we already stores data under this key
 			list.set(indices[key], data);
-			return;
+			return false;
 		}
 		
 		indices[key] = list.add(data);
 		keys[indices[key]] = key;
+		
+		return true;
 	}
 	
 	public DATA get(int key) {
@@ -91,6 +98,10 @@ public class FastIntMap<DATA> implements Cloneable {
 		return list.get(indices[key]);
 	}
 	
+	/**
+	 * @param key
+	 * @return the data that was previously associated with the 'key'
+	 */
 	public DATA remove(int key) {
 		if (indices[key] < 0) return null;
 		
@@ -99,6 +110,12 @@ public class FastIntMap<DATA> implements Cloneable {
 		indices[key] = -1;
 		
 		return removed;
+	}
+	
+	public void clear() {
+		Arrays.fill(indices, -1);
+		Arrays.fill(keys, -1);
+		list.clear();
 	}
 	
 	public boolean containsKey(int key) {

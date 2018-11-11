@@ -12,6 +12,12 @@ public abstract class PDDLPredicate implements Comparable<PDDLPredicate> {
 	public abstract String getName();
 	
 	/**
+	 * True for predicates that can be changed neither by an action nor event.
+	 * @return
+	 */
+	public abstract boolean isStatic();
+	
+	/**
 	 * Returns new instance of this predicate.
 	 * @return
 	 */
@@ -28,6 +34,12 @@ public abstract class PDDLPredicate implements Comparable<PDDLPredicate> {
 	 * @return
 	 */
 	public abstract String toPredicate();
+	
+	/**
+	 * Computes unique integer predicate representation. 
+	 * @return
+	 */
+	public abstract int toInteger();
 	
 	@Override
 	public int compareTo(PDDLPredicate o) {

@@ -4,6 +4,10 @@ import cz.cuni.mff.jpddl.PDDLType;
 
 public class T_Object extends PDDLType {
 	
+	public static int count = 0;
+	public static int bitCount = 0;
+	public static int bitMask = 0;
+	
 	public static int lastPos = 0;
 	public static int lastCount = 0;
 	public static long lastFlag = 0;
@@ -14,6 +18,13 @@ public class T_Object extends PDDLType {
 	
 	public T_Object(String name) {
 		super(name);
+		
+		++count;
+		while (count > Math.pow(bitCount, 2)) {
+			bitCount += 1;
+			bitMask <<= 1;
+			bitMask |= 1;
+		}
 		
 		if (lastCount == 0) {
 			pos = 0;

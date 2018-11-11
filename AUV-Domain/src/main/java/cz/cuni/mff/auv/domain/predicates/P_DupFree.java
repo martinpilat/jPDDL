@@ -3,12 +3,17 @@ package cz.cuni.mff.auv.domain.predicates;
 import java.util.Collection;
 
 import cz.cuni.mff.auv.domain.Predicate;
+import cz.cuni.mff.auv.domain.predicates.P_ConnectedShip.Map_T_Location_2;
+import cz.cuni.mff.auv.domain.predicates.P_ConnectedShip.Map_T_Location_3;
 import cz.cuni.mff.auv.domain.types.T_Location;
+import cz.cuni.mff.auv.domain.types.T_Ship;
 import cz.cuni.mff.auv.problem.E_Location;
+import cz.cuni.mff.auv.problem.E_Ship;
 import cz.cuni.mff.jpddl.IStorage;
 import cz.cuni.mff.jpddl.store.FastIntMap;
 import cz.cuni.mff.jpddl.store.FastIntMap.ForEachEntry;
 import cz.cuni.mff.jpddl.store.Pool;
+import cz.cuni.mff.jpddl.utils.StateCompact;
 
 /**
  * PREDICATE
@@ -16,6 +21,8 @@ import cz.cuni.mff.jpddl.store.Pool;
  */
 public class P_DupFree extends Predicate {
 
+	public static final int FLAG_TYPE = 6;
+	
 	public T_Location l;
 	
 	public P_DupFree() {
@@ -60,8 +67,27 @@ public class P_DupFree extends Predicate {
 	}
 	
 	@Override
+	public boolean isStatic() {
+		return false;
+	}
+	
+	@Override
 	public String toPredicate() {
 		return "(dup-free " + l.name + ")";
+	}
+	
+	@Override
+	public int toInteger() {
+		return toInt(l);
+	}
+	
+	public static int toInt(T_Location l) {
+		return    (T_Location.getIndex(l) << (Predicate.MASK_TYPE_BIT_COUNT))
+			    | FLAG_TYPE;
+	}
+	
+	public static T_Location fromInt_l(int predicate) {
+		return E_Location.THIS.getElement( (predicate >> (Predicate.MASK_TYPE_BIT_COUNT)) & T_Location.bitMask );
 	}
 	
 	// =======
@@ -92,8 +118,8 @@ public class P_DupFree extends Predicate {
 			return containsKey(T_Location.getIndex(obj));
 		}
 		
-		public void put(T_Location key, Boolean value) {
-			put(T_Location.getIndex(key), value);
+		public boolean put(T_Location key, Boolean value) {
+			return put(T_Location.getIndex(key), value);
 		}
 		
 		public Boolean remove(T_Location key) {
@@ -105,6 +131,8 @@ public class P_DupFree extends Predicate {
 	public static final class Storage_P_DupFree implements IStorage<P_DupFree> {
 		
 		private final Map_T_Location_1 storage;
+		
+		public StateCompact compact;
 		
 		public Storage_P_DupFree() {
 			storage = new Map_T_Location_1(T_Location.getCount());
@@ -133,12 +161,20 @@ public class P_DupFree extends Predicate {
 			return storage.containsKey(l);
 		}
 		
-		public void set(T_Location l) {
-			storage.put(l, true);
+		public boolean set(T_Location l) {
+			if (storage.put(l, true)) {
+				compact.set(P_DupFree.toInt(l));
+				return true;
+			}
+			return false;
 		}
 		
-		public void clear(T_Location l) {
-			storage.remove(l);
+		public boolean clear(T_Location l) {
+			if (storage.remove(l) != null) {
+				compact.clear(P_DupFree.toInt(l));
+				return true;
+			}
+			return false;
 		}
 		
 		@Override
@@ -147,13 +183,13 @@ public class P_DupFree extends Predicate {
 		}
 
 		@Override
-		public void set(P_DupFree p) {
-			set(p.l);
+		public boolean set(P_DupFree p) {
+			return set(p.l);
 		}
 
 		@Override
-		public void clear(P_DupFree p) {
-			clear(p.l);
+		public boolean clear(P_DupFree p) {
+			return clear(p.l);
 		}
 		
 		@Override
@@ -177,6 +213,13 @@ public class P_DupFree extends Predicate {
 				}						
 			});			
 		}
+		
+		/**
+		 * Warning, this does not affect dynamic StateCompact of the state!
+		 */
+		public void clearAll() {
+			storage.clear();	
+		}	
 		
 	}
 	

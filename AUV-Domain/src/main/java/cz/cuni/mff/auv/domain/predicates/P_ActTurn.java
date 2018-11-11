@@ -13,6 +13,8 @@ import cz.cuni.mff.jpddl.store.Single;
  */
 public final class P_ActTurn extends Predicate {
 
+	public static final int FLAG_TYPE = 1;
+	
 	public P_ActTurn() {		
 	}
 	
@@ -46,8 +48,22 @@ public final class P_ActTurn extends Predicate {
 	}
 	
 	@Override
+	public boolean isStatic() {
+		return true;
+	}
+	
+	@Override
 	public String toPredicate() {
 		return "(act-turn)";
+	}
+	
+	@Override
+	public int toInteger() {
+		return toInt();
+	}
+	
+	public static int toInt() {
+		return FLAG_TYPE;
 	}
 	
 	// =======
@@ -81,6 +97,13 @@ public final class P_ActTurn extends Predicate {
 		@Override
 		public FastIntMap internal() {
 			throw new RuntimeException("Not applicable!");
+		}
+		
+		/**
+		 * Warning, this does not affect dynamic StateCompact of the parent state!
+		 */
+		public void clearAll() {
+			clear();
 		}
 		
 	}

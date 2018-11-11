@@ -1,0 +1,6 @@
+(move l-1-1 l-1-2)
+(events )
+(move l-1-2 l-1-3)
+(events )
+(collect r1 l-1-3)
+; cost = 5 (unit cost)

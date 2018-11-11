@@ -32,6 +32,8 @@ public final class Ev_EnterShipAuv extends Event {
 	public T_Location l;
 	public T_Auv a;
 	
+	public boolean[] applied = new boolean[] { false, false, false, false, false };
+	
 	public Ev_EnterShipAuv() {
 	}
 	
@@ -173,19 +175,19 @@ public final class Ev_EnterShipAuv extends Event {
 	 */
 	@Override
 	public void apply(State state) {
-		state.p_At.set(s, l);
-		state.p_Free.clear(l);
-		state.p_DupFree.clear(l);
-		state.p_Outside.clear(s);
-		state.p_Operational.clear(a);
+		applied[0] = state.p_At.set(s, l);
+		applied[1] = state.p_Free.clear(l);
+		applied[2] = state.p_DupFree.clear(l);
+		applied[3] = state.p_Outside.clear(s);
+		applied[4] = state.p_Operational.clear(a);
 	}
 	
 	public void reverse(State state) {
-		state.p_At.clear(s, l);
-		state.p_Free.set(l);
-		state.p_DupFree.set(l);
-		state.p_Outside.set(s);
-		state.p_Operational.set(a);
+		if (applied[0]) state.p_At.clear(s, l);
+		if (applied[1]) state.p_Free.set(l);
+		if (applied[2]) state.p_DupFree.set(l);
+		if (applied[3]) state.p_Outside.set(s);
+		if (applied[4]) state.p_Operational.set(a);
 	}
 	
 	// ===================================================

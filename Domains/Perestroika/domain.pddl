@@ -1,0 +1,98 @@
+(define (domain Perestroika)
+(:requirements :typing :equality)
+(:types location resource - object
+        
+)
+
+(:predicates (accessible ?l - location)
+             (act-round)             
+             (alive)
+             (at-agent ?l - location)
+             (at-res ?r - resource ?l - location)
+             (big ?l - location)
+             (connected ?l1 ?l2 - location)
+             (dead)
+           ; (dup-accessible ?l - location)
+             (medium ?l - location)
+             (none ?l - location) 
+             (small ?l - location)
+             (solid ?l - location)
+             (taken ?r - resource)
+)
+
+(:action collect
+:parameters (?r - resource ?l - location)
+:precondition (and (alive)
+                   (at-agent ?l)
+                   (at-res ?r ?l)                   
+              )
+:effect (and (taken ?r)
+        )
+)
+
+(:action move
+:parameters (?l1 ?l2 - location)
+:precondition (and (alive)
+                   (at-agent ?l1)                   
+                   (connected ?l1 ?l2)
+                   (accessible ?l2)
+                  ;(dup-accessible ?l2)
+              )
+:effect (and (not (at-agent ?l1))
+             (at-agent ?l2)
+        )
+)
+
+(:event shrink-big
+:parameters (?l - location)
+:precondition (and (big ?l)
+              )
+:effect (and (medium ?l)
+             (not (big ?l))
+        )
+)
+
+(:event shrink-medium
+:parameters (?l - location)
+:precondition (and (medium ?l)
+              )
+:effect (and (small ?l)
+             (not (medium ?l))
+        )
+)
+
+(:event shrink-small-empty
+:parameters (?l - location)
+:precondition (and (small ?l)
+                   (not (at-agent ?l))
+              )
+:effect (and (none ?l)
+             (not (small ?l))
+             (not (accessible ?l))
+        )
+)
+
+(:event shrink-small-agent
+:parameters (?l - location)
+:precondition (and (small ?l)
+                   (at-agent ?l)
+              )
+:effect (and (none ?l)
+             (not (small ?l))
+             (not (accessible ?l))
+             (not (alive))
+             (dead)
+        )
+)
+
+(:event create
+:parameters (?l - location)
+:precondition (and (none ?l)
+              )
+:effect (and (big ?l)
+             (not (none ?l))
+             (accessible ?l)
+        )
+)
+
+)

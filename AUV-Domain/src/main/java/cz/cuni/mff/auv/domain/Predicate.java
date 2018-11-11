@@ -19,6 +19,10 @@ import cz.cuni.mff.jpddl.PDDLPredicate;
 import cz.cuni.mff.jpddl.PDDLStringInstance;
 
 public abstract class Predicate extends PDDLPredicate {
+	
+	public static final int MASK_TYPE = 1 + 2 + 4 + 8;
+	
+	public static final int MASK_TYPE_BIT_COUNT = 4;
 
 	public static final Predicate[] ALL = new Predicate[] {
 			new P_ActTurn(), new P_At(), new P_AtRes(), new P_Connected(), 
@@ -53,6 +57,6 @@ public abstract class Predicate extends PDDLPredicate {
 	}
 	
 	@Override
-	public abstract Predicate create();
+	public abstract Predicate create();	
 	
 }

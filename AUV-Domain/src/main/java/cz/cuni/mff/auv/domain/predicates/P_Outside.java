@@ -9,6 +9,7 @@ import cz.cuni.mff.jpddl.IStorage;
 import cz.cuni.mff.jpddl.store.FastIntMap;
 import cz.cuni.mff.jpddl.store.FastIntMap.ForEachEntry;
 import cz.cuni.mff.jpddl.store.Pool;
+import cz.cuni.mff.jpddl.utils.StateCompact;
 
 /**
  * PREDICATE
@@ -16,6 +17,8 @@ import cz.cuni.mff.jpddl.store.Pool;
  */
 public class P_Outside extends Predicate {
 
+	public static final int FLAG_TYPE = 11;
+	
 	public T_Ship s;
 	
 	public P_Outside() {
@@ -60,8 +63,27 @@ public class P_Outside extends Predicate {
 	}
 	
 	@Override
+	public boolean isStatic() {
+		return false;
+	}
+	
+	@Override
 	public String toPredicate() {
 		return "(outside " + s.name + ")";
+	}
+	
+	@Override
+	public int toInteger() {
+		return toInt(s);
+	}
+	
+	public static int toInt(T_Ship s) {
+		return    (T_Ship.getIndex(s) << (Predicate.MASK_TYPE_BIT_COUNT))
+			    | FLAG_TYPE;
+	}
+	
+	public static T_Ship fromInt_s(int predicate) {
+		return E_Ship.THIS.getElement( (predicate >> (Predicate.MASK_TYPE_BIT_COUNT)) & T_Ship.bitMask );
 	}
 	
 	// =======
@@ -92,8 +114,8 @@ public class P_Outside extends Predicate {
 			return containsKey(T_Ship.getIndex(obj));
 		}
 		
-		public void put(T_Ship key, Boolean value) {
-			put(T_Ship.getIndex(key), value);
+		public boolean put(T_Ship key, Boolean value) {
+			return put(T_Ship.getIndex(key), value);
 		}
 		
 		public Boolean remove(T_Ship key) {
@@ -105,6 +127,8 @@ public class P_Outside extends Predicate {
 	public static final class Storage_P_Outside implements IStorage<P_Outside> {
 		
 		private final Map_T_Ship_1 storage;
+		
+		public StateCompact compact;
 		
 		public Storage_P_Outside() {
 			storage = new Map_T_Ship_1(T_Ship.getCount());
@@ -133,14 +157,21 @@ public class P_Outside extends Predicate {
 			return storage.containsKey(s);
 		}
 		
-		public void set(T_Ship s) {
-			storage.put(s, true);
+		public boolean set(T_Ship s) {
+			if (storage.put(s, true)) {
+				compact.set(P_Outside.toInt(s));
+				return true;
+			}
+			return false;
 		}
 		
-		public void clear(T_Ship s) {
-			storage.remove(s);
+		public boolean clear(T_Ship s) {
+			if (storage.remove(s) != null) {
+				compact.clear(P_Outside.toInt(s));
+				return true;
+			}
+			return false;
 		}
-	 
 		
 		@Override
 		public boolean isSet(P_Outside p) {
@@ -148,13 +179,13 @@ public class P_Outside extends Predicate {
 		}
 
 		@Override
-		public void set(P_Outside p) {
-			set(p.s);
+		public boolean set(P_Outside p) {
+			return set(p.s);
 		}
 
 		@Override
-		public void clear(P_Outside p) {
-			clear(p.s);
+		public boolean clear(P_Outside p) {
+			return clear(p.s);
 		}
 		
 		@Override
@@ -178,6 +209,13 @@ public class P_Outside extends Predicate {
 				}						
 			});			
 		}
+		
+		/**
+		 * Warning, this does not affect dynamic StateCompact of the state!
+		 */
+		public void clearAll() {
+			storage.clear();
+		}	
 		
 	}
 	

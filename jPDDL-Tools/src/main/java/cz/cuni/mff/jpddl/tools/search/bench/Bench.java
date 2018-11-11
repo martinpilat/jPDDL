@@ -1,33 +1,24 @@
 package cz.cuni.mff.jpddl.tools.search.bench;
 
-public class Bench {
+public class Bench extends Timed {
 
-	public long startMillis;
-	
 	public int nodesVisited;
 	
-	public long endMillis;
-	
-	public long durationMillis;
-	
 	public void start() {
-		startMillis = System.currentTimeMillis();
-		endMillis = durationMillis = 0;
+		super.start();
 		nodesVisited = 0;
 	}
 	
 	public void end() {
-		endMillis = System.currentTimeMillis();
-		durationMillis = endMillis - startMillis;
+		super.end();
 	}
 	
 	public void report(String headline) {
-		report(headline, "");
+		super.report(headline);
 	}
 	
 	public void report(String headline, String indent) {
-		System.out.println(indent + headline);
-		System.out.println(indent + "  +-- search time:   " + durationMillis + "ms = " + (((double)durationMillis) / 1000.0d) + "s");
+		super.report(headline, indent);
 		System.out.println(indent + "  +-- nodes visited: " + nodesVisited);
 		System.out.println(indent + "  +-- performance:   " + (((double)nodesVisited) / (((double)durationMillis))) + " nodes/ms");
 	}

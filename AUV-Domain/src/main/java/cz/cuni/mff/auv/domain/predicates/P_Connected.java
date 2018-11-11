@@ -3,8 +3,11 @@ package cz.cuni.mff.auv.domain.predicates;
 import java.util.Collection;
 
 import cz.cuni.mff.auv.domain.Predicate;
+import cz.cuni.mff.auv.domain.predicates.P_AtRes.Map_T_Location_2;
 import cz.cuni.mff.auv.domain.types.T_Location;
+import cz.cuni.mff.auv.domain.types.T_Resource;
 import cz.cuni.mff.auv.problem.E_Location;
+import cz.cuni.mff.auv.problem.E_Resource;
 import cz.cuni.mff.jpddl.IStorage;
 import cz.cuni.mff.jpddl.store.FastIntMap;
 import cz.cuni.mff.jpddl.store.FastIntMap.ForEachEntry;
@@ -16,6 +19,8 @@ import cz.cuni.mff.jpddl.store.Pool;
  */
 public class P_Connected extends Predicate {
 
+	public static final int FLAG_TYPE = 4;
+	
 	public T_Location l1;
 	public T_Location l2;
 	
@@ -64,8 +69,32 @@ public class P_Connected extends Predicate {
 	}
 	
 	@Override
+	public boolean isStatic() {
+		return true;
+	}
+	
+	@Override
 	public String toPredicate() {
 		return "(connected " + l1.name + " " + l2.name + ")";
+	}
+	
+	@Override
+	public int toInteger() {
+		return toInt(l1, l2);
+	}
+	
+	public static int toInt(T_Location l1, T_Location l2) {
+		return   (T_Location.getIndex(l1) << (T_Location.bitCount + Predicate.MASK_TYPE_BIT_COUNT))
+			   | (T_Location.getIndex(l2) << (Predicate.MASK_TYPE_BIT_COUNT))
+			   | FLAG_TYPE;
+	}
+	
+	public static T_Location fromInt_l1(int predicate) {
+		return E_Location.THIS.getElement( (predicate >> (T_Location.bitCount + Predicate.MASK_TYPE_BIT_COUNT)) & T_Location.bitMask );
+	}
+	
+	public static T_Location fromInt_l2(int predicate) {
+		return E_Location.THIS.getElement( (predicate >> (Predicate.MASK_TYPE_BIT_COUNT)) & T_Location.bitMask );
 	}
 	
 	// =======
@@ -130,8 +159,8 @@ public class P_Connected extends Predicate {
 			return containsKey(T_Location.getIndex(obj));
 		}
 		
-		public void put(T_Location key, Boolean value) {
-			put(T_Location.getIndex(key), value);
+		public boolean put(T_Location key, Boolean value) {
+			return put(T_Location.getIndex(key), value);
 		}
 		
 		public Boolean remove(T_Location key) {
@@ -173,19 +202,19 @@ public class P_Connected extends Predicate {
 			return map_t_location_2.containsKey(l2);
 		}
 		
-		public void set(T_Location l1, T_Location l2) {
+		public boolean set(T_Location l1, T_Location l2) {
 			Map_T_Location_2 map_t_location_2 = storage.get(l1);
 			if (map_t_location_2 == null) {
 				map_t_location_2 = new Map_T_Location_2(T_Location.getCount());
 				storage.put(l1, map_t_location_2);
 			}			
-			map_t_location_2.put(l2, true);
+			return map_t_location_2.put(l2, true);
 		}
 		
-		public void clear(T_Location l1, T_Location l2) {
+		public boolean clear(T_Location l1, T_Location l2) {
 			Map_T_Location_2 map_t_location_2 = storage.get(l1);
-			if (map_t_location_2 == null) return;
-			map_t_location_2.remove(l2);
+			if (map_t_location_2 == null) return false;
+			return map_t_location_2.remove(l2) != null;
 		}
 	 
 		
@@ -195,13 +224,13 @@ public class P_Connected extends Predicate {
 		}
 
 		@Override
-		public void set(P_Connected p) {
-			set(p.l1, p.l2);
+		public boolean set(P_Connected p) {
+			return set(p.l1, p.l2);
 		}
 
 		@Override
-		public void clear(P_Connected p) {
-			clear(p.l1, p.l2);
+		public boolean clear(P_Connected p) {
+			return clear(p.l1, p.l2);
 		}
 		
 		@Override
@@ -234,6 +263,20 @@ public class P_Connected extends Predicate {
 				
 			});			
 		}
+		
+		/**
+		 * Warning, this does not affect dynamic StateCompact of the state!
+		 */
+		public void clearAll() {
+			storage.forEachEntry(new ForEachEntry<Map_T_Location_2>() {
+				@Override
+				public boolean entry(final int key, final Map_T_Location_2 data) {
+					data.clear();
+					return true;
+				}
+				
+			});	
+		}	
 		
 	}
 	

@@ -31,6 +31,8 @@ public final class Ev_MoveShipAuv extends Event {
 	public T_Location l2;
 	public T_Auv a;
 	
+	public boolean[] applied = new boolean[] { false, false, false, false, false, false, false };
+	
 	public Ev_MoveShipAuv() {
 	}
 	
@@ -48,7 +50,7 @@ public final class Ev_MoveShipAuv extends Event {
 
 	@Override
 	public String toString() {
-		return "Ev_MoveShipFree[s - ship = " + s + ", l1 - location = " + l1 + ", l2 - location = " + l1 + ", a - auv = " + a + "]";
+		return "Ev_MoveShipAuv[s - ship = " + s + ", l1 - location = " + l1 + ", l2 - location = " + l1 + ", a - auv = " + a + "]";
 	}
 	
 	@Override
@@ -172,23 +174,23 @@ public final class Ev_MoveShipAuv extends Event {
 	 */
 	@Override
 	public void apply(State state) {
-		state.p_At.set(s, l2);
-		state.p_At.clear(s, l1);
-		state.p_Free.set(l1);
-		state.p_DupFree.set(l1);
-		state.p_Free.clear(l2);
-		state.p_DupFree.clear(l2);
-		state.p_Operational.clear(a);
+		applied[0] = state.p_At.set(s, l2);
+		applied[1] = state.p_At.clear(s, l1);
+		applied[2] = state.p_Free.set(l1);
+		applied[3] = state.p_DupFree.set(l1);
+		applied[4] = state.p_Free.clear(l2);
+		applied[5] = state.p_DupFree.clear(l2);
+		applied[6] = state.p_Operational.clear(a);
 	}
 	
 	public void reverse(State state) {
-		state.p_At.clear(s, l2);
-		state.p_At.set(s, l1);
-		state.p_Free.clear(l1);
-		state.p_DupFree.clear(l1);
-		state.p_Free.set(l2);
-		state.p_DupFree.set(l2);
-		state.p_Operational.set(a);
+		if (applied[0]) state.p_At.clear(s, l2);
+		if (applied[1]) state.p_At.set(s, l1);
+		if (applied[2]) state.p_Free.clear(l1);
+		if (applied[3]) state.p_DupFree.clear(l1);
+		if (applied[4]) state.p_Free.set(l2);
+		if (applied[5]) state.p_DupFree.set(l2);
+		if (applied[6]) state.p_Operational.set(a);
 	}
 	
 	// ===================================================

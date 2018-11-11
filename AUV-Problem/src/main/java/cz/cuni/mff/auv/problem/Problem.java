@@ -386,16 +386,16 @@ public final class Problem extends PDDLProblem {
 		state.p_Exit.set(E_Ships.s, E_Locations.l51);
 		state.p_Exit.set(E_Ships.s, E_Locations.l85);
 		
-		state.p_ConnectedShip.set(E_Ships.s, E_Locations.l58, E_Locations.l58);
-		state.p_ConnectedShip.set(E_Ships.s, E_Locations.l57, E_Locations.l57);
-		state.p_ConnectedShip.set(E_Ships.s, E_Locations.l56, E_Locations.l56);
-		state.p_ConnectedShip.set(E_Ships.s, E_Locations.l55, E_Locations.l55);
-		state.p_ConnectedShip.set(E_Ships.s, E_Locations.l54, E_Locations.l54);
-		state.p_ConnectedShip.set(E_Ships.s, E_Locations.l53, E_Locations.l53);
-		state.p_ConnectedShip.set(E_Ships.s, E_Locations.l52, E_Locations.l52);
-		state.p_ConnectedShip.set(E_Ships.s, E_Locations.l55, E_Locations.l55);
-		state.p_ConnectedShip.set(E_Ships.s, E_Locations.l65, E_Locations.l65);
-		state.p_ConnectedShip.set(E_Ships.s, E_Locations.l75, E_Locations.l75);		
+		state.p_ConnectedShip.set(E_Ships.s, E_Locations.l58, E_Locations.l57);
+		state.p_ConnectedShip.set(E_Ships.s, E_Locations.l57, E_Locations.l56);
+		state.p_ConnectedShip.set(E_Ships.s, E_Locations.l56, E_Locations.l54);
+		state.p_ConnectedShip.set(E_Ships.s, E_Locations.l55, E_Locations.l54);
+		state.p_ConnectedShip.set(E_Ships.s, E_Locations.l54, E_Locations.l53);
+		state.p_ConnectedShip.set(E_Ships.s, E_Locations.l53, E_Locations.l52);
+		state.p_ConnectedShip.set(E_Ships.s, E_Locations.l52, E_Locations.l51);
+		state.p_ConnectedShip.set(E_Ships.s, E_Locations.l55, E_Locations.l65);
+		state.p_ConnectedShip.set(E_Ships.s, E_Locations.l65, E_Locations.l75);
+		state.p_ConnectedShip.set(E_Ships.s, E_Locations.l75, E_Locations.l85);		
 	}
 	
 	@Override

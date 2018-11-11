@@ -3,7 +3,9 @@ package cz.cuni.mff.auv.domain.predicates;
 import java.util.Collection;
 
 import cz.cuni.mff.auv.domain.Predicate;
+import cz.cuni.mff.auv.domain.predicates.P_Entry.Map_T_Location_2;
 import cz.cuni.mff.auv.domain.types.T_Location;
+import cz.cuni.mff.auv.domain.types.T_Resource;
 import cz.cuni.mff.auv.domain.types.T_Ship;
 import cz.cuni.mff.auv.problem.E_Location;
 import cz.cuni.mff.auv.problem.E_Ship;
@@ -17,6 +19,8 @@ import cz.cuni.mff.jpddl.store.Pool;
  * (exit ?s - ship ?l - location)
  */
 public final class P_Exit extends Predicate {
+	
+	public static final int FLAG_TYPE = 8;
 	
 	public T_Ship s;
 	public T_Location l;
@@ -67,8 +71,32 @@ public final class P_Exit extends Predicate {
 	}
 	
 	@Override
+	public boolean isStatic() {
+		return true;
+	}
+	
+	@Override
 	public String toPredicate() {
 		return "(exit " + s.name + " " + l.name + ")";
+	}
+	
+	@Override
+	public int toInteger() {
+		return toInt(s, l);
+	}
+	
+	public static int toInt(T_Ship s, T_Location l) {
+		return   (T_Resource.getIndex(s) << (T_Location.bitCount + Predicate.MASK_TYPE_BIT_COUNT))
+			   | (T_Location.getIndex(l) << (Predicate.MASK_TYPE_BIT_COUNT))
+			   | FLAG_TYPE;
+	}
+	
+	public static T_Ship fromInt_s(int predicate) {
+		return E_Ship.THIS.getElement( (predicate >> (T_Location.bitCount + Predicate.MASK_TYPE_BIT_COUNT)) & T_Ship.bitMask );
+	}
+	
+	public static T_Location fromInt_l(int predicate) {
+		return E_Location.THIS.getElement( (predicate >> (Predicate.MASK_TYPE_BIT_COUNT)) & T_Location.bitMask );
 	}
 	
 	// =======
@@ -133,8 +161,8 @@ public final class P_Exit extends Predicate {
 			return containsKey(T_Location.getIndex(obj));
 		}
 		
-		public void put(T_Location key, Boolean value) {
-			put(T_Location.getIndex(key), value);
+		public boolean put(T_Location key, Boolean value) {
+			return put(T_Location.getIndex(key), value);
 		}
 		
 		public Boolean remove(T_Location key) {
@@ -176,19 +204,19 @@ public final class P_Exit extends Predicate {
 			return map_t_location_2.containsKey(l);
 		}
 		
-		public void set(T_Ship s, T_Location l) {
+		public boolean set(T_Ship s, T_Location l) {
 			Map_T_Location_2 map_t_location_2 = storage.get(s);
 			if (map_t_location_2 == null) {
 				map_t_location_2 = new Map_T_Location_2(T_Location.getCount());
 				storage.put(s, map_t_location_2);
 			}			
-			map_t_location_2.put(l, true);
+			return map_t_location_2.put(l, true);
 		}
 		
-		public void clear(T_Ship s, T_Location l) {
+		public boolean clear(T_Ship s, T_Location l) {
 			Map_T_Location_2 map_t_location_2 = storage.get(s);
-			if (map_t_location_2 == null) return;
-			map_t_location_2.remove(l);
+			if (map_t_location_2 == null) return false;
+			return map_t_location_2.remove(l) != null;
 		}
 	 
 		
@@ -198,13 +226,13 @@ public final class P_Exit extends Predicate {
 		}
 
 		@Override
-		public void set(P_Exit p) {
-			set(p.s, p.l);
+		public boolean set(P_Exit p) {
+			return set(p.s, p.l);
 		}
 
 		@Override
-		public void clear(P_Exit p) {
-			clear(p.s, p.l);
+		public boolean clear(P_Exit p) {
+			return clear(p.s, p.l);
 		}
 		
 		@Override
@@ -237,6 +265,19 @@ public final class P_Exit extends Predicate {
 				
 			});			
 		}
+		
+		/**
+		 * Warning, this does not affect dynamic StateCompact of the state!
+		 */
+		public void clearAll() {
+			storage.forEachEntry(new ForEachEntry<Map_T_Location_2>() {
+				@Override
+				public boolean entry(final int key, final Map_T_Location_2 data) {
+					data.clear();
+					return true;
+				}				
+			});	
+		}	
 		
 	}
 	
