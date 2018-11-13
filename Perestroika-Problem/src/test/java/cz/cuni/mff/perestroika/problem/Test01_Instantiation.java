@@ -2,7 +2,7 @@ package cz.cuni.mff.perestroika.problem;
 
 import org.junit.Test;
 
-import cz.cuni.mff.perestroika.problem.Problem;
+import cz.cuni.mff.perestroika.problem1.Problem;
 
 public class Test01_Instantiation {
 

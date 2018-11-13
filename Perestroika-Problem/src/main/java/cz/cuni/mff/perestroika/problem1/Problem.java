@@ -1,4 +1,4 @@
-package cz.cuni.mff.perestroika.problem;
+package cz.cuni.mff.perestroika.problem1;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -40,6 +40,7 @@ public final class Problem extends PDDLProblem {
 		
 		state.p_ActRound.set();
 		state.p_Alive.set();
+		state.p_AtAgent.set(E_Locations.l11);
 		state.p_AtRes.set(E_Resources.r1, E_Locations.l15);
 		state.p_AtRes.set(E_Resources.r2, E_Locations.l33);
 		state.p_AtRes.set(E_Resources.r3, E_Locations.l55);

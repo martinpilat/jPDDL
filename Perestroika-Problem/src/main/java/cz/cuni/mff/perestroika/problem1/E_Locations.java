@@ -1,6 +1,7 @@
-package cz.cuni.mff.perestroika.problem;
+package cz.cuni.mff.perestroika.problem1;
 
 import cz.cuni.mff.perestroika.domain.types.T_Location;
+import cz.cuni.mff.perestroika.problem.E_Location;
 
 public final class E_Locations {
 	

@@ -1,4 +1,4 @@
-package cz.cuni.mff.perestroika.problem;
+package cz.cuni.mff.perestroika.problem3;
 
 import java.util.Collection;
 

@@ -20,7 +20,7 @@ public final class E_Location extends PDDLEnum<T_Location> {
 		return true;
 	}
 
-	protected void register(int index, T_Location e) {
+	public void register(int index, T_Location e) {
 		super.register(index, e);
 	}
 	

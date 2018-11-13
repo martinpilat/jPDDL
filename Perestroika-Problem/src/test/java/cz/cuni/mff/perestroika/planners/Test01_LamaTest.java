@@ -17,7 +17,7 @@ import cz.cuni.mff.jpddl.tools.validators.PlanTesterDFS.PlanTesterDFSResult;
 import cz.cuni.mff.jpddl.tools.validators.SafeStates;
 import cz.cuni.mff.jpddl.utils.StateCompact;
 import cz.cuni.mff.perestroika.domain.Effector;
-import cz.cuni.mff.perestroika.problem.Problem;
+import cz.cuni.mff.perestroika.problem3.Problem;
 
 public class Test01_LamaTest {
 
@@ -97,7 +97,7 @@ public class Test01_LamaTest {
 			}
 			
 			// TEST THE PLAN - OPPORTUNISTIC
-			SafeStates safeStates = new SafeStates(problem.getDomain(), new File("safe_states"));
+			SafeStates safeStates = new SafeStates(problem.getDomain(), new File("Domains/Perestroika/safe_states-3"));
 			{
 				time.start();
 				PlanTester planTester = new PlanTester(problem.getDomain(), problem.getApplicables());				

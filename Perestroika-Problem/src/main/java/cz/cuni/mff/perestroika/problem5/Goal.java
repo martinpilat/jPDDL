@@ -1,4 +1,4 @@
-package cz.cuni.mff.perestroika.problem;
+package cz.cuni.mff.perestroika.problem5;
 
 import cz.cuni.mff.jpddl.PDDLGoal;
 import cz.cuni.mff.jpddl.PDDLState;
