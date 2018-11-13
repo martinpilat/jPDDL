@@ -20,7 +20,7 @@ public final class E_Auv extends PDDLEnum<T_Auv> {
 		return true;
 	}
 	
-	protected void register(int index, T_Auv e) {
+	public void register(int index, T_Auv e) {
 		super.register(index, e);
 	}
 	

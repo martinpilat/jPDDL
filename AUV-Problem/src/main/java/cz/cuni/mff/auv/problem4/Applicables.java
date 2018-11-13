@@ -1,4 +1,4 @@
-package cz.cuni.mff.auv.problem;
+package cz.cuni.mff.auv.problem4;
 
 import java.util.Collection;
 

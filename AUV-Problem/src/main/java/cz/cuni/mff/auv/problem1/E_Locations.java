@@ -1,6 +1,7 @@
-package cz.cuni.mff.auv.problem;
+package cz.cuni.mff.auv.problem1;
 
 import cz.cuni.mff.auv.domain.types.T_Location;
+import cz.cuni.mff.auv.problem.E_Location;
 import cz.cuni.mff.jpddl.PDDLEnum;
 
 public final class E_Locations {

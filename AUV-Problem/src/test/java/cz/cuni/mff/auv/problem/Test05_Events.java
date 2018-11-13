@@ -1,5 +1,6 @@
 package cz.cuni.mff.auv.problem;
 
+import cz.cuni.mff.auv.problem1.Problem;
 import org.junit.Test;
 
 public class Test05_Events {

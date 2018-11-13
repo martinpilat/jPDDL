@@ -20,7 +20,7 @@ public final class E_Vehicle extends PDDLEnum<T_Vehicle> {
 		return false;
 	}
 	
-	protected void register(int index, T_Vehicle e) {
+	public void register(int index, T_Vehicle e) {
 		super.register(index, e);
 	}
 	

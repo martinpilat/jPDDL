@@ -1,4 +1,4 @@
-package cz.cuni.mff.auv.problem;
+package cz.cuni.mff.auv.problem3;
 
 import cz.cuni.mff.auv.domain.State;
 import cz.cuni.mff.jpddl.PDDLGoal;
@@ -50,7 +50,7 @@ public class Goal extends PDDLGoal {
 		return    state.p_Sampled.isSet(E_Resources.r1)
 			   && state.p_Sampled.isSet(E_Resources.r2)
 			   && state.p_Sampled.isSet(E_Resources.r3)
-			   && state.p_At.isSet(E_Auvs.a, E_Locations.l11)
+			   && state.p_At.isSet(E_Auvs.a, E_Locations.l_1_1)
 			   && state.p_Operational.isSet(E_Auvs.a);
 	}
 	
@@ -84,7 +84,7 @@ public class Goal extends PDDLGoal {
 		
 		achieved = false;
 		for (State state : states) {
-			if (achieved = state.p_At.isSet(E_Auvs.a, E_Locations.l11)) break;
+			if (achieved = state.p_At.isSet(E_Auvs.a, E_Locations.l_1_1)) break;
 		}
 		if (!achieved) return false;
 		

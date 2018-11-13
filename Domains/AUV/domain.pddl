@@ -14,7 +14,7 @@
              (outside ?s - ship)
              (entry ?s - ship ?l - location)
              (exit ?s - ship ?l - location)
-             (act-turn)
+             (act-round)
 
              (dup-free ?l - location)
 )
@@ -43,7 +43,6 @@
                    (operational ?a)
               )
 :effect (and (sampled ?r)
-             (not (at-res ?r ?l))
         )
 )
 

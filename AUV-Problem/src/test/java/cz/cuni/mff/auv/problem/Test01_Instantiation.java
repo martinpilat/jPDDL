@@ -1,12 +1,13 @@
 package cz.cuni.mff.auv.problem;
 
+import cz.cuni.mff.auv.problem1.Problem;
 import org.junit.Test;
 
 public class Test01_Instantiation {
 
 	@Test
 	public void test() {
-		Problem problem = new Problem();		
+		Problem problem = new Problem();
 		problem.getState().dump();
 	}
 	

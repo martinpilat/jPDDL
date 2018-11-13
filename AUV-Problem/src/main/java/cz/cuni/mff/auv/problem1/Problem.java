@@ -1,4 +1,4 @@
-package cz.cuni.mff.auv.problem;
+package cz.cuni.mff.auv.problem1;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
