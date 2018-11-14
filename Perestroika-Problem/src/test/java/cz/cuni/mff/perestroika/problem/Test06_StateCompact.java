@@ -38,21 +38,34 @@ public class Test06_StateCompact {
 			
 			action.unify(state, action, callback);
 			
+			
+			System.out.println("==============");
+			System.out.println("ORIGINAL STATE");
+			System.out.println("==============");
+			state.dump(true);
+			
 			System.out.println("APPLICABLE " + action.getName() + "(s):");
 			if (applicables.size() > 0) {
 				for (Effector applicable : applicables) {
 					System.out.println("  " + applicable.toEffector());
 				}
 				
-				for (Effector applicable : applicables) { 
-					System.out.println("  Reseting dynamic state!");
+				System.out.println("  APPLYING ACTION(s):");
+				for (Effector applicable : applicables) {
+					System.out.println("    Action: " + applicable.toEffector());
+					System.out.println("    Reseting dynamic state!");
 					StateCompact dynamic = state.getDynamic().clone();
 					state.setDynamic(dynamic);
+										
 					if (!applicable.isApplicable(state)) {
-						System.out.println("  Effector NOT APPLICABLE ANYMORE!");
+						System.out.println("      Effector NOT APPLICABLE ANYMORE!");
+						System.out.println("=======================");
+						System.out.println("STATE AFTER SET DYNAMIC");
+						System.out.println("=======================");
+						state.dump(true);
 						return;
 					} else {
-						System.out.println("  Effector still applicable.");
+						System.out.println("    Effector still applicable.");
 					}
 				}
 				

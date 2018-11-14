@@ -199,12 +199,18 @@ public class Test01_LamaTest {
 				
 			// TEST THE PLAN - BFS WAY
 			{
+				time.reportInline("PLAN TESTING BFS");
+				problem.getState().dump(true);
+				
 				time.start();
 				PlanTesterBFS planTesterBFS = new PlanTesterBFS(problem.getDomain(), problem.getApplicables());
 				PlanTesterBFSResult planTesterBFSResult = planTesterBFS.check(problem.getGoal(), problem.getState(), safeStates, 15, plan);
 				time.end();
 				System.out.println();
-				time.reportInline("PLAN TESTING BFS");	
+					
+				
+				
+				
 				System.out.println("  +-- Events-lookahead " + (planTesterBFSResult.bfsLimit));
 				if (planTesterBFSResult.valid) {
 					System.out.println("  +-- Plan is valid!");

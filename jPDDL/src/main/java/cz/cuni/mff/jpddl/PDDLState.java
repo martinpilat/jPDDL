@@ -29,6 +29,8 @@ public abstract class PDDLState implements ICloneable {
 	
 	public abstract void setDynamic(StateCompact dynamicPartOfTheState);
 	
+	public abstract IStorage[] getStorages();
+	
 	/**
 	 * NOT A CLONE, if you want to persist the state, you have to  {@link StateCompact#clone()} it!
 	 * @return

@@ -199,8 +199,7 @@ public class State extends PDDLState {
 		p_Alive.clearAll();
 		p_AtAgent.clearAll();
 		p_AtRes.clearAll();
-		p_Big.clearAll();
-		p_Connected.clearAll();
+		p_Big.clearAll();		
 		p_Dead.clearAll();
 		p_Medium.clearAll();
 		p_None.clearAll();
