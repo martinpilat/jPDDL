@@ -27,12 +27,12 @@ public final class Domain extends PDDLDomain {
 	
 	@Override
 	public File getDomainFile() {
-		return locateResourceFile("auv/domain.pddl");
+		return locateResourceFile("auv/domain.pddl", "resources/auv/domain.pddl", "AUV-Domain/src/main/resources/auv/domain.pddl", "../AUV-Domain/src/main/resources/auv/domain.pddl", "../../AUV-Domain/src/main/resources/auv/domain.pddl" );
 	}
 	
 	@Override
 	public File getDomainPureFile() {
-		return locateResourceFile("auv/domain-pure.pddl");
+		return locateResourceFile("auv/domain-pure.pddl", "resources/auv/domain-pure.pddl", "AUV-Domain/src/main/resources/auv/domain-pure.pddl", "../AUV-Domain/src/main/resources/auv/domain-pure.pddl", "../../AUV-Domain/src/main/resources/auv/domain-pure.pddl" );
 	}
 	
 	@Override

@@ -63,27 +63,32 @@ public abstract class PDDLDomain {
 
 	public abstract PDDLPredicate[] toPredicates(PDDLStringInstance[] ses);
 	
-	public File locateResourceFile(String path) {
+	public File locateResourceFile(String... options) {
 		Class[] toTry = new Class[] { getClass(), PDDLDomain.class, ResourceBundle.class };
 		
-		for (Class cls : toTry) {
-			try {
-				URL url = getClass().getResource(path);
-				URI uri = url.toURI();
-				File result = new File(uri);
-				return result;
-			} catch (Exception e) {				
-			}
-			try {
-				URL url = getClass().getClassLoader().getResource(path);
-				URI uri = url.toURI();
-				File result = new File(uri);
-				return result;
-			} catch (Exception e) {				
+		for (String path : options) {
+			
+			for (Class cls : toTry) {
+				try {
+					URL url = getClass().getResource(path);
+					URI uri = url.toURI();
+					File result = new File(uri);
+					return result;
+				} catch (Exception e) {				
+				}
+				try {
+					URL url = getClass().getClassLoader().getResource(path);
+					URI uri = url.toURI();
+					File result = new File(uri);
+					return result;
+				} catch (Exception e) {				
+				}
+				File result = new File(path);
+				if (result.exists()) return result;
 			}
 		}
 		
-		throw new RuntimeException("Failed to locate resource: " + path);
+		throw new RuntimeException("Failed to locate resource: " + options);
 		
 	}
 	

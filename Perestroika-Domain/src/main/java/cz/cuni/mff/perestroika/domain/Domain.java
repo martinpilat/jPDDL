@@ -24,12 +24,12 @@ public final class Domain extends PDDLDomain {
 	
 	@Override
 	public File getDomainFile() {
-		return locateResourceFile("perestroika/domain.pddl");
+		return locateResourceFile("perestroika/domain.pddl", "resources/perestroika/domain.pddl", "Perestroika-Domain/src/main/resources/perestroika/domain.pddl", "../Perestroika-Domain/src/main/resources/perestroika/domain.pddl", "../../Perestroika-Domain/src/main/resources/perestroika/domain.pddl" );
 	}
 	
 	@Override
 	public File getDomainPureFile() {
-		return locateResourceFile("perestroika/domain-pure.pddl");
+		return locateResourceFile("perestroika/domain-pure.pddl", "resources/perestroika/domain-pure.pddl", "Perestroika-Domain/src/main/resources/perestroika/domain-pure.pddl", "../Perestroika-Domain/src/main/resources/perestroika/domain-pure.pddl", "../../Perestroika-Domain/src/main/resources/perestroika/domain-pure.pddl" );
 	}
 	
 	@Override
