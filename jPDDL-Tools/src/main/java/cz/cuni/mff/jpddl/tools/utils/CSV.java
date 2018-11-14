@@ -207,12 +207,29 @@ public class CSV {
 			}
     	}
     	
-    	PrintWriter writer;
-		try {
-			writer = new PrintWriter(new BufferedOutputStream(new FileOutputStream(file, true)));
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException("Failed to append to file: " + file.getAbsolutePath(), e);
-		}
+    	PrintWriter writer = null;
+    	
+    	for (int i = 0; i < 5; ++i) {
+			try {
+				writer = new PrintWriter(new BufferedOutputStream(new FileOutputStream(file, true)));
+			} catch (FileNotFoundException e) {
+				if (i < 5) {
+					// LET'S TRY LATER ON
+					try {
+						Thread.sleep(256);
+					} catch (Exception e1) {
+					}
+					continue;
+				}
+				throw new RuntimeException("Failed to append to file: " + file.getAbsolutePath(), e);
+			}
+			
+			break;
+    	}
+    	
+    	if (writer == null) {
+    		throw new RuntimeException("Failed to append to file: " + file.getAbsolutePath());
+    	}
 		
 		boolean first = true;
 		for (Object obj : row) {

@@ -35,3 +35,5 @@ target
 /.metadata/
 /AUV-Problem/results.csv
 /.recommenders
+/jPDDL-Console/problem.pddl
+/jPDDL-Console/results.csv
