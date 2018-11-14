@@ -17,7 +17,7 @@
 	<url>https://github.com/kefik/jPDDL</url>
 	
 	<properties>
-		<main.class>cz.cuni.mff.jppdl.console.Main</main.class>
+		<main.class>cz.cuni.mff.jpddl.console.Main</main.class>
 	</properties>
 	
 	<dependencies>

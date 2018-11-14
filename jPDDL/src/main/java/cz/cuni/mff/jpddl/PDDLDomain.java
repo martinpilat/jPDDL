@@ -1,7 +1,10 @@
 package cz.cuni.mff.jpddl;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URL;
 import java.util.Collection;
+import java.util.ResourceBundle;
 
 public abstract class PDDLDomain {
 
@@ -59,5 +62,29 @@ public abstract class PDDLDomain {
 	public abstract PDDLPredicate toPredicate(PDDLStringInstance se);
 
 	public abstract PDDLPredicate[] toPredicates(PDDLStringInstance[] ses);
+	
+	public File locateResourceFile(String path) {
+		Class[] toTry = new Class[] { getClass(), PDDLDomain.class, ResourceBundle.class };
+		
+		for (Class cls : toTry) {
+			try {
+				URL url = getClass().getResource(path);
+				URI uri = url.toURI();
+				File result = new File(uri);
+				return result;
+			} catch (Exception e) {				
+			}
+			try {
+				URL url = getClass().getClassLoader().getResource(path);
+				URI uri = url.toURI();
+				File result = new File(uri);
+				return result;
+			} catch (Exception e) {				
+			}
+		}
+		
+		throw new RuntimeException("Failed to locate resource: " + path);
+		
+	}
 	
 }

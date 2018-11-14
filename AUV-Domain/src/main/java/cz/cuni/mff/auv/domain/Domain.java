@@ -27,26 +27,12 @@ public final class Domain extends PDDLDomain {
 	
 	@Override
 	public File getDomainFile() {
-		try {
-			URL url = getClass().getClassLoader().getResource("domain.pddl");
-			URI uri = url.toURI();
-			File result = new File(uri);
-			return result;
-		} catch (Exception e) {
-			throw new RuntimeException("Failed to locate domain.pddl file!", e);
-		}
+		return locateResourceFile("auv/domain.pddl");
 	}
 	
 	@Override
 	public File getDomainPureFile() {
-		try {
-			URL url = getClass().getClassLoader().getResource("domain-pure.pddl");
-			URI uri = url.toURI();
-			File result = new File(uri);
-			return result;
-		} catch (Exception e) {
-			throw new RuntimeException("Failed to locate domain-pure.pddl file!", e);
-		}
+		return locateResourceFile("auv/domain-pure.pddl");
 	}
 	
 	@Override
