@@ -18,7 +18,7 @@ public class T_Location extends T_Object {
 		super(name);
 		
 		++count;
-		while (count+1 > Math.pow(bitCount, 2)) {
+		while (count+1 > Math.pow(2, bitCount)) {
 			bitCount += 1;
 			bitMask <<= 1;
 			bitMask |= 1;

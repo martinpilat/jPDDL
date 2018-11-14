@@ -97,7 +97,7 @@ public class Test01_LamaTest {
 			}
 			
 			// TEST THE PLAN - OPPORTUNISTIC
-			SafeStates safeStates = new SafeStates(problem.getDomain(), new File("Domains/Perestroika/safe_states-3"));
+			SafeStates safeStates = new SafeStates(problem.getDomain(), new File("../Domains/Perestroika/safe_states-3"));
 			{
 				time.start();
 				PlanTester planTester = new PlanTester(problem.getDomain(), problem.getApplicables());				

@@ -47,7 +47,7 @@ public final class Ac_Collect extends Action {
 	
 	@Override
 	public String getName() {
-		return "sample";		
+		return "collect";		
 	}
 	
 	@Override

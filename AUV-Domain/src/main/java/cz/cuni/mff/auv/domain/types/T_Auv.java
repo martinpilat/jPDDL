@@ -18,7 +18,7 @@ public class T_Auv extends T_Vehicle {
 		super(name);
 		
 		++count;
-		while (count > Math.pow(bitCount, 2)) {
+		while (count+1 > Math.pow(2, bitCount)) {
 			bitCount += 1;
 			bitMask <<= 1;
 			bitMask |= 1;
