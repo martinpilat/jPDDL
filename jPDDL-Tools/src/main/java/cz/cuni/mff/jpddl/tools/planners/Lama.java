@@ -2,9 +2,12 @@ package cz.cuni.mff.jpddl.tools.planners;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -16,9 +19,9 @@ import cz.cuni.mff.jpddl.PDDLStringInstance;
 
 public class Lama extends PlannerBase {
 
-	protected String fdDir = "../Planners/fast-downward/";
+	public static String fdDir = "../Planners/fast-downward/";
 	
-	protected String fdExec = "../../lama.sh"; // relative to $fdDir/tmp/dir 
+	public static String fdExec = "../../lama.sh"; // relative to $fdDir/tmp/dir 
 	
 
 	protected File lamaWorkingDir;
@@ -123,7 +126,6 @@ public class Lama extends PlannerBase {
 
 		return result;
 	}
-
 
 	protected PDDLStringInstance parseLine(String line) {
 		String action = line.trim();

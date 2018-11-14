@@ -1,5 +1,6 @@
 package cz.cuni.mff.perestroika.problem2;
 
+
 import cz.cuni.mff.jpddl.PDDLDeadEnd;
 import cz.cuni.mff.jpddl.PDDLProblem;
 import cz.cuni.mff.perestroika.domain.Domain;

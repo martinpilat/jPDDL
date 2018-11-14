@@ -19,7 +19,7 @@ import cz.cuni.mff.jpddl.tools.validators.IPlanValidator.PlanValidatorResult;
 
 public class LamaSimulation {
 	
-	public void simulate(int totalRuns, String id, PDDLProblem problem, IPlanValidator validator, int maxIterations, int randomSeed, File csvOutputFile) {
+	public void simulate(int totalRuns, String id, PDDLProblem problem, IPlanValidator validator, int maxIterations, long randomSeed, File csvOutputFile) {
 		Random random = new Random(randomSeed);
 		
 		LamaRun run = new LamaRun();

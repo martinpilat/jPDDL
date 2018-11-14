@@ -6,7 +6,7 @@ public class Randoms {
 	
 	private static Random random = new Random(1);
 	
-	public static void setMasterSeed(int masterSeed) {
+	public static void setMasterSeed(long masterSeed) {
 		random = new Random(masterSeed);
 	}
 	

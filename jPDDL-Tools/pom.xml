@@ -13,8 +13,8 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>jPDDL</name>
-	<url>https://github.com/kefik/jPDDL-Tools</url>
+	<name>jPDDL-Tools</name>
+	<url>https://github.com/kefik/jPDDL</url>
 	
 	<dependencies>
 	    <!-- jPDDL Base -->
