@@ -10,47 +10,42 @@ import cz.cuni.mff.jpddl.PDDLEffector;
 import cz.cuni.mff.jpddl.PDDLGoal;
 import cz.cuni.mff.jpddl.PDDLState;
 
-public class PlanTester {
+public class PlanTester implements IPlanValidator {
 	
-	public static class PlanTesterResult {
-		
-		public PDDLState state;
-		
-		public SafeStates safeStates;
-		
-		public PDDLEffector[] plan;
-		
-		public PDDLEffector[] events;
-		
-		public boolean valid;				
-		
-		public int lastExecutableEffectorIndex;
+	public static class PlanTesterResult extends PlanValidatorResult {
 		
 		/**
-		 * State was safe after actions and events [0;lastSafeStateIndex) were applied.
-		 * I.e., if you take state and applies plan[0];events[0];plane[1];events[1];...;plan[lastSafeStateIndex-1];events[lastSafeStateIndex-1]
-		 * you are in the safe state.
+		 * Safe states used.
 		 */
-		public int lastSafeStateIndex;
+		public SafeStates safeStates;
+		
+		/**
+		 * Sequence of unfortunate events in case of failure.
+		 */
+		public PDDLEffector[] events;
+		
 	}
 	
 	private PDDLDomain domain;
 	
 	private PDDLApplicables applicables;
+
+	private long randomSeed;
 	
 	private Random random;
-
-	public PlanTester(PDDLDomain domain, PDDLApplicables applicables) {
-		this(domain, applicables, System.currentTimeMillis());
-	}
 	
-	public PlanTester(PDDLDomain domain, PDDLApplicables applicables, long randomSeed) {
+	private SafeStates safeStates;
+
+	public void config(PDDLDomain domain, PDDLApplicables applicables, long randomSeed, SafeStates safeStates) {
 		this.domain = domain;
 		this.applicables = applicables;
+		this.randomSeed = randomSeed;
 		this.random = new Random(randomSeed);
+		this.safeStates = safeStates;
 	}
 	
-	public PlanTesterResult check(PDDLGoal goal, PDDLState state, SafeStates safeStates, PDDLEffector... plan) {
+	@Override
+	public PlanTesterResult validate(PDDLGoal goal, PDDLState state, PDDLEffector... plan) {
 		PlanTesterResult result = new PlanTesterResult();
 		
 		result.valid = true;
@@ -103,5 +98,9 @@ public class PlanTester {
 		
 	}
 	
+	@Override
+	public String getDescription() {
+		return getClass().getSimpleName() + "[seed=" + randomSeed + "]";
+	}	
 	
 }

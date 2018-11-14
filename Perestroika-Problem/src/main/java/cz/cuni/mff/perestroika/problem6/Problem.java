@@ -1,20 +1,11 @@
 package cz.cuni.mff.perestroika.problem6;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
 
-import cz.cuni.mff.jpddl.IStorage;
-import cz.cuni.mff.jpddl.PDDLEnum;
-import cz.cuni.mff.jpddl.PDDLPredicate;
+import cz.cuni.mff.jpddl.PDDLDeadEnd;
 import cz.cuni.mff.jpddl.PDDLProblem;
-import cz.cuni.mff.jpddl.PDDLState;
-import cz.cuni.mff.jpddl.PDDLType;
 import cz.cuni.mff.perestroika.domain.Domain;
 import cz.cuni.mff.perestroika.domain.State;
+import cz.cuni.mff.perestroika.problem1.DeadEnd;
 
 public final class Problem extends PDDLProblem {
 	
@@ -30,13 +21,13 @@ public final class Problem extends PDDLProblem {
 	
 	public Goal goal;
 	
-	public Applicables applicables;
+	public DeadEnd deadEnd;
 	
 	public Problem() {
 		domain = new Domain();
 		state = new State();
 		goal = new Goal();
-		applicables = new Applicables();
+		deadEnd = new DeadEnd();
 		
 		state.p_ActRound.set();
 		state.p_Alive.set();
@@ -554,8 +545,8 @@ public final class Problem extends PDDLProblem {
 	}	
 	
 	@Override
-	public Applicables getApplicables() {
-		return applicables;
+	public PDDLDeadEnd getDeadEnd() {
+		return deadEnd;
 	}
 	
 }

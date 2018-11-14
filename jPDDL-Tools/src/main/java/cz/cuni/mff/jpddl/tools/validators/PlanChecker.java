@@ -4,27 +4,24 @@ import cz.cuni.mff.jpddl.PDDLDomain;
 import cz.cuni.mff.jpddl.PDDLEffector;
 import cz.cuni.mff.jpddl.PDDLGoal;
 import cz.cuni.mff.jpddl.PDDLState;
+import cz.cuni.mff.jpddl.tools.validators.IPlanValidator.PlanValidatorResult;
 
-public class PlanChecker {
+public class PlanChecker implements IPlanValidator {
 
-	public static class PlanCheckerResult {
-		
-		public PDDLState state;
-		
-		public PDDLEffector[] plan;
-		
-		public boolean valid;				
-		
-		public int lastExecutableEffectorIndex;		
+	public static class PlanCheckerResult extends PlanValidatorResult {
 	}
 	
 	private PDDLDomain domain;
 
-	public PlanChecker(PDDLDomain domain) {
+	public PlanChecker() {
+	}
+	
+	public void config(PDDLDomain domain) {
 		this.domain = domain;
 	}
 	
-	public PlanCheckerResult check(PDDLGoal goal, PDDLState state, PDDLEffector... plan) {
+	@Override
+	public PlanCheckerResult validate(PDDLGoal goal, PDDLState state, PDDLEffector... plan) {
 		PlanCheckerResult result = new PlanCheckerResult();
 		
 		result.valid = true;
@@ -55,6 +52,11 @@ public class PlanChecker {
 		// RETURN RESULT
 		return result;
 		
+	}
+	
+	@Override
+	public String getDescription() {
+		return getClass().getSimpleName();
 	}
 	
 }

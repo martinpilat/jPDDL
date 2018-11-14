@@ -50,12 +50,24 @@ public abstract class Effector extends PDDLEffector {
 		return isApplicable((State)state);
 	}
 	
+	public boolean isApplicable(PDDLState state, PDDLState minusState) {
+		return isApplicable((State)state, (State)minusState);
+	}
+	
 	/**
 	 * Is action applicable in the given 'state'?
 	 * @param state
 	 * @return
 	 */
 	public abstract boolean isApplicable(State state);
+	
+	/**
+	 * Is action applicable in the: state / minusState ?
+	 * @param state
+	 * @param minusState
+	 * @return
+	 */
+	public abstract boolean isApplicable(State state, State minusState);
 	
 	/**
 	 * {@link #isApplicable(State)} in all 'states' ?

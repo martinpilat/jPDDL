@@ -1,6 +1,7 @@
 package cz.cuni.mff.jpddl;
 
 import cz.cuni.mff.jpddl.store.ICloneable;
+import cz.cuni.mff.jpddl.utils.StateCompact;
 
 public abstract class PDDLEffector implements ICloneable {
 
@@ -55,6 +56,14 @@ public abstract class PDDLEffector implements ICloneable {
 	public abstract boolean isApplicable(PDDLState state);
 	
 	/**
+	 * Is action applicable in the: state / minusState ?
+	 * @param state
+	 * @param minusState
+	 * @return
+	 */
+	public abstract boolean isApplicable(PDDLState state, PDDLState minusState);
+	
+	/**
 	 * Apply effects in the given 'state' without checking preconditions.
 	 * @param state
 	 */
@@ -65,6 +74,30 @@ public abstract class PDDLEffector implements ICloneable {
 	 * @param state
 	 */
 	public abstract void reverse(PDDLState state);
+	
+	/**
+	 * Adds POSITIVE effects of the action into the 'compact' state.
+	 * @param compact
+	 */
+	public abstract void addAdds(StateCompact compact);
+	
+	/**
+	 * Removes POSITIVE effects of the action from the 'compact' state.
+	 * @param compact
+	 */
+	public abstract void removeAdds(StateCompact compact);
+	
+	/**
+	 * Adds NEGATIVE effects of the action into the 'compact' state.
+	 * @param compact
+	 */
+	public abstract void addDeletes(StateCompact compact);
+	
+	/**
+	 * Removes NEGATIVE effects of the action from the 'compact' state.
+	 * @param compact
+	 */
+	public abstract void removeDeletes(StateCompact compact);
 	
 	/**
 	 * Enumerator of the effectors that conform to this instance; note that effector and callback must 

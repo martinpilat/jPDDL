@@ -5,8 +5,15 @@ import cz.cuni.mff.jpddl.PDDLEffector;
 import cz.cuni.mff.jpddl.PDDLState;
 import cz.cuni.mff.jpddl.store.FastIntMap;
 import cz.cuni.mff.jpddl.store.Pool;
+import cz.cuni.mff.jpddl.utils.StateCompact;
 import cz.cuni.mff.perestroika.domain.Event;
 import cz.cuni.mff.perestroika.domain.State;
+import cz.cuni.mff.perestroika.domain.predicates.P_Accessible;
+import cz.cuni.mff.perestroika.domain.predicates.P_Alive;
+import cz.cuni.mff.perestroika.domain.predicates.P_Dead;
+import cz.cuni.mff.perestroika.domain.predicates.P_Medium;
+import cz.cuni.mff.perestroika.domain.predicates.P_None;
+import cz.cuni.mff.perestroika.domain.predicates.P_Small;
 import cz.cuni.mff.perestroika.domain.types.T_Location;
 import cz.cuni.mff.perestroika.problem.E_Location;
 
@@ -106,6 +113,12 @@ public final class Ev_ShrinkSmallAgent extends Event {
 		return    state.p_Small.isSet(l) 
 			   && state.p_AtAgent.isSet(l);
 	}
+	
+	@Override
+	public boolean isApplicable(State state, State minusState) {
+		return    state.p_Small.isSet(l)   && !minusState.p_Small.isSet(l) 
+			   && state.p_AtAgent.isSet(l) && !minusState.p_AtAgent.isSet(l);
+	}
 		
 	@Override
 	public boolean isApplicableUnion(State... states) {
@@ -154,6 +167,32 @@ public final class Ev_ShrinkSmallAgent extends Event {
 		if (applied[2]) state.p_Accessible.set(l);
 		if (applied[3]) state.p_Alive.set();
 		if (applied[4]) state.p_Dead.clear();
+	}
+	
+	@Override
+	public void addAdds(StateCompact compact) {
+		compact.set(P_None.toInt(l));
+		compact.set(P_Dead.toInt());
+	}
+	
+	@Override
+	public void removeAdds(StateCompact compact) {
+		compact.clear(P_None.toInt(l));
+		compact.clear(P_Dead.toInt());
+	}
+	
+	@Override
+	public void addDeletes(StateCompact compact) {
+		compact.set(P_Small.toInt(l));
+		compact.set(P_Accessible.toInt(l));
+		compact.set(P_Alive.toInt());
+	}
+	
+	@Override
+	public void removeDeletes(StateCompact compact) {
+		compact.clear(P_Small.toInt(l));
+		compact.clear(P_Accessible.toInt(l));
+		compact.clear(P_Alive.toInt());
 	}
 	
 	// ===================================================

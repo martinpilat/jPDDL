@@ -68,4 +68,13 @@ public class T_Auv extends T_Vehicle {
 		return lastPos * 64 + lastCount;
 	}
 
+	public static void reset() {
+		count = 0;
+		bitCount = 0;
+		bitMask = 0;		
+		lastPos = 0;
+		lastCount = 0;
+		lastFlag = 0;
+	}
+	
 }

@@ -8,12 +8,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class PDDLProblem {	
+
+	public PDDLApplicables applicables;
+	
+	public PDDLProblem() {
+		applicables = new PDDLApplicables();
+	}
 	
 	public abstract String getName();
 	public abstract PDDLDomain getDomain();
 	public abstract PDDLState getState();
 	public abstract PDDLGoal getGoal();
-	public abstract PDDLApplicables getApplicables();
+	public abstract PDDLDeadEnd getDeadEnd();
+	
+	public PDDLApplicables getApplicables() {
+		return applicables;
+	}
+
 	
 	public String toPDDL(PDDLState state) {
 		StringBuffer sb = new StringBuffer();

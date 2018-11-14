@@ -34,6 +34,10 @@ public class StateCompact implements Cloneable {
 		state.addAll(other.state);
 	}
 	
+	public void remove(StateCompact other) {
+		state.removeAll(other.state);
+	}	
+	
 	public StateCompact clone() {
 		StateCompact state = get();
 		state.add(this);

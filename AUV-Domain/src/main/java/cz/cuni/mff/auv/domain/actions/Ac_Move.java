@@ -4,6 +4,8 @@ import cz.cuni.mff.auv.domain.Action;
 import cz.cuni.mff.auv.domain.State;
 import cz.cuni.mff.auv.domain.predicates.P_At;
 import cz.cuni.mff.auv.domain.predicates.P_Connected;
+import cz.cuni.mff.auv.domain.predicates.P_DupFree;
+import cz.cuni.mff.auv.domain.predicates.P_Free;
 import cz.cuni.mff.auv.domain.types.T_Auv;
 import cz.cuni.mff.auv.domain.types.T_Location;
 import cz.cuni.mff.auv.problem.E_Auv;
@@ -13,6 +15,7 @@ import cz.cuni.mff.jpddl.PDDLEffector;
 import cz.cuni.mff.jpddl.PDDLState;
 import cz.cuni.mff.jpddl.store.FastIntMap;
 import cz.cuni.mff.jpddl.store.Pool;
+import cz.cuni.mff.jpddl.utils.StateCompact;
 
 /**
  * ACTION
@@ -128,6 +131,15 @@ public final class Ac_Move extends Action {
 	}
 	
 	@Override
+	public boolean isApplicable(State state, State minusState) {
+		return    state.p_Operational.isSet(a)    && !minusState.p_Operational.isSet(a) 
+		       && state.p_At.isSet(a, l1)         && !minusState.p_At.isSet(a, l1)
+		       && state.p_Connected.isSet(l1, l2) && !minusState.p_Connected.isSet(l1, l2)
+		       && state.p_Free.isSet(l2)          && !minusState.p_Free.isSet(l2)
+		       && state.p_DupFree.isSet(l2)       && !minusState.p_DupFree.isSet(l2);
+	}
+	
+	@Override
 	public boolean isApplicableUnion(State... states) {
 		boolean applicable;
 		
@@ -196,6 +208,34 @@ public final class Ac_Move extends Action {
 		if (applied[3]) state.p_DupFree.clear(l1);
 		if (applied[4]) state.p_Free.set(l2);
 		if (applied[5]) state.p_DupFree.set(l2);
+	}
+	
+	@Override
+	public void addAdds(StateCompact compact) {
+		compact.set(P_At.toInt(a, l2));
+		compact.set(P_Free.toInt(l1));
+		compact.set(P_DupFree.toInt(l1));		
+	}
+	
+	@Override
+	public void removeAdds(StateCompact compact) {
+		compact.clear(P_At.toInt(a, l2));
+		compact.clear(P_Free.toInt(l1));
+		compact.clear(P_DupFree.toInt(l1));
+	}
+	
+	@Override
+	public void addDeletes(StateCompact compact) {
+		compact.set(P_At.toInt(a, l1));
+		compact.set(P_Free.toInt(l2));
+		compact.set(P_DupFree.toInt(l2));
+	}
+	
+	@Override
+	public void removeDeletes(StateCompact compact) {
+		compact.clear(P_At.toInt(a, l1));
+		compact.clear(P_Free.toInt(l2));
+		compact.clear(P_DupFree.toInt(l2));
 	}
 	
 	// ===================================================

@@ -56,6 +56,13 @@ public abstract class PDDLEnum<T extends PDDLType> {
 		return elements.size();
 	}
 	
+	public void reset() {
+		elements.clear();
+		elementsArray = null;
+		elementsMap.clear();
+		bitCount = 0;
+	}
+	
 	@Override
 	public String toString() {
 		return (getClass() == null ? "PDDLEnum[" : getClass().getSimpleName() + "[") + "size=" + getSize() + "]";

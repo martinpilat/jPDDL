@@ -4,7 +4,10 @@ import cz.cuni.mff.auv.domain.Event;
 import cz.cuni.mff.auv.domain.State;
 import cz.cuni.mff.auv.domain.predicates.P_At;
 import cz.cuni.mff.auv.domain.predicates.P_ConnectedShip;
+import cz.cuni.mff.auv.domain.predicates.P_DupFree;
 import cz.cuni.mff.auv.domain.predicates.P_Entry;
+import cz.cuni.mff.auv.domain.predicates.P_Free;
+import cz.cuni.mff.auv.domain.predicates.P_Operational;
 import cz.cuni.mff.auv.domain.types.T_Location;
 import cz.cuni.mff.auv.domain.types.T_Ship;
 import cz.cuni.mff.auv.domain.types.T_Vehicle;
@@ -17,6 +20,7 @@ import cz.cuni.mff.jpddl.PDDLEffector;
 import cz.cuni.mff.jpddl.PDDLState;
 import cz.cuni.mff.jpddl.store.FastIntMap;
 import cz.cuni.mff.jpddl.store.Pool;
+import cz.cuni.mff.jpddl.utils.StateCompact;
 
 /**
  * EVENT
@@ -128,6 +132,14 @@ public final class Ev_MoveShipFree extends Event {
 			   && state.p_Free.isSet(l2) 
 			   && state.p_DupFree.isSet(l2); 
 	}
+	
+	@Override
+	public boolean isApplicable(State state, State minusState) {
+		return    state.p_At.isSet(s, l1)                && !minusState.p_At.isSet(s, l1) 
+			   && state.p_ConnectedShip.isSet(s, l1, l2) && !minusState.p_ConnectedShip.isSet(s, l1, l2)
+			   && state.p_Free.isSet(l2)                 && !minusState.p_Free.isSet(l2)
+			   && state.p_DupFree.isSet(l2)              && !minusState.p_DupFree.isSet(l2); 
+	}
 		
 	@Override
 	public boolean isApplicableUnion(State... states) {
@@ -191,6 +203,34 @@ public final class Ev_MoveShipFree extends Event {
 		if (applied[3]) state.p_DupFree.clear(l1);
 		if (applied[4]) state.p_Free.set(l2);
 		if (applied[5]) state.p_DupFree.set(l2);
+	}
+	
+	@Override
+	public void addAdds(StateCompact compact) {
+		compact.set(P_At.toInt(s, l2));
+		compact.set(P_Free.toInt(l1));
+		compact.set(P_DupFree.toInt(l1));
+	}
+	
+	@Override
+	public void removeAdds(StateCompact compact) {
+		compact.clear(P_At.toInt(s, l2));
+		compact.clear(P_Free.toInt(l1));
+		compact.clear(P_DupFree.toInt(l1));
+	}
+	
+	@Override
+	public void addDeletes(StateCompact compact) {
+		compact.set(P_At.toInt(s, l1));
+		compact.set(P_Free.toInt(l2));
+		compact.set(P_DupFree.toInt(l2));
+	}
+	
+	@Override
+	public void removeDeletes(StateCompact compact) {
+		compact.clear(P_At.toInt(s, l1));
+		compact.clear(P_Free.toInt(l2));
+		compact.clear(P_DupFree.toInt(l2));
 	}
 	
 	// ===================================================

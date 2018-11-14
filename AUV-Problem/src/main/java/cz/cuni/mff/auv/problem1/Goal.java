@@ -47,11 +47,11 @@ public class Goal extends PDDLGoal {
 //			state.dump();
 //		}
 		
-		return    state.p_Sampled.isSet(E_Resources.r1)
-			   && state.p_Sampled.isSet(E_Resources.r2)
-			   && state.p_Sampled.isSet(E_Resources.r3)
-			   && state.p_At.isSet(E_Auvs.a, E_Locations.l11)
-			   && state.p_Operational.isSet(E_Auvs.a);
+		return    state.p_Sampled.isSet(E_Resources.THIS.r1)
+			   && state.p_Sampled.isSet(E_Resources.THIS.r2)
+			   && state.p_Sampled.isSet(E_Resources.THIS.r3)
+			   && state.p_At.isSet(E_Auvs.THIS.a, E_Locations.THIS.l11)
+			   && state.p_Operational.isSet(E_Auvs.THIS.a);
 	}
 	
 	public boolean isAchievedAll(State... states) {
@@ -66,31 +66,31 @@ public class Goal extends PDDLGoal {
 		
 		achieved = false;
 		for (State state : states) {
-			if (achieved = state.p_Sampled.isSet(E_Resources.r1)) break;
+			if (achieved = state.p_Sampled.isSet(E_Resources.THIS.r1)) break;
 		}
 		if (!achieved) return false;
 		
 		achieved = false;
 		for (State state : states) {
-			if (achieved = state.p_Sampled.isSet(E_Resources.r2)) break;
+			if (achieved = state.p_Sampled.isSet(E_Resources.THIS.r2)) break;
 		}
 		if (!achieved) return false;
 		
 		achieved = false;
 		for (State state : states) {
-			if (achieved = state.p_Sampled.isSet(E_Resources.r3)) break;
+			if (achieved = state.p_Sampled.isSet(E_Resources.THIS.r3)) break;
 		}
 		if (!achieved) return false;
 		
 		achieved = false;
 		for (State state : states) {
-			if (achieved = state.p_At.isSet(E_Auvs.a, E_Locations.l11)) break;
+			if (achieved = state.p_At.isSet(E_Auvs.THIS.a, E_Locations.THIS.l11)) break;
 		}
 		if (!achieved) return false;
 		
 		achieved = false;
 		for (State state : states) {
-			if (achieved = state.p_Operational.isSet(E_Auvs.a)) break;
+			if (achieved = state.p_Operational.isSet(E_Auvs.THIS.a)) break;
 		}
 		if (!achieved) return false;
 		

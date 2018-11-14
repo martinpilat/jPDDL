@@ -6,9 +6,12 @@ import cz.cuni.mff.jpddl.PDDLEffector;
 import cz.cuni.mff.jpddl.PDDLState;
 import cz.cuni.mff.jpddl.store.FastIntMap;
 import cz.cuni.mff.jpddl.store.Pool;
+import cz.cuni.mff.jpddl.utils.StateCompact;
 import cz.cuni.mff.perestroika.domain.Action;
 import cz.cuni.mff.perestroika.domain.State;
+import cz.cuni.mff.perestroika.domain.predicates.P_AtAgent;
 import cz.cuni.mff.perestroika.domain.predicates.P_Connected;
+import cz.cuni.mff.perestroika.domain.predicates.P_Taken;
 import cz.cuni.mff.perestroika.domain.types.T_Location;
 import cz.cuni.mff.perestroika.problem.E_Location;
 
@@ -119,6 +122,14 @@ public final class Ac_Move extends Action {
 	}
 	
 	@Override
+	public boolean isApplicable(State state, State minusState) {
+		return    state.p_Alive.isSet()           && !minusState.p_Alive.isSet()           
+			   && state.p_AtAgent.isSet(l1)       && !minusState.p_AtAgent.isSet(l1)
+			   && state.p_Connected.isSet(l1, l2) && !minusState.p_Connected.isSet(l1, l2)
+			   && state.p_Accessible.isSet(l2)    && !minusState.p_Accessible.isSet(l2);   
+	}
+	
+	@Override
 	public boolean isApplicableUnion(State... states) {
 		boolean applicable;
 		
@@ -170,6 +181,27 @@ public final class Ac_Move extends Action {
 		if (applied[0]) state.p_AtAgent.set(l1);
 		if (applied[1]) state.p_AtAgent.clear(l2);
 	}
+	
+	@Override
+	public void addAdds(StateCompact compact) {
+		compact.set(P_AtAgent.toInt(l2));
+	}
+	
+	@Override
+	public void removeAdds(StateCompact compact) {
+		compact.clear(P_AtAgent.toInt(l2));
+	}
+	
+	@Override
+	public void addDeletes(StateCompact compact) {
+		compact.set(P_AtAgent.toInt(l1));
+	}
+	
+	@Override
+	public void removeDeletes(StateCompact compact) {
+		compact.clear(P_AtAgent.toInt(l1));
+	}
+
 	
 	// ===================================================
 	// ENUMERATION OF APPLICABLE EFFECTORS VIA UNIFICATION

@@ -6,13 +6,14 @@ import cz.cuni.mff.jpddl.PDDLEnum;
 
 public final class E_Ships {
 
-	public static final T_Ship s = new T_Ship("s");
+	public final T_Ship s = new T_Ship("s");
 	
-	static {
-		E_Ship.THIS.register(T_Ship.getIndex(s), s);
-	}
+	public static E_Ships THIS;
 		
 	protected E_Ships() {
+		THIS = this;
+		
+		E_Ship.THIS.register(T_Ship.getIndex(s), s);
 	}
 	
 }

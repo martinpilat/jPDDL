@@ -4,6 +4,9 @@ import cz.cuni.mff.auv.domain.Action;
 import cz.cuni.mff.auv.domain.State;
 import cz.cuni.mff.auv.domain.predicates.P_At;
 import cz.cuni.mff.auv.domain.predicates.P_AtRes;
+import cz.cuni.mff.auv.domain.predicates.P_DupFree;
+import cz.cuni.mff.auv.domain.predicates.P_Free;
+import cz.cuni.mff.auv.domain.predicates.P_Sampled;
 import cz.cuni.mff.auv.domain.types.T_Auv;
 import cz.cuni.mff.auv.domain.types.T_Location;
 import cz.cuni.mff.auv.domain.types.T_Resource;
@@ -15,6 +18,7 @@ import cz.cuni.mff.jpddl.PDDLEffector;
 import cz.cuni.mff.jpddl.PDDLState;
 import cz.cuni.mff.jpddl.store.FastIntMap;
 import cz.cuni.mff.jpddl.store.Pool;
+import cz.cuni.mff.jpddl.utils.StateCompact;
 
 /**
  * ACTION
@@ -125,6 +129,13 @@ public final class Ac_Sample extends Action {
 	}
 	
 	@Override
+	public boolean isApplicable(State state, State minusState) {
+		return    state.p_Operational.isSet(a) && !minusState.p_Operational.isSet(a)  
+			   && state.p_At.isSet(a, l)       && !minusState.p_At.isSet(a, l)
+			   && state.p_AtRes.isSet(r, l)    && !minusState.p_AtRes.isSet(r, l);
+	}
+	
+	@Override
 	public boolean isApplicableUnion(State... states) {
 		boolean applicable;
 		
@@ -170,6 +181,26 @@ public final class Ac_Sample extends Action {
 	public void reverse(State state) {
 		if (applied[0]) state.p_Sampled.clear(r);
 		if (applied[1]) state.p_AtRes.set(r, l);
+	}
+	
+	@Override
+	public void addAdds(StateCompact compact) {
+		compact.set(P_Sampled.toInt(r));
+	}
+	
+	@Override
+	public void removeAdds(StateCompact compact) {
+		compact.clear(P_Sampled.toInt(r));
+	}
+	
+	@Override
+	public void addDeletes(StateCompact compact) {
+		compact.set(P_AtRes.toInt(r, l));
+	}
+	
+	@Override
+	public void removeDeletes(StateCompact compact) {
+		compact.clear(P_AtRes.toInt(r, l));
 	}
 	
 	// ===================================================

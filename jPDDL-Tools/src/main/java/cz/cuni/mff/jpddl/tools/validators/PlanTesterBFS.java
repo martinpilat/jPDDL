@@ -2,6 +2,7 @@ package cz.cuni.mff.jpddl.tools.validators;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -19,31 +20,28 @@ import cz.cuni.mff.jpddl.utils.StateCompact;
  * 
  * @author Jimmy
  */
-public class PlanTesterBFS {
+public class PlanTesterBFS implements IPlanValidator {
 	
-	public static class PlanTesterBFSResult {
-		
-		public PDDLState state;
-		
+	public static class PlanTesterBFSResult extends PlanValidatorResult {
+
+		/**
+		 * Safe states used.
+		 */
 		public SafeStates safeStates;
 		
-		public PDDLEffector[] plan;
-		
-		public PDDLEffector[] events;
-		
-		public boolean valid;				
-		
-		public int lastExecutableEffectorIndex;
-		
 		/**
-		 * State was safe after actions and events [0;lastSafeStateIndex) were applied.
-		 * I.e., if you take state and applies plan[0];events[0];plane[1];events[1];...;plan[lastSafeStateIndex-1];events[lastSafeStateIndex-1]
-		 * you are in the safe state.
+		 * Unfortunate sequence of events in case of failure.
 		 */
-		public int lastSafeStateIndex;
-		
+		public PDDLEffector[] events;
+
+		/**
+		 * How many states were probed.
+		 */
 		public int statesProbed = 0;
 		
+		/**
+		 * With what limit the validator was running.
+		 */
 		public int bfsLimit;
 	}
 	
@@ -81,16 +79,18 @@ public class PlanTesterBFS {
 
 	private PDDLDomain domain;
 	private PDDLApplicables applicables;
+	private SafeStates safeStates;
+	private int levelLimit;
 	
-	public PlanTesterBFS() {		
-	}
-
-	public PlanTesterBFS(PDDLDomain domain, PDDLApplicables applicables) {
+	public void config(PDDLDomain domain, PDDLApplicables applicables, SafeStates safeStates, int levelLimit) {
 		this.domain = domain;
 		this.applicables = applicables;
+		this.safeStates = safeStates;
+		this.levelLimit = levelLimit;
 	}
 	
-	public PlanTesterBFSResult check(PDDLGoal goal, PDDLState state, SafeStates safeStates, int levelLimit, PDDLEffector... plan) {
+	@Override
+	public PlanTesterBFSResult validate(PDDLGoal goal, PDDLState state, PDDLEffector... plan) {
 		PlanTesterBFSResult result = new PlanTesterBFSResult();
 		
 		result.valid = true;
@@ -105,7 +105,7 @@ public class PlanTesterBFS {
 		// SAVE STATE
 		StateCompact dynamic = state.getDynamic().clone();
 		
-		if (bfs(goal, state, safeStates, plan, result, levelLimit)) {
+		if (bfs(goal, state, plan, result, levelLimit)) {
 			result.valid = true;
 		} else {
 			result.valid = false;
@@ -119,7 +119,7 @@ public class PlanTesterBFS {
 		
 	}
 	
-	public boolean bfs(PDDLGoal goal, PDDLState state, SafeStates safeStates, PDDLEffector[] plan, PlanTesterBFSResult result, int levelLimit) {
+	public boolean bfs(PDDLGoal goal, PDDLState state, PDDLEffector[] plan, PlanTesterBFSResult result, int levelLimit) {
 		// GOAL ACHIEVED?
 		if (goal.isAchieved(state)) {
 			// WE'RE DONE
@@ -133,8 +133,10 @@ public class PlanTesterBFS {
 		
 		// LAST CONFIRMED SAFE STATE INDEX
 		boolean initialStateSafe = safeStates.isSafe(state);
-		boolean[] currIndexLevelSafe = new boolean[] {initialStateSafe, initialStateSafe};
-		int currIndexLevel = -1;
+		boolean[] indexSafe = new boolean[plan.length+1];
+		Arrays.fill(indexSafe, true);
+		indexSafe[0] = initialStateSafe;
+		int currIndexLevel = 0;
 		
 		// UTILS
 		List<PDDLEffector> events = new ArrayList<PDDLEffector>();	
@@ -147,24 +149,18 @@ public class PlanTesterBFS {
 			
 			if (s.index > currIndexLevel) {
 				// WE HAVE JUST FINISHED EVALUATING NEXT BFS LAYER
+				
 				//System.out.println("PlanTesterBFS: reached layer " + s.index + ", queue size = " + queue.size());
 
 				// s => state after applying action[0],any-event[0],...,action[s.index-1],any-event[s.index-1]
 				//   => all sequence of events events [0]-[s.index-1] were checked not to mess up the plan
 				//   => we have checked that under all circumstances action[s.index-1] is applicable				
-				if (currIndexLevelSafe[0]) {
-					result.lastSafeStateIndex = s.index-1;
+				if (indexSafe[currIndexLevel]) {
+					result.lastSafeStateIndex = currIndexLevel;
 				}
-				
-				// RESTART SAFE STATE CHECKING
-				currIndexLevelSafe[0] = currIndexLevelSafe[1];
-				currIndexLevelSafe[1] = true;
+
 				currIndexLevel = s.index;
 			}
-			
-			// IS SAFE STATE?
-			boolean isSafeState = safeStates.isSafe(state);
-			currIndexLevelSafe[1] = currIndexLevelSafe[1] && isSafeState;
 			
 			// RESET THE STATE
 			state.setDynamic(s.state);
@@ -193,6 +189,8 @@ public class PlanTesterBFS {
 				// GOAL ACHIEVED?
 				if (goal.isAchieved(state)) {
 					// WE'RE DONE
+					result.lastExecutableEffectorIndex = s.index;
+					result.lastSafeStateIndex = s.index+1;
 					return true;
 				}
 							
@@ -200,15 +198,27 @@ public class PlanTesterBFS {
 				events.clear();
 				events.add(null); // add NO-EVENT
 				applicables.collectApplicableEvents(domain, state, events);
-				Collections.shuffle(events); // randomize
 				
 				// CONSTRUCT OFFSPRING BFS STATES
 				for (PDDLEffector event : events) {
+					// APPLY EVENT TO AFFECT THE STATE
 					if (event != null) {
-						event.apply(state);
+						event.apply(state);						
 					}
+					
+					// STATE AFTER THE EVENT SAFE?
+					if (indexSafe[s.index+1]) {
+						if (!safeStates.isSafe(state)) {
+							// NO! Applicating this event is breaking the safety!
+							indexSafe[s.index+1] = false;
+						}
+					}
+					
+					// ADD NEW BFS NODE
 					StateCompact newState = state.getDynamic().clone();					
 					queue.add(new BFSState(s.index+1, newState, event, s));
+					
+					// REVERSE THE EVENT TO RESTORE THE STATE
 					if (event != null) {
 						event.reverse(state);
 					}
@@ -220,12 +230,18 @@ public class PlanTesterBFS {
 		}
 		
 		// NO SEQUENCE OF EVENTS PREVENT THE PLAN FROM APPLICATION
-		if (currIndexLevelSafe[1]) {
+		if (indexSafe[1]) {
 			// LAST LEVEL CHECKED OK
 			result.lastSafeStateIndex = levelLimit;
 		}
 		
 		return true;		
 	}
+	
+	@Override
+	public String getDescription() {
+		return getClass().getSimpleName() + "[limit=" + levelLimit + "]";
+	}
+
 	
 }

@@ -5,8 +5,13 @@ import cz.cuni.mff.jpddl.PDDLEffector;
 import cz.cuni.mff.jpddl.PDDLState;
 import cz.cuni.mff.jpddl.store.FastIntMap;
 import cz.cuni.mff.jpddl.store.Pool;
+import cz.cuni.mff.jpddl.utils.StateCompact;
 import cz.cuni.mff.perestroika.domain.Event;
 import cz.cuni.mff.perestroika.domain.State;
+import cz.cuni.mff.perestroika.domain.predicates.P_Accessible;
+import cz.cuni.mff.perestroika.domain.predicates.P_AtAgent;
+import cz.cuni.mff.perestroika.domain.predicates.P_Big;
+import cz.cuni.mff.perestroika.domain.predicates.P_None;
 import cz.cuni.mff.perestroika.domain.types.T_Location;
 import cz.cuni.mff.perestroika.problem.E_Location;
 
@@ -104,6 +109,11 @@ public final class Ev_Create extends Event {
 	public boolean isApplicable(State state) {
 		return    state.p_None.isSet(l); 
 	}
+	
+	@Override
+	public boolean isApplicable(State state, State minusState) {
+		return    state.p_None.isSet(l) && !minusState.p_None.isSet(l); 
+	}
 		
 	@Override
 	public boolean isApplicableUnion(State... states) {
@@ -140,6 +150,28 @@ public final class Ev_Create extends Event {
 		if (applied[0]) state.p_Big.clear(l);
 		if (applied[1]) state.p_None.set(l);
 		if (applied[2]) state.p_Accessible.clear(l);
+	}
+		
+	@Override
+	public void addAdds(StateCompact compact) {
+		compact.set(P_Big.toInt(l));
+		compact.set(P_Accessible.toInt(l));
+	}
+	
+	@Override
+	public void removeAdds(StateCompact compact) {
+		compact.clear(P_Big.toInt(l));
+		compact.clear(P_Accessible.toInt(l));
+	}
+	
+	@Override
+	public void addDeletes(StateCompact compact) {
+		compact.set(P_None.toInt(l));
+	}
+	
+	@Override
+	public void removeDeletes(StateCompact compact) {
+		compact.clear(P_None.toInt(l));
 	}
 	
 	// ===================================================

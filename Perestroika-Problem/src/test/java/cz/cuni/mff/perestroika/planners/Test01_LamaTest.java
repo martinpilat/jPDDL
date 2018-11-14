@@ -14,6 +14,8 @@ import cz.cuni.mff.jpddl.tools.validators.PlanTesterBFS;
 import cz.cuni.mff.jpddl.tools.validators.PlanTesterBFS.PlanTesterBFSResult;
 import cz.cuni.mff.jpddl.tools.validators.PlanTesterDFS;
 import cz.cuni.mff.jpddl.tools.validators.PlanTesterDFS.PlanTesterDFSResult;
+import cz.cuni.mff.jpddl.tools.validators.PlanTesterFlat;
+import cz.cuni.mff.jpddl.tools.validators.PlanTesterFlat.PlanTesterFlatResult;
 import cz.cuni.mff.jpddl.tools.validators.SafeStates;
 import cz.cuni.mff.jpddl.utils.StateCompact;
 import cz.cuni.mff.perestroika.domain.Effector;
@@ -70,14 +72,15 @@ public class Test01_LamaTest {
 			
 			// CHECK THE PLAN
 			{
-				time.start();
-				
-				PlanChecker planChecker = new PlanChecker(problem.getDomain());
-				PlanCheckerResult planCheckerResult = planChecker.check(problem.getGoal(), problem.getState(), plan);
-				
-				time.end();
 				System.out.println();
-				time.reportInline("PLAN CHECKING");			
+				System.out.println("PLAN CHECKING");	
+				
+				time.start();
+				PlanChecker planChecker = new PlanChecker();
+				planChecker.config(problem.getDomain());
+				PlanCheckerResult planCheckerResult = planChecker.validate(problem.getGoal(), problem.getState(), plan);
+				time.end();
+				time.reportInline("  +-- TIME");	
 				
 				if (planCheckerResult.valid) {
 					System.out.println("  +-- Plan is valid!");
@@ -99,12 +102,15 @@ public class Test01_LamaTest {
 			// TEST THE PLAN - OPPORTUNISTIC
 			SafeStates safeStates = new SafeStates(problem.getDomain(), new File("../Domains/Perestroika/safe_states-3"));
 			{
-				time.start();
-				PlanTester planTester = new PlanTester(problem.getDomain(), problem.getApplicables());				
-				PlanTesterResult planTesterResult = planTester.check(problem.getGoal(), problem.getState(), safeStates, plan);
-				time.end();
 				System.out.println();
-				time.reportInline("PLAN TESTER");
+				System.out.println("PLAN TESTER");								
+				
+				time.start();
+				PlanTester planTester = new PlanTester();
+				planTester.config(problem.getDomain(), problem.getApplicables(), 1, safeStates);				
+				PlanTesterResult planTesterResult = planTester.validate(problem.getGoal(), problem.getState(), plan);
+				time.end();
+				time.reportInline("  +-- TIME");								
 				
 				if (planTesterResult.valid) {
 					System.out.println("  +-- Plan is valid!");
@@ -149,12 +155,19 @@ public class Test01_LamaTest {
 			
 			// TEST THE PLAN - DFS WAY
 			{
-				time.start();
-				PlanTesterDFS planTesterDFS = new PlanTesterDFS(problem.getDomain(), problem.getApplicables());
-				PlanTesterDFSResult planTesterDFSResult = planTesterDFS.check(problem.getGoal(), problem.getState(), safeStates, plan);
-				time.end();
 				System.out.println();
-				time.reportInline("PLAN TESTER DFS");				
+				//problem.getState().dump(true);
+				System.out.println("PLAN TESTER DFS");
+				
+				
+				time.start();
+				PlanTesterDFS planTesterDFS = new PlanTesterDFS();
+				planTesterDFS.config(problem.getDomain(), problem.getApplicables(), safeStates);
+				PlanTesterDFSResult planTesterDFSResult = planTesterDFS.validate(problem.getGoal(), problem.getState(), plan);
+				time.end();
+				time.reportInline("  +-- TIME");
+				
+								
 				if (planTesterDFSResult.valid) {
 					System.out.println("  +-- Plan is valid!");
 					System.out.println("  +-- Applied events " + planTesterDFSResult.appliedEvents);
@@ -199,17 +212,16 @@ public class Test01_LamaTest {
 				
 			// TEST THE PLAN - BFS WAY
 			{
-				time.reportInline("PLAN TESTING BFS");
-				problem.getState().dump(true);
+				System.out.println();
+				System.out.println("PLAN TESTING BFS");
+				//problem.getState().dump(true);
 				
 				time.start();
-				PlanTesterBFS planTesterBFS = new PlanTesterBFS(problem.getDomain(), problem.getApplicables());
-				PlanTesterBFSResult planTesterBFSResult = planTesterBFS.check(problem.getGoal(), problem.getState(), safeStates, 15, plan);
+				PlanTesterBFS planTesterBFS = new PlanTesterBFS();
+				planTesterBFS.config(problem.getDomain(), problem.getApplicables(), safeStates, 15);
+				PlanTesterBFSResult planTesterBFSResult = planTesterBFS.validate(problem.getGoal(), problem.getState(), plan);
 				time.end();
-				System.out.println();
-					
-				
-				
+				time.reportInline("  +-- TIME");
 				
 				System.out.println("  +-- Events-lookahead " + (planTesterBFSResult.bfsLimit));
 				if (planTesterBFSResult.valid) {
@@ -242,6 +254,58 @@ public class Test01_LamaTest {
 					if (planTesterBFSResult.events[i] != null) planTesterBFSResult.events[i].apply(planTesterBFSResult.state);
 				}
 				planTesterBFSResult.state.dump();
+				*/
+				
+				/*
+				System.out.println("CHECKING THE STATE!");
+				if (!originalState.equals(problem.getState().getDynamic())) {
+					System.out.println("  +-- State differs from the original state!");
+					problem.getState().setDynamic(originalState);
+				} else {
+					System.out.println("  +-- State is still the same.");
+				}
+				*/
+			}
+			
+			// TEST THE PLAN - FLAT WAY
+			{
+				System.out.println();
+				System.out.println("PLAN TESTING FLAT");
+				//problem.getState().dump(true);
+				
+				time.start();
+				PlanTesterFlat planTesterFlat = new PlanTesterFlat();
+				planTesterFlat.config(problem.getDomain(), problem.getApplicables(), safeStates);
+				PlanTesterFlatResult planTesterFlatResult = planTesterFlat.validate(problem.getGoal(), problem.getState(), plan);
+				time.end();
+				time.reportInline("  +-- TIME");
+				
+				if (planTesterFlatResult.valid) {
+					System.out.println("  +-- Plan is valid!");
+				} else {
+					System.out.println("  +-- Plan is INvalid! Last executable action index is " + planTesterFlatResult.lastExecutableEffectorIndex + ".");
+					System.out.print("  +-- Actions: ");
+					for (int i = 0; i < planTesterFlatResult.plan.length; ++i) {
+						if (i != 0) System.out.print(" -> ");
+						if (i == planTesterFlatResult.lastExecutableEffectorIndex+1) {
+							System.out.print("!!! ");
+						}
+						System.out.print(planTesterFlatResult.plan[i] == null ? "null" : planTesterFlatResult.plan[i].toEffector());
+						if (i == planTesterFlatResult.lastExecutableEffectorIndex+1) {
+							System.out.print(" !!! ");
+						}
+					}
+					System.out.println();						
+				}
+				
+				System.out.println("  +-- Last safe state index is " + planTesterFlatResult.lastSafeStateIndex + ".");
+				/*
+				System.out.println("SAFE STATE");
+				for (int i = 0; i < planTesterFlatResult.lastSafeStateIndex; ++i) {
+					planTesterFlatResult.plan[i].apply(planTesterFlatResult.state);
+					if (planTesterFlatResult.events[i] != null) planTesterFlatResult.events[i].apply(planTesterFlatResult.state);
+				}
+				planTesterFlatResult.state.dump();
 				*/
 				
 				/*

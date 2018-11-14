@@ -2,7 +2,12 @@ package cz.cuni.mff.auv.domain.events;
 
 import cz.cuni.mff.auv.domain.Event;
 import cz.cuni.mff.auv.domain.State;
+import cz.cuni.mff.auv.domain.predicates.P_At;
+import cz.cuni.mff.auv.domain.predicates.P_DupFree;
 import cz.cuni.mff.auv.domain.predicates.P_Entry;
+import cz.cuni.mff.auv.domain.predicates.P_Free;
+import cz.cuni.mff.auv.domain.predicates.P_Operational;
+import cz.cuni.mff.auv.domain.predicates.P_Outside;
 import cz.cuni.mff.auv.domain.types.T_Location;
 import cz.cuni.mff.auv.domain.types.T_Ship;
 import cz.cuni.mff.auv.problem.E_Auv;
@@ -13,6 +18,7 @@ import cz.cuni.mff.jpddl.PDDLEffector;
 import cz.cuni.mff.jpddl.PDDLState;
 import cz.cuni.mff.jpddl.store.FastIntMap;
 import cz.cuni.mff.jpddl.store.Pool;
+import cz.cuni.mff.jpddl.utils.StateCompact;
 
 /**
  * EVENT
@@ -119,6 +125,14 @@ public final class Ev_EnterShipFree extends Event {
 			   && state.p_Free.isSet(l) 
 			   && state.p_DupFree.isSet(l); 
 	}
+	
+	@Override
+	public boolean isApplicable(State state, State minusState) {
+		return    state.p_Outside.isSet(s)  && !minusState.p_Outside.isSet(s) 
+			   && state.p_Entry.isSet(s, l) && !minusState.p_Entry.isSet(s, l)
+			   && state.p_Free.isSet(l)     && !minusState.p_Free.isSet(l)
+			   && state.p_DupFree.isSet(l)  && !minusState.p_DupFree.isSet(l); 
+	}
 		
 	@Override
 	public boolean isApplicableUnion(State... states) {
@@ -176,6 +190,30 @@ public final class Ev_EnterShipFree extends Event {
 		if (applied[1]) state.p_Free.set(l);
 		if (applied[2]) state.p_DupFree.set(l);
 		if (applied[3]) state.p_Outside.set(s);
+	}
+	
+	@Override
+	public void addAdds(StateCompact compact) {
+		compact.set(P_At.toInt(s, l));
+	}
+	
+	@Override
+	public void removeAdds(StateCompact compact) {
+		compact.clear(P_At.toInt(s, l));
+	}
+	
+	@Override
+	public void addDeletes(StateCompact compact) {
+		compact.set(P_Free.toInt(l));
+		compact.set(P_DupFree.toInt(l));
+		compact.set(P_Outside.toInt(s));
+	}
+	
+	@Override
+	public void removeDeletes(StateCompact compact) {
+		compact.clear(P_Free.toInt(l));
+		compact.clear(P_DupFree.toInt(l));
+		compact.clear(P_Outside.toInt(s));
 	}
 	
 	// ===================================================

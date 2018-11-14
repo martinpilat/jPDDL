@@ -6,9 +6,11 @@ import cz.cuni.mff.jpddl.PDDLEffector;
 import cz.cuni.mff.jpddl.PDDLState;
 import cz.cuni.mff.jpddl.store.FastIntMap;
 import cz.cuni.mff.jpddl.store.Pool;
+import cz.cuni.mff.jpddl.utils.StateCompact;
 import cz.cuni.mff.perestroika.domain.Action;
 import cz.cuni.mff.perestroika.domain.State;
 import cz.cuni.mff.perestroika.domain.predicates.P_AtRes;
+import cz.cuni.mff.perestroika.domain.predicates.P_Taken;
 import cz.cuni.mff.perestroika.domain.types.T_Location;
 import cz.cuni.mff.perestroika.domain.types.T_Resource;
 import cz.cuni.mff.perestroika.problem.E_Location;
@@ -118,6 +120,13 @@ public final class Ac_Collect extends Action {
 	}
 	
 	@Override
+	public boolean isApplicable(State state, State minusState) {
+		return    state.p_Alive.isSet()     && !minusState.p_Alive.isSet()  
+			   && state.p_AtAgent.isSet(l)  && !minusState.p_AtAgent.isSet(l)
+			   && state.p_AtRes.isSet(r, l) && !minusState.p_AtRes.isSet(r, l);
+	}
+	
+	@Override
 	public boolean isApplicableUnion(State... states) {
 		boolean applicable;
 		
@@ -161,6 +170,24 @@ public final class Ac_Collect extends Action {
 	@Override
 	public void reverse(State state) {
 		if (applied[0]) state.p_Taken.clear(r);
+	}
+	
+	@Override
+	public void addAdds(StateCompact compact) {
+		compact.set(P_Taken.toInt(r));
+	}
+	
+	@Override
+	public void removeAdds(StateCompact compact) {
+		compact.clear(P_Taken.toInt(r));
+	}
+	
+	@Override
+	public void addDeletes(StateCompact compact) {
+	}
+	
+	@Override
+	public void removeDeletes(StateCompact compact) {
 	}
 	
 	// ===================================================

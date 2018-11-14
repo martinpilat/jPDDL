@@ -14,44 +14,38 @@ import cz.cuni.mff.jpddl.PDDLState;
  * 
  * @author Jimmy
  */
-public class PlanTesterDFS {
+public class PlanTesterDFS implements IPlanValidator {
 	
-	public static class PlanTesterDFSResult {
-		
-		public PDDLState state;
-		
-		public SafeStates safeStates;
-		
-		public PDDLEffector[] plan;
-		
-		public PDDLEffector[] events;
-		
-		public boolean valid;				
-		
-		public int lastExecutableEffectorIndex;
+	public static class PlanTesterDFSResult extends PlanValidatorResult {
 		
 		/**
-		 * State was safe after actions and events [0;lastSafeStateIndex) were applied.
-		 * I.e., if you take state and applies plan[0];events[0];plane[1];events[1];...;plan[lastSafeStateIndex-1];events[lastSafeStateIndex-1]
-		 * you are in the safe state.
+		 * Safe states used.
 		 */
-		public int lastSafeStateIndex;
+		public SafeStates safeStates;
 		
+		/**
+		 * Unfortunate sequence of events in case of failure.
+		 */
+		public PDDLEffector[] events;
+
+		/**
+		 * How many events we have applied during the search.
+		 */
 		public int appliedEvents = 0;
 	}
 
 	private PDDLDomain domain;
 	private PDDLApplicables applicables;
+	private SafeStates safeStates;
 	
-	public PlanTesterDFS() {		
-	}
-
-	public PlanTesterDFS(PDDLDomain domain, PDDLApplicables applicables) {
+	public void config(PDDLDomain domain, PDDLApplicables applicables, SafeStates safeStates) {
 		this.domain = domain;
 		this.applicables = applicables;
+		this.safeStates = safeStates;
 	}
 	
-	public PlanTesterDFSResult check(PDDLGoal goal, PDDLState state, SafeStates safeStates, PDDLEffector... plan) {
+	@Override
+	public PlanTesterDFSResult validate(PDDLGoal goal, PDDLState state, PDDLEffector... plan) {
 		PlanTesterDFSResult result = new PlanTesterDFSResult();
 		
 		result.valid = true;
@@ -62,7 +56,7 @@ public class PlanTesterDFS {
 		result.lastExecutableEffectorIndex = -1;
 		result.lastSafeStateIndex = -1;
 		
-		if (dfs(state, safeStates, plan, 0, result)) {
+		if (dfs(state, plan, 0, result)) {
 			// CHECK GOAL
 			result.valid = goal.isAchieved(state);
 		} else {
@@ -74,7 +68,7 @@ public class PlanTesterDFS {
 		
 	}
 	
-	public boolean dfs(PDDLState state, SafeStates safeStates, PDDLEffector[] plan, int index, PlanTesterDFSResult result) {
+	public boolean dfs(PDDLState state, PDDLEffector[] plan, int index, PlanTesterDFSResult result) {
 		if (index >= plan.length) return true;
 		
 		// IS SAFE STATE?
@@ -104,7 +98,7 @@ public class PlanTesterDFS {
 			++result.appliedEvents;
 			
 			// SEARCH NEXT LEVEL
-			if (!dfs(state, safeStates, plan, index+1, result)) {			
+			if (!dfs(state, plan, index+1, result)) {			
 				// WE HAVE FOUND UNFORTUNATE SEQUENCE OF EVENTS
 				if (result.lastSafeStateIndex < 0 && isSafeState) {
 					result.lastSafeStateIndex = index;					
@@ -128,7 +122,7 @@ public class PlanTesterDFS {
 		
 		// NO EVENT HAPPENED 
 		// => SEARCH NEXT LEVEL
-		if (!dfs(state, safeStates, plan, index+1, result)) {			
+		if (!dfs(state, plan, index+1, result)) {			
 			// WE HAVE FOUND UNFORTUNATE SEQUENCE OF EVENTS
 			if (result.lastSafeStateIndex < 0 && isSafeState) {
 				result.lastSafeStateIndex = index;					
@@ -144,6 +138,11 @@ public class PlanTesterDFS {
 		plan[index].reverse(state);
 		
 		return true;		
+	}
+	
+	@Override
+	public String getDescription() {
+		return getClass().getSimpleName();
 	}
 	
 }

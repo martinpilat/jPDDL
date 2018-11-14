@@ -19,7 +19,7 @@ public class Timed {
 	}
 	
 	public void reportInline(String headline) {
-		System.out.println(headline + ": " + durationMillis + "ms = " + (((double)durationMillis) / 1000.0d) + "s");
+		System.out.println(headline + ": " + getTimeString(durationMillis));
 	}
 	
 	public void report(String headline) {
@@ -28,7 +28,11 @@ public class Timed {
 	
 	public void report(String headline, String indent) {
 		System.out.println(indent + headline);
-		System.out.println(indent + "  +-- time:   " + durationMillis + "ms = " + (((double)durationMillis) / 1000.0d) + "s");
+		System.out.println(indent + "  +-- time:   " + getTimeString(durationMillis));
+	}
+	
+	public static String getTimeString(long millis) {
+		return millis + "ms = " + (((double)millis) / 1000.0d) + "s";
 	}
 	
 }
