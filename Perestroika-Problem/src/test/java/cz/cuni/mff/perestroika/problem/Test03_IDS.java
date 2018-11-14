@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import cz.cuni.mff.jpddl.PDDLEffector;
 import cz.cuni.mff.jpddl.tools.search.IDS;
-import cz.cuni.mff.perestroika.problem.Problem;
+import cz.cuni.mff.perestroika.problem1.Problem;
 
 public class Test03_IDS {
 

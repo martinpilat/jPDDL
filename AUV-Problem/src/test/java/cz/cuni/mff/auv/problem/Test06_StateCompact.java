@@ -5,6 +5,7 @@ import java.util.List;
 
 import cz.cuni.mff.auv.domain.Effector;
 import cz.cuni.mff.auv.domain.State;
+import cz.cuni.mff.auv.problem1.Problem;
 import cz.cuni.mff.jpddl.IPDDLUnification;
 import cz.cuni.mff.jpddl.utils.StateCompact;
 

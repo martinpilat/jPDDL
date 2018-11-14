@@ -3,9 +3,9 @@ package cz.cuni.mff.auv.problem;
 import java.util.ArrayList;
 import java.util.List;
 
+import cz.cuni.mff.auv.problem1.Problem;
 import org.junit.Test;
 
-import cz.cuni.mff.auv.domain.Action;
 import cz.cuni.mff.auv.domain.Effector;
 import cz.cuni.mff.auv.domain.State;
 import cz.cuni.mff.jpddl.IPDDLUnification;

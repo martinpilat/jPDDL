@@ -20,7 +20,7 @@ public final class E_Ship extends PDDLEnum<T_Ship> {
 		return true;
 	}
 	
-	protected void register(int index, T_Ship e) {
+	public void register(int index, T_Ship e) {
 		super.register(index, e);
 	}
 	

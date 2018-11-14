@@ -6,10 +6,9 @@ import java.util.List;
 import org.junit.Test;
 
 import cz.cuni.mff.jpddl.IPDDLUnification;
-import cz.cuni.mff.perestroika.domain.Action;
 import cz.cuni.mff.perestroika.domain.Effector;
 import cz.cuni.mff.perestroika.domain.State;
-import cz.cuni.mff.perestroika.problem.Problem;
+import cz.cuni.mff.perestroika.problem1.Problem;
 
 public class Test02_Effectors {
 

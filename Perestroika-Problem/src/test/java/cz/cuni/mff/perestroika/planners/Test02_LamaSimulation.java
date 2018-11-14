@@ -13,7 +13,7 @@ import cz.cuni.mff.jpddl.tools.validators.PlanTesterBFS;
 import cz.cuni.mff.jpddl.tools.validators.SafeStates;
 import cz.cuni.mff.jpddl.tools.validators.PlanTesterBFS.PlanTesterBFSResult;
 import cz.cuni.mff.perestroika.domain.Effector;
-import cz.cuni.mff.perestroika.problem.Problem;
+import cz.cuni.mff.perestroika.problem1.Problem;
 
 public class Test02_LamaSimulation {
 	

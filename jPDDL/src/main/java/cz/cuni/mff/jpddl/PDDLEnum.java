@@ -23,7 +23,7 @@ public abstract class PDDLEnum<T extends PDDLType> {
 	
 	private int bitCount = 0;
 	
-	protected void register(int index, T e) {
+	public void register(int index, T e) {
 		while (elements.size() <= index) elements.add(null);
 		elements.set(index, e);
 		elementsMap.put(e.name, e);

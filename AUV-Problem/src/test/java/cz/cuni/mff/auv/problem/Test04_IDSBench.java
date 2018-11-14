@@ -2,6 +2,7 @@ package cz.cuni.mff.auv.problem;
 
 import java.util.List;
 
+import cz.cuni.mff.auv.problem1.Problem;
 import org.junit.Test;
 
 import cz.cuni.mff.jpddl.PDDLEffector;

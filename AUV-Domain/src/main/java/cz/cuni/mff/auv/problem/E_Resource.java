@@ -20,7 +20,7 @@ public final class E_Resource extends PDDLEnum<T_Resource> {
 		return true;
 	}
 	
-	protected void register(int index, T_Resource e) {
+	public void register(int index, T_Resource e) {
 		super.register(index, e);
 	}
 	

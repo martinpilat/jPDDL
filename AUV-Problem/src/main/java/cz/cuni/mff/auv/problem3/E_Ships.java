@@ -1,0 +1,24 @@
+package cz.cuni.mff.auv.problem3;
+
+import cz.cuni.mff.auv.domain.types.T_Ship;
+import cz.cuni.mff.auv.problem.E_Ship;
+import cz.cuni.mff.jpddl.PDDLEnum;
+
+public final class E_Ships {
+
+	
+	public static final T_Ship s = new T_Ship("s");
+	public static final T_Ship s2 = new T_Ship("s2");
+	public static final T_Ship s3 = new T_Ship("s3");
+
+	static {
+	    
+		E_Ship.THIS.register(T_Ship.getIndex(s), s);
+		E_Ship.THIS.register(T_Ship.getIndex(s2), s2);
+		E_Ship.THIS.register(T_Ship.getIndex(s3), s3);
+	}
+		
+	protected E_Ships() {
+	}
+	
+}

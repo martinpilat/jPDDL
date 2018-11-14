@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import cz.cuni.mff.auv.domain.Effector;
-import cz.cuni.mff.auv.problem.Problem;
+import cz.cuni.mff.auv.problem1.Problem;
 import cz.cuni.mff.jpddl.PDDLEffector;
 import cz.cuni.mff.jpddl.PDDLStringInstance;
 import cz.cuni.mff.jpddl.tools.planners.Lama;
@@ -39,7 +39,7 @@ public class Test02_LamaSimulation {
 		int LOOKAHEAD = 15;
 		
 		Problem problem = new Problem();		
-		SafeStates safeStates = new SafeStates(problem.getDomain(), new File("safe_states"));
+		SafeStates safeStates = new SafeStates(problem.getDomain(), new File("Domains/AUV/safe_states"));
 		PlanTesterBFS planTesterBFS = new PlanTesterBFS(problem.getDomain(), problem.getApplicables());
 		
 		File domainFile = problem.getDomain().getDomainPureFile();
