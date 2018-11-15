@@ -2,7 +2,6 @@ package cz.cuni.mff.auv.planners;
 
 import java.io.File;
 
-import cz.cuni.mff.auv.problem3.Problem;
 import cz.cuni.mff.jpddl.tools.simulations.LamaSimulation;
 import cz.cuni.mff.jpddl.tools.validators.PlanChecker;
 import cz.cuni.mff.jpddl.tools.validators.PlanTesterFlat;
@@ -11,8 +10,8 @@ import cz.cuni.mff.jpddl.tools.validators.SafeStates;
 public class Test02_LamaSimulation {
 	
 	public void sim3(int runs) {
-		Problem problem = new Problem();		
-		SafeStates safeStates = new SafeStates(problem.getDomain(), new File("../Domains/AUV/safe_states-3"));
+		cz.cuni.mff.auv.problem5.Problem problem = new cz.cuni.mff.auv.problem5.Problem();		
+		SafeStates safeStates = new SafeStates(problem.getDomain(), new File("../Domains/AUV/safe_states-5"));
 				
 		PlanChecker planChecker = new PlanChecker();
 		planChecker.config(problem.getDomain(), safeStates);

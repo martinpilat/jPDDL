@@ -45,13 +45,15 @@ public class LamaRun {
 	
 	private long planningMillis = 0;
 	
+	private boolean noopAction = false;
+	
 	private void simulateEvent(PDDLProblem problem, Random random) {
 		// COLLECT APPLICABLE EVENTS
 		events .clear();
-		events.add(null); // add NO-EVENT
+		if (!noopAction) events.add(null); // add NO-EVENT
 		problem.getApplicables().collectApplicableEvents(problem.getDomain(), problem.getState(), events);
 		
-		Collections.shuffle(events); // randomize
+		Collections.shuffle(events, random); // randomize
 		
 		PDDLEffector event = events.get(0);
 		
@@ -183,10 +185,10 @@ public class LamaRun {
 							PlanValidatorResult planCheckerImprovedResult = validator.validate(problem.getGoal(), problem.getState(), improvedPlan);
 							validationTime.end();
 							validatingMillis += validationTime.durationMillis;
-							if (planCheckerImprovedResult.firstSafeStateIndex > 0) {
-								System.out.println("      +-- Safe state found in " + planCheckerImprovedResult.firstSafeStateIndex + " steps, simulating plan!");
+							if (planCheckerImprovedResult.lastSafeStateIndex > 0) {
+								System.out.println("      +-- Last safe state found in " + planCheckerImprovedResult.lastSafeStateIndex + " steps, simulating plan!");
 								plan = improvedPlan;
-								toExecuteActions = planCheckerImprovedResult.firstSafeStateIndex;
+								toExecuteActions = planCheckerImprovedResult.lastSafeStateIndex;
 							} else {
 								System.out.println("      +-- NO SAFE STATE CAN BE REACHED WITH THE IMPROVED PLAN!");
 							}
@@ -196,8 +198,9 @@ public class LamaRun {
 					}
 				}
 				
-				if (toExecuteActions > 0) {
+				if (toExecuteActions > 0) {					
 					System.out.println("  +-- Executing plan, actions[0-" + (toExecuteActions-1) + "]");
+					noopAction = false;
 					for (int i = 0; i < toExecuteActions; ++i) {
 						if (!plan[i].isApplicable(problem.getState())) {
 							System.out.println("    +-- Action[" + i  + "/" + (++action) + "]: " + plan[i].toEffector() + " is NOT APPLICABLE, terminating the plan execution!");
@@ -214,6 +217,7 @@ public class LamaRun {
 					}
 				} else {
 					System.out.println("  +-- ACTION[" + (++action) + ".]: no-op");
+					noopAction = true;
 					simulateEvent(problem, random);
 				}		
 			}
@@ -270,7 +274,7 @@ public class LamaRun {
 		
 		// TRANSLATE PLAN
 		PDDLEffector[] improvement = problem.getDomain().toEffectors(lamaPlan.toArray(new PDDLStringInstance[0]));			
-		System.out.println("    +-- Improvement has " + plan.length + " steps, merging with original plan");
+		System.out.println("    +-- Improvement has '" + plan.length + "' steps, merging with original plan");
 		
 		List<PDDLEffector> result = new ArrayList<PDDLEffector>();
 		for (int i = 0; i < improvement.length; ++i) 

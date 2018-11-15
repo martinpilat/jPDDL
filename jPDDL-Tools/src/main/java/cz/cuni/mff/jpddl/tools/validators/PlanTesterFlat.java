@@ -62,7 +62,8 @@ public class PlanTesterFlat implements IPlanValidator {
 		StateCompact stateWithoutPMinus = new StateCompact();
 		StateCompact stateWithPPlus = new StateCompact();		
 		
-		for (int i = 0; i < plan.length; ++i) {
+		int i;
+		for (i = 0; i < plan.length; ++i) {
 			// SET STATE WITHOUT pMinus
 			stateWithoutPMinus.reset();
 			stateWithoutPMinus.add(s);
@@ -120,6 +121,8 @@ public class PlanTesterFlat implements IPlanValidator {
 		state.setDynamic(stateWithoutPMinus);		
 		if (!goal.isAchieved(state)) {
 			result.valid = false;
+		} else {
+			result.lastSafeStateIndex = i;
 		}
 		
 		// ROLLBACK STATE
