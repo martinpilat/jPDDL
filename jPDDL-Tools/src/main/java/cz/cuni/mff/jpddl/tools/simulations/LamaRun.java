@@ -130,14 +130,16 @@ public class LamaRun {
 			planningTime.end();
 			planningMillis += planningTime.durationMillis;
 			problemFile.delete();
+			
+			int toExecuteActions = 0;
+			PDDLEffector[] plan = null;
+			
 			if (lamaPlan == null) {
 				System.out.println("  +-- LAMA FAILED TO FIND THE PLAN!");
 			} else {
 				// TRANSLATE PLAN
-				PDDLEffector[] plan = problem.getDomain().toEffectors(lamaPlan.toArray(new PDDLStringInstance[0]));			
-				System.out.println("  +-- Plan has " + plan.length + " steps");
-					
-				int toExecuteActions = 0;
+				plan = problem.getDomain().toEffectors(lamaPlan.toArray(new PDDLStringInstance[0]));			
+				System.out.println("  +-- Plan has " + plan.length + " steps");				
 				
 				System.out.println("  +-- Validating the plan...");
 				validationTime.start();
@@ -197,30 +199,32 @@ public class LamaRun {
 						System.out.println("    +-- No safe state found along the plan.");
 					}
 				}
-				
-				if (toExecuteActions > 0) {					
-					System.out.println("  +-- Executing plan, actions[0-" + (toExecuteActions-1) + "]");
-					noopAction = false;
-					for (int i = 0; i < toExecuteActions; ++i) {
-						if (!plan[i].isApplicable(problem.getState())) {
-							System.out.println("    +-- Action[" + i  + "/" + (++action) + "]: " + plan[i].toEffector() + " is NOT APPLICABLE, terminating the plan execution!");
-							break;
-						}
-						System.out.println("    +-- ACTION[" + (++action) + ".]: " + plan[i].toEffector());
-						plan[i].apply(problem.getState());
-						if (problem.getGoal().isAchieved(problem.getState())) {
-							System.out.println("    +-- GOAL ACHIEVED!");
-							result = LamaRunResult.GOAL_ACHIEVED;
-							break;
-						}
-						simulateEvent(problem, random);
-					}
-				} else {
-					System.out.println("  +-- ACTION[" + (++action) + ".]: no-op");
-					noopAction = true;
-					simulateEvent(problem, random);
-				}		
+										
 			}
+			
+			if (toExecuteActions > 0) {					
+				System.out.println("  +-- Executing plan, actions[0-" + (toExecuteActions-1) + "]");
+				noopAction = false;
+				for (int i = 0; i < toExecuteActions; ++i) {
+					if (!plan[i].isApplicable(problem.getState())) {
+						System.out.println("    +-- Action[" + i  + "/" + (++action) + "]: " + plan[i].toEffector() + " is NOT APPLICABLE, terminating the plan execution!");
+						break;
+					}
+					System.out.println("    +-- ACTION[" + (++action) + ".]: " + plan[i].toEffector());
+					plan[i].apply(problem.getState());
+					if (problem.getGoal().isAchieved(problem.getState())) {
+						System.out.println("    +-- GOAL ACHIEVED!");
+						result = LamaRunResult.GOAL_ACHIEVED;
+						break;
+					}
+					simulateEvent(problem, random);
+				}
+			} else {
+				System.out.println("  +-- ACTION[" + (++action) + ".]: no-op");
+				noopAction = true;
+				simulateEvent(problem, random);
+			}
+			
 		}
 		
 		System.out.println("LamaRun Finished");
