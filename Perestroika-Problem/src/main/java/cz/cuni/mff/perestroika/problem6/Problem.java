@@ -2,12 +2,12 @@ package cz.cuni.mff.perestroika.problem6;
 
 
 import cz.cuni.mff.jpddl.PDDLDeadEnd;
-import cz.cuni.mff.jpddl.PDDLProblem;
 import cz.cuni.mff.perestroika.domain.Domain;
 import cz.cuni.mff.perestroika.domain.State;
+import cz.cuni.mff.perestroika.problem.PerestroikaProblem;
 import cz.cuni.mff.perestroika.problem1.DeadEnd;
 
-public final class Problem extends PDDLProblem {
+public final class Problem extends PerestroikaProblem {
 	
 	static {
 		// ENSURE STATIC INITIALIZATION OF THE CLASSES

@@ -12,12 +12,15 @@ public class PlanChecker implements IPlanValidator {
 	}
 	
 	private PDDLDomain domain;
+	
+	private SafeStates safeStates;
 
 	public PlanChecker() {
 	}
 	
-	public void config(PDDLDomain domain) {
+	public void config(PDDLDomain domain, SafeStates safeStates) {
 		this.domain = domain;
+		this.safeStates = safeStates;
 	}
 	
 	@Override
@@ -28,11 +31,17 @@ public class PlanChecker implements IPlanValidator {
 		result.state = state;
 		result.plan = plan;
 		result.lastExecutableEffectorIndex = -1;
+		result.lastSafeStateIndex = safeStates.isSafe(state) ? 0 : -1;
 		
 		for (int i = 0; i < plan.length; ++i) {
 			if (plan[i].isApplicable(state)) {
 				result.lastExecutableEffectorIndex = i;
 				plan[i].apply(state);
+				
+				if (result.firstSafeStateIndex < 0 && safeStates.isSafe(state)) {
+					result.firstSafeStateIndex = i+1;
+				}
+				
 			} else {
 				result.valid = false;
 				break;

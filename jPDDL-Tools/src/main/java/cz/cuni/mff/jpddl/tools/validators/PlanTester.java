@@ -65,6 +65,10 @@ public class PlanTester implements IPlanValidator {
 				result.lastExecutableEffectorIndex = i;				
 				plan[i].apply(state);
 				
+				if (result.firstSafeStateIndex < 0 && safeStates.isSafe(state)) {
+					result.firstSafeStateIndex = i+1;
+				}
+				
 				// SIMULATE RANDOM EVENT
 				List<PDDLEffector> events = new ArrayList<PDDLEffector>();
 				applicables.collectApplicableEvents(domain, state, events);				

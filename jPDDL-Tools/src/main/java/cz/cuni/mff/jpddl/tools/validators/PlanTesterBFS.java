@@ -156,6 +156,9 @@ public class PlanTesterBFS implements IPlanValidator {
 				//   => all sequence of events events [0]-[s.index-1] were checked not to mess up the plan
 				//   => we have checked that under all circumstances action[s.index-1] is applicable				
 				if (indexSafe[currIndexLevel]) {
+					if (result.firstSafeStateIndex < 0 && currIndexLevel > 0) {
+						result.firstSafeStateIndex = currIndexLevel;
+					}
 					result.lastSafeStateIndex = currIndexLevel;
 				}
 
@@ -209,7 +212,7 @@ public class PlanTesterBFS implements IPlanValidator {
 					// STATE AFTER THE EVENT SAFE?
 					if (indexSafe[s.index+1]) {
 						if (!safeStates.isSafe(state)) {
-							// NO! Applicating this event is breaking the safety!
+							// NO! Applying this event is breaking the safety!
 							indexSafe[s.index+1] = false;
 						}
 					}
@@ -230,8 +233,11 @@ public class PlanTesterBFS implements IPlanValidator {
 		}
 		
 		// NO SEQUENCE OF EVENTS PREVENT THE PLAN FROM APPLICATION
-		if (indexSafe[1]) {
+		if (indexSafe[levelLimit]) {
 			// LAST LEVEL CHECKED OK
+			if (result.firstSafeStateIndex < 0) {
+				result.firstSafeStateIndex = levelLimit;
+			}
 			result.lastSafeStateIndex = levelLimit;
 		}
 		

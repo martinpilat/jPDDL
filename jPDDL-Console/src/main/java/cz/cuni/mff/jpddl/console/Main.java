@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
-
 import com.martiansoftware.jsap.FlaggedOption;
 import com.martiansoftware.jsap.JSAP;
 import com.martiansoftware.jsap.JSAPException;
@@ -110,6 +108,8 @@ public class Main {
 	private static File safeStatesFile;
 	
 	private static SafeStates safeStates;
+	
+	private static PlanChecker planChecker;
 	
 	private static boolean headerOutput = false;
 
@@ -269,7 +269,7 @@ public class Main {
 		
 		FlaggedOption opt544 = new FlaggedOption(ARG_SAFE_STATES_FILE_LONG)
 	    		.setStringParser(JSAP.STRING_PARSER)
-	    		.setRequired(false)
+	    		.setRequired(true)
 		    	.setShortFlag(ARG_SAFE_STATES_FILE_SHORT)
 		    	.setLongFlag(ARG_SAFE_STATES_FILE_LONG);    
 		opt544.setHelp("File containing list of safe states.");
@@ -398,26 +398,22 @@ public class Main {
 			fail("Invalid number of total runs = " + totalRuns + " < 1.");
 		}
 		
-		if (safeStatesFileString != null && safeStatesFileString.length() > 0) {
-			safeStatesFile = new File(safeStatesFileString);
-			System.out.println("-- Safe states file: " + safeStatesFileString + " --> " + safeStatesFile.getAbsolutePath());		
-			if (!safeStatesFile.exists()) {
-				fail("Safe states file does not exist at '" + safeStatesFileString + "', resolved as: " + safeStatesFile.getAbsolutePath());
-			}
-			if (!safeStatesFile.isFile()) {
-				fail("Safe states file is not a file at at '" + safeStatesFileString + "', resolved as: " + safeStatesFile.getAbsolutePath());
-			}
-			System.out.println("---- Safe states file exist.");
-			safeStates = new SafeStates(problem.getDomain(), safeStatesFile);
-			System.out.println("---- Safe states file loaded, safe states count: " + safeStates.predicates.size());
-		} else {
-			System.out.println("-- Safe states file not specified.");
+		safeStatesFile = new File(safeStatesFileString);
+		System.out.println("-- Safe states file: " + safeStatesFileString + " --> " + safeStatesFile.getAbsolutePath());		
+		if (!safeStatesFile.exists()) {
+			fail("Safe states file does not exist at '" + safeStatesFileString + "', resolved as: " + safeStatesFile.getAbsolutePath());
 		}
+		if (!safeStatesFile.isFile()) {
+			fail("Safe states file is not a file at at '" + safeStatesFileString + "', resolved as: " + safeStatesFile.getAbsolutePath());
+		}
+		System.out.println("---- Safe states file exist.");
+		safeStates = new SafeStates(problem.getDomain(), safeStatesFile);
+		System.out.println("---- Safe states file loaded, safe states count: " + safeStates.predicates.size());
 		
-		if (!validatorString.equals("CHECKER") && safeStatesFile == null) {
+		if (safeStatesFile == null) {
 			fail("Selected plan validator (" + validatorString + ") requires a safe states file!");
 		}
-		
+				
 	    System.out.println("Sanity checks OK!");
 	}
 	
@@ -436,9 +432,14 @@ public class Main {
 		Lama.fdDir = fastDownwardDirString;
 		Lama.fdExec = fastDownwardExecString;
 		
+		System.out.println("-- configuring plan checker");
+		planChecker = new PlanChecker();
+		planChecker.config(problem.getDomain(), safeStates);
+		
+		
 		System.out.println("-- configuring the plan validator");
 		if (validatorString.equals("CHECKER")) {
-			((PlanChecker)validator).config(problem.getDomain());
+			((PlanChecker)validator).config(problem.getDomain(), safeStates);
 		} else
 		if (validatorString.equals("RNG")) {
 			((PlanTester)validator).config(problem.getDomain(), problem.getApplicables(), randomSeed, safeStates);
@@ -463,7 +464,7 @@ public class Main {
 		
 		Timed time = new Timed();
 		time.start();
-		simulation.simulate(totalRuns, simulationId, problem, validator, maxIterations, randomSeed, resultsCSVFile);
+		simulation.simulate(totalRuns, simulationId, problem, planChecker, validator, maxIterations, randomSeed, resultsCSVFile);
 		time.end();
 		
 		System.out.println();

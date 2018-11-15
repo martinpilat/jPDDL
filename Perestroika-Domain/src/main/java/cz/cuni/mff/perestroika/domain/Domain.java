@@ -33,6 +33,11 @@ public final class Domain extends PDDLDomain {
 	}
 	
 	@Override
+	public File getDomainFlatFile() {
+		return locateResourceFile("perestroika/domain-flat.pddl", "resources/perestroika/domain-flat.pddl", "Perestroika-Domain/src/main/resources/perestroika/domain-flat.pddl", "../Perestroika-Domain/src/main/resources/perestroika/domain-flat.pddl", "../../Perestroika-Domain/src/main/resources/perestroika/domain-flat.pddl" );
+	}
+	
+	@Override
 	public Action[] getActions() {
 		return Action.ALL;
 	}

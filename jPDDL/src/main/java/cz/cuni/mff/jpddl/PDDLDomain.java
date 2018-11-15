@@ -22,6 +22,12 @@ public abstract class PDDLDomain {
 	 */
 	public abstract File getDomainPureFile();
 	
+	/**
+	 * Returns file with flat PDDL domain. 
+	 * @return
+	 */
+	public abstract File getDomainFlatFile();
+	
 	public abstract PDDLEffector[] getActions();
 	public abstract PDDLEffector[] getEvents();
 	public abstract PDDLEffector[] getEffectors();

@@ -7,6 +7,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import cz.cuni.mff.jpddl.utils.StateCompact;
+
 public abstract class PDDLProblem {	
 
 	public PDDLApplicables applicables;
@@ -26,7 +28,7 @@ public abstract class PDDLProblem {
 	}
 
 	
-	public String toPDDL(PDDLState state) {
+	public String toPDDL(PDDLState state, String goal) {
 		StringBuffer sb = new StringBuffer();
 		sb.append("(define (problem " + getName() + ")\n");
 		sb.append("(:domain " + getDomain().getName() + ")\n");
@@ -60,7 +62,7 @@ public abstract class PDDLProblem {
 		sb.append("\n");
 		sb.append(")\n");		
 		sb.append("\n");
-		sb.append(getGoal().toPDDL());
+		sb.append(goal);
 		sb.append("\n");
 		sb.append(")");
 		
@@ -70,12 +72,14 @@ public abstract class PDDLProblem {
 	public void createProblemFile(File targetFile, PDDLState state) {
 		try {
 			PrintWriter writer = new PrintWriter(new BufferedOutputStream(new FileOutputStream(targetFile)));
-			writer.println(toPDDL(state));
+			writer.println(toPDDL(state, getGoal().toPDDL()));
 			writer.close();
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to produce PDDL Problem file at: " + targetFile.getAbsolutePath(), e);
 		}
 	}
+	
+	public abstract void createProblemFile(File targetFile, PDDLState state, StateCompact targetState);
 	
 	
 }

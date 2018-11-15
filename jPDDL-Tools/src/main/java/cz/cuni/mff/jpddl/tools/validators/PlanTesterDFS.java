@@ -74,6 +74,10 @@ public class PlanTesterDFS implements IPlanValidator {
 		// IS SAFE STATE?
 		boolean isSafeState = safeStates.isSafe(state);
 		
+		if (isSafeState && result.firstSafeStateIndex < 0 && index > 0) {
+			result.firstSafeStateIndex = index;
+		}
+		
 		// CHECK ACTION APPLICABILITY
 		if (!plan[index].isApplicable(state)) {
 			// ACTION NOT APPLICABLE!

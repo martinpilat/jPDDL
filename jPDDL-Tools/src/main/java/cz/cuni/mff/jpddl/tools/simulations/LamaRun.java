@@ -16,6 +16,7 @@ import cz.cuni.mff.jpddl.tools.search.bench.Timed;
 import cz.cuni.mff.jpddl.tools.utils.CSV;
 import cz.cuni.mff.jpddl.tools.validators.IPlanValidator;
 import cz.cuni.mff.jpddl.tools.validators.IPlanValidator.PlanValidatorResult;
+import cz.cuni.mff.jpddl.tools.validators.PlanChecker;
 import cz.cuni.mff.jpddl.utils.StateCompact;
 
 public class LamaRun {
@@ -42,6 +43,8 @@ public class LamaRun {
 	
 	private int action = 0;
 	
+	private long planningMillis = 0;
+	
 	private void simulateEvent(PDDLProblem problem, Random random) {
 		// COLLECT APPLICABLE EVENTS
 		events .clear();
@@ -56,7 +59,7 @@ public class LamaRun {
 		if (event != null) event.apply(problem.getState());		
 	}
 	
-	public void run(String id, PDDLProblem problem, IPlanValidator validator, int maxIterations, long randomSeed, File csvOutputFile) {
+	public void run(String id, PDDLProblem problem, PlanChecker planChecker, IPlanValidator validator, int maxIterations, long randomSeed, File csvOutputFile) {
 		StateCompact initialState = problem.getState().getDynamic().clone();
 		
 		Random random = new Random(randomSeed);
@@ -64,8 +67,8 @@ public class LamaRun {
 		Timed allTime = new Timed();
 		Timed planningTime = new Timed();
 		Timed validationTime = new Timed();
-		
-		long planningMillis = 0;
+				
+		planningMillis = 0;
 		long validatingMillis = 0;
 		
 		allTime.start();
@@ -82,6 +85,7 @@ public class LamaRun {
 		
 		// INIT LAMA
 		File domainFile = problem.getDomain().getDomainPureFile();		
+		File flatDomainFile = problem.getDomain().getDomainFlatFile();		
 		Lama lama = new Lama();
 		
 		// INTERNAL VARS
@@ -152,7 +156,7 @@ public class LamaRun {
 					} else {
 						System.out.println("    +-- Plan reported to be uninterruptible, simulating it all...");
 						toExecuteActions = plan.length;
-					}
+					}					
 				} else {
 					System.out.println("    +-- Plan can be interrupted by events");
 					if (validatorResult.lastSafeStateIndex > 0) {
@@ -160,6 +164,35 @@ public class LamaRun {
 						toExecuteActions = validatorResult.lastSafeStateIndex;
 					} else {
 						System.out.println("    +-- And no safe state reported to be found.");
+					}
+				}
+				
+				if (toExecuteActions == 0 && plan.length > 0) {
+					System.out.println("  +-- No actions to execute, trying to find a safe state via plan-checker...");
+					validationTime.start();
+					PlanValidatorResult planCheckerResult = planChecker.validate(problem.getGoal(), problem.getState(), plan);
+					validationTime.end();
+					validatingMillis += validationTime.durationMillis;
+					if (planCheckerResult.firstSafeStateIndex > 0) {
+						System.out.println("    +-- First safe state in " + planCheckerResult.firstSafeStateIndex + " actions, going to improve the plan.");
+						PDDLEffector[] improvedPlan = improvePlan(problem, lama, flatDomainFile, plan, planCheckerResult.firstSafeStateIndex, planningTime);
+						if (improvedPlan != null) {
+							System.out.println("      +-- Improved plan found, it has " + improvedPlan.length + " steps");
+							System.out.println("      +-- Checking the improved plan...");
+							validationTime.start();
+							PlanValidatorResult planCheckerImprovedResult = validator.validate(problem.getGoal(), problem.getState(), improvedPlan);
+							validationTime.end();
+							validatingMillis += validationTime.durationMillis;
+							if (planCheckerImprovedResult.firstSafeStateIndex > 0) {
+								System.out.println("      +-- Safe state found in " + planCheckerImprovedResult.firstSafeStateIndex + " steps, simulating plan!");
+								plan = improvedPlan;
+								toExecuteActions = planCheckerImprovedResult.firstSafeStateIndex;
+							} else {
+								System.out.println("      +-- NO SAFE STATE CAN BE REACHED WITH THE IMPROVED PLAN!");
+							}
+						}
+					} else {
+						System.out.println("    +-- No safe state found along the plan.");
 					}
 				}
 				
@@ -202,6 +235,48 @@ public class LamaRun {
 		outputToCSV(csvOutputFile, id, problem, validator, result, iteration, allTime.durationMillis, planningMillis, validatingMillis, simulationMillis, randomSeed, maxIterations);
 		
 		problem.getState().setDynamic(initialState);
+	}
+
+	private PDDLEffector[] improvePlan(PDDLProblem problem, Lama lama, File flatDomainFile, PDDLEffector[] plan, int firstSafeStateIndex, Timed planningTime) {
+		// BACKUP STATE
+		StateCompact currentState = problem.getState().getDynamic().clone();
+		
+		// GET TO SAFE STATE
+		for (int i = 0; i < firstSafeStateIndex; ++i) {
+			plan[i].apply(problem.getState());
+		}
+		
+		// SAVE THE SAFE STATE
+		StateCompact targetState = problem.getState().getDynamic().clone();
+		
+		// RESTORE THE CURRENT STATE
+		problem.getState().setDynamic(currentState);
+		
+		// GENERATE PROBLEM FILE
+		File problemFile = new File("problem-flat.pddl");
+		problem.createProblemFile(problemFile, problem.getState(), targetState);
+		
+		// PLAN!
+		planningTime.start();
+		List<PDDLStringInstance> lamaPlan = lama.plan(flatDomainFile, problemFile);
+		planningTime.end();
+		planningMillis += planningTime.durationMillis;
+		problemFile.delete();
+		
+		if (lamaPlan == null) {
+			System.out.println("    +-- LAMA FAILED TO FIND IMPROVEMENT!");
+			return null;
+		}
+		
+		// TRANSLATE PLAN
+		PDDLEffector[] improvement = problem.getDomain().toEffectors(lamaPlan.toArray(new PDDLStringInstance[0]));			
+		System.out.println("    +-- Improvement has " + plan.length + " steps, merging with original plan");
+		
+		PDDLEffector[] result = new PDDLEffector[improvement.length + plan.length - firstSafeStateIndex];
+		for (int i = 0; i < improvement.length; ++i) result[i] = improvement[i];
+		for (int i = firstSafeStateIndex; i < plan.length; ++i) result[improvement.length + i - firstSafeStateIndex] = plan[firstSafeStateIndex];
+		
+		return result;
 	}
 
 	private void outputToCSV(File csvOutputFile, String id, PDDLProblem problem, IPlanValidator validator, LamaRunResult result, int iterations,

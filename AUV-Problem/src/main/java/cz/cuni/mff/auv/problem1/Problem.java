@@ -2,11 +2,10 @@ package cz.cuni.mff.auv.problem1;
 
 import cz.cuni.mff.auv.domain.Domain;
 import cz.cuni.mff.auv.domain.State;
-import cz.cuni.mff.jpddl.PDDLApplicables;
+import cz.cuni.mff.auv.problem.AuvProblem;
 import cz.cuni.mff.jpddl.PDDLDeadEnd;
-import cz.cuni.mff.jpddl.PDDLProblem;
 
-public final class Problem extends PDDLProblem {
+public final class Problem extends AuvProblem {
 	
 	static {
 		// ENSURE STATIC INITIALIZATION OF THE CLASSES

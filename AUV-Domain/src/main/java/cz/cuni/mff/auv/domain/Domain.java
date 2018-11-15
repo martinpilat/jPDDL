@@ -36,6 +36,11 @@ public final class Domain extends PDDLDomain {
 	}
 	
 	@Override
+	public File getDomainFlatFile() {
+		return locateResourceFile("auv/domain-flat.pddl", "resources/auv/domain-flat.pddl", "AUV-Domain/src/main/resources/auv/domain-flat.pddl", "../AUV-Domain/src/main/resources/auv/domain-flat.pddl", "../../AUV-Domain/src/main/resources/auv/domain-flat.pddl" );
+	}
+	
+	@Override
 	public Action[] getActions() {
 		return Action.ALL;
 	}

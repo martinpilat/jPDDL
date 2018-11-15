@@ -29,6 +29,11 @@ public interface IPlanValidator {
 		public int lastExecutableEffectorIndex;
 		
 		/**
+		 * First safe state after applying actions 0, 1, ..., firstSafeStateIndex-1.
+		 */
+		public int firstSafeStateIndex = -1;
+		
+		/**
 		 * State was safe after applying actions 0, 1, ..., lastSafeStateIndex-1.
 		 */
 		public int lastSafeStateIndex = -1;

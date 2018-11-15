@@ -70,6 +70,9 @@ public class PlanTesterFlat implements IPlanValidator {
 			state.setDynamic(stateWithoutPMinus);	
 			
 			if (safeStates != null && safeStates.isSafe(state)) {
+				if (result.firstSafeStateIndex < 0 && i > 0) {
+					result.firstSafeStateIndex = i;
+				}
 				result.lastSafeStateIndex = i;
 			}			
 			

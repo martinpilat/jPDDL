@@ -42,6 +42,8 @@ public class Test01_LamaTest {
 		File problemFile = new File("auv-problem.pddl");
 		problem.createProblemFile(problemFile, problem.getState());
 		
+		SafeStates safeStates = new SafeStates(problem.getDomain(), new File("../Domains/AUV/safe_states-3"));
+		
 		Lama lama = new Lama();
 		
 		time.end();
@@ -77,7 +79,7 @@ public class Test01_LamaTest {
 				
 				time.start();
 				PlanChecker planChecker = new PlanChecker();
-				planChecker.config(problem.getDomain());
+				planChecker.config(problem.getDomain(), safeStates);
 				PlanCheckerResult planCheckerResult = planChecker.validate(problem.getGoal(), problem.getState(), plan);
 				time.end();
 				time.reportInline("  +-- TIME");
@@ -100,7 +102,7 @@ public class Test01_LamaTest {
 			}
 			
 			// TEST THE PLAN - OPPORTUNISTIC
-			SafeStates safeStates = new SafeStates(problem.getDomain(), new File("../Domains/AUV/safe_states-3"));
+			
 			{
 				System.out.println();
 				System.out.println("PLAN TESTING");				
