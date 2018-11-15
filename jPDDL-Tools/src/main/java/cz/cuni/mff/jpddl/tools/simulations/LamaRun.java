@@ -272,11 +272,13 @@ public class LamaRun {
 		PDDLEffector[] improvement = problem.getDomain().toEffectors(lamaPlan.toArray(new PDDLStringInstance[0]));			
 		System.out.println("    +-- Improvement has " + plan.length + " steps, merging with original plan");
 		
-		PDDLEffector[] result = new PDDLEffector[improvement.length + plan.length - firstSafeStateIndex];
-		for (int i = 0; i < improvement.length; ++i) result[i] = improvement[i];
-		for (int i = firstSafeStateIndex; i < plan.length; ++i) result[improvement.length + i - firstSafeStateIndex] = plan[firstSafeStateIndex];
+		List<PDDLEffector> result = new ArrayList<PDDLEffector>();
+		for (int i = 0; i < improvement.length; ++i) 
+			if (improvement[i] != null) result.add(improvement[i]);
+		for (int i = firstSafeStateIndex; i < plan.length; ++i)
+			result.add(plan[i]);
 		
-		return result;
+		return result.toArray(new PDDLEffector[0]);
 	}
 
 	private void outputToCSV(File csvOutputFile, String id, PDDLProblem problem, IPlanValidator validator, LamaRunResult result, int iterations,

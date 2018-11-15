@@ -25,6 +25,7 @@ public abstract class Action extends Effector {
 	
 	public static Action toAction(PDDLStringInstance se) {
 		Action proto = BY_NAME.get(se.name);
+		if (proto == null) return null;
 		Action result = (Action)proto.create();
 		result.assign(se.args.toArray(new String[0]));
 		return result;		

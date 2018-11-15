@@ -31,6 +31,7 @@ public abstract class Event extends Effector {
 	
 	public static Event toEvent(PDDLStringInstance se) {
 		Event proto = BY_NAME.get(se.name);
+		if (proto == null) return null;
 		Event result = (Event)proto.create();
 		result.assign(se.args.toArray(new String[0]));
 		return result;		

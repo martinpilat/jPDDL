@@ -31,6 +31,7 @@ public abstract class Effector extends PDDLEffector {
 	
 	public static Effector toEffector(PDDLStringInstance se) {
 		Effector proto = BY_NAME.get(se.name);
+		if (proto == null) return null;
 		Effector result = (Effector)proto.create();
 		result.assign(se.args.toArray(new String[0]));
 		return result;		
