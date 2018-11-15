@@ -61,7 +61,7 @@ public class LamaRun {
 		if (event != null) event.apply(problem.getState());		
 	}
 	
-	public void run(String id, PDDLProblem problem, PlanChecker planChecker, IPlanValidator validator, int maxIterations, long randomSeed, File csvOutputFile) {
+	public void run(String id, int runCount, PDDLProblem problem, PlanChecker planChecker, IPlanValidator validator, int maxIterations, long randomSeed, File csvOutputFile) {
 		StateCompact initialState = problem.getState().getDynamic().clone();
 		
 		Random random = new Random(randomSeed);
@@ -236,7 +236,7 @@ public class LamaRun {
 		System.out.println("    +-- validation " + Timed.getTimeString(validatingMillis));
 		System.out.println("    +-- simulation " + Timed.getTimeString(simulationMillis));
 		
-		outputToCSV(csvOutputFile, id, problem, validator, result, iteration, allTime.durationMillis, planningMillis, validatingMillis, simulationMillis, randomSeed, maxIterations);
+		outputToCSV(csvOutputFile, id, runCount, problem, validator, result, iteration, allTime.durationMillis, planningMillis, validatingMillis, simulationMillis, randomSeed, maxIterations);
 		
 		problem.getState().setDynamic(initialState);
 	}
@@ -285,7 +285,7 @@ public class LamaRun {
 		return result.toArray(new PDDLEffector[0]);
 	}
 
-	private void outputToCSV(File csvOutputFile, String id, PDDLProblem problem, IPlanValidator validator, LamaRunResult result, int iterations,
+	private void outputToCSV(File csvOutputFile, String id, int run, PDDLProblem problem, IPlanValidator validator, LamaRunResult result, int iterations,
 			long durationMillis, long planningMillis, long validatingMillis, long simulationMillis, long randomSeed,
 			int maxIterations) {
 		
@@ -294,8 +294,8 @@ public class LamaRun {
 		Date now = Calendar.getInstance().getTime();
 		
 		CSV.appendCSVRow(csvOutputFile, 
-			new String[] {"date", "id", "problem",            "validator",                 "result", "iterations", "durationMillis", "planningMillis", "validatingMillis", "simulationMillis", "randomSeed", "maxIterations"},
-			               now,    id,   problem.getClass(),   validator.getDescription(),  result,   iterations,   durationMillis,   planningMillis,   validatingMillis,   simulationMillis,   randomSeed,   maxIterations			               
+			new String[] {"date", "id", "run", "problem",            "validator",                 "result", "iterations", "durationMillis", "planningMillis", "validatingMillis", "simulationMillis", "randomSeed", "maxIterations"},
+			               now,    id,   run,   problem.getClass(),   validator.getDescription(),  result,   iterations,   durationMillis,   planningMillis,   validatingMillis,   simulationMillis,   randomSeed,   maxIterations			               
 		);
 		
 	}
