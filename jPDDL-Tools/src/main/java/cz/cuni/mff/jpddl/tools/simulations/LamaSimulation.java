@@ -23,9 +23,8 @@ public class LamaSimulation {
 			System.out.println("=============================");
 			System.out.println("RUN " + (i+1) + " / " + totalRuns);
 			System.out.println("=============================");
-			
-			String runId = id + "-" + (i+1);
-			run.run(runId, problem, planChecker, validator, maxIterations, random.nextLong(), csvOutputFile, eventSelector);
+
+			run.run(id, i+1, problem, planChecker, validator, maxIterations, random.nextLong(), csvOutputFile, eventSelector);
 		}		
 	}
 

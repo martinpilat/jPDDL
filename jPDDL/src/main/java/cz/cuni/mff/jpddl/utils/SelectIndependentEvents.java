@@ -53,6 +53,7 @@ public class SelectIndependentEvents implements IEventSelector {
     @Override
     public List<PDDLEffector> select(PDDLProblem problem, List<PDDLEffector> events) {
 
+        events.add(null); // make sure null is always in the list of events - it is used to end the loop
         PDDLEffector event = events.remove(0);
         ArrayList<PDDLEffector> selected_events = new ArrayList<>();
         while (event != null) {

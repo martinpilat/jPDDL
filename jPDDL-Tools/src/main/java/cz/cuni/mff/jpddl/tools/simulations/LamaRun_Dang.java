@@ -61,7 +61,7 @@ public class LamaRun_Dang {
 			System.out.println("    +-- EVENT [" + action + ".]: no-event");
 	}
 	
-	public void run(String id, PDDLProblem problem, PlanChecker planChecker, IPlanValidator validator, int maxIterations, long randomSeed, File csvOutputFile, IEventSelector event_selector) {
+	public void run(String id, int run, PDDLProblem problem, PlanChecker planChecker, IPlanValidator validator, int maxIterations, long randomSeed, File csvOutputFile, IEventSelector event_selector) {
 		StateCompact initialState = problem.getState().getDynamic().clone();
 		
 		Random random = new Random(randomSeed);
@@ -209,67 +209,23 @@ public class LamaRun_Dang {
 		System.out.println("    +-- validation " + Timed.getTimeString(validatingMillis));
 		System.out.println("    +-- simulation " + Timed.getTimeString(simulationMillis));
 		
-		outputToCSV(csvOutputFile, id, problem, validator, result, iteration, allTime.durationMillis, planningMillis, validatingMillis, simulationMillis, randomSeed, maxIterations);
+		outputToCSV(csvOutputFile, id, run, problem, validator, result, iteration, allTime.durationMillis, planningMillis, validatingMillis, simulationMillis, randomSeed, maxIterations);
 		
 		problem.getState().setDynamic(initialState);
 	}
 
-	private PDDLEffector[] improvePlan(PDDLProblem problem, Lama lama, File flatDomainFile, PDDLEffector[] plan, int firstSafeStateIndex, Timed planningTime) {
-		// BACKUP STATE
-		StateCompact currentState = problem.getState().getDynamic().clone();
-		
-		// GET TO SAFE STATE
-		for (int i = 0; i < firstSafeStateIndex; ++i) {
-			plan[i].apply(problem.getState());
-		}
-		
-		// SAVE THE SAFE STATE
-		StateCompact targetState = problem.getState().getDynamic().clone();
-		
-		// RESTORE THE CURRENT STATE
-		problem.getState().setDynamic(currentState);
-		
-		// GENERATE PROBLEM FILE
-		File problemFile = new File("problem-flat.pddl");
-		problem.createProblemFile(problemFile, problem.getState(), targetState);
-		
-		// PLAN!
-		planningTime.start();
-		List<PDDLStringInstance> lamaPlan = lama.plan(flatDomainFile, problemFile);
-		planningTime.end();
-		planningMillis += planningTime.durationMillis;
-		problemFile.delete();
-		
-		if (lamaPlan == null) {
-			System.out.println("    +-- LAMA FAILED TO FIND IMPROVEMENT!");
-			return null;
-		}
-		
-		// TRANSLATE PLAN
-		PDDLEffector[] improvement = problem.getDomain().toEffectors(lamaPlan.toArray(new PDDLStringInstance[0]));			
-		System.out.println("    +-- Improvement has " + plan.length + " steps, merging with original plan");
-		
-		List<PDDLEffector> result = new ArrayList<PDDLEffector>();
-		for (int i = 0; i < improvement.length; ++i) 
-			if (improvement[i] != null) result.add(improvement[i]);
-		for (int i = firstSafeStateIndex; i < plan.length; ++i)
-			result.add(plan[i]);
-		
-		return result.toArray(new PDDLEffector[0]);
-	}
-
-	private void outputToCSV(File csvOutputFile, String id, PDDLProblem problem, IPlanValidator validator, LamaRunResult result, int iterations,
+	private void outputToCSV(File csvOutputFile, String id, int run, PDDLProblem problem, IPlanValidator validator, LamaRunResult result, int iterations,
 			long durationMillis, long planningMillis, long validatingMillis, long simulationMillis, long randomSeed,
 			int maxIterations) {
 		
 		System.out.println("  +-- appending result into " + csvOutputFile.getAbsolutePath());
 		
 		Date now = Calendar.getInstance().getTime();
-		
-		CSV.appendCSVRow(csvOutputFile, 
-			new String[] {"date", "id", "problem",            "validator",                 "result", "iterations", "durationMillis", "planningMillis", "validatingMillis", "simulationMillis", "randomSeed", "maxIterations"},
-			               now,    id,   problem.getClass(),   validator.getDescription(),  result,   iterations,   durationMillis,   planningMillis,   validatingMillis,   simulationMillis,   randomSeed,   maxIterations			               
-		);
+
+        CSV.appendCSVRow(csvOutputFile,
+                new String[] {"date", "id", "run", "problem",            "validator",                 "result", "iterations", "durationMillis", "planningMillis", "validatingMillis", "simulationMillis", "randomSeed", "maxIterations"},
+                now,    id,   run,   problem.getClass(),   validator.getDescription(),  result,   iterations,   durationMillis,   planningMillis,   validatingMillis,   simulationMillis,   randomSeed,   maxIterations
+        );
 		
 	}
 	
