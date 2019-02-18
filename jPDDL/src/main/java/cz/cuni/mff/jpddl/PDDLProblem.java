@@ -27,7 +27,14 @@ public abstract class PDDLProblem {
 		return applicables;
 	}
 
-	
+	public int dang() {
+		throw new UnsupportedOperationException();
+	}
+
+	public String getClosestSafeState() {
+		throw new UnsupportedOperationException();
+	}
+
 	public String toPDDL(PDDLState state, String goal) {
 		StringBuffer sb = new StringBuffer();
 		sb.append("(define (problem " + getName() + ")\n");
@@ -68,17 +75,24 @@ public abstract class PDDLProblem {
 		
 		return sb.toString();
 	}
-	
+
 	public void createProblemFile(File targetFile, PDDLState state) {
+		createProblemFile(targetFile, state, (String)null);
+	}
+
+	public void createProblemFile(File targetFile, PDDLState state, String customGoal) {
 		try {
 			PrintWriter writer = new PrintWriter(new BufferedOutputStream(new FileOutputStream(targetFile)));
-			writer.println(toPDDL(state, getGoal().toPDDL()));
+			if (customGoal == null)
+				writer.println(toPDDL(state, getGoal().toPDDL()));
+			else
+				writer.println((toPDDL(state, customGoal)));
 			writer.close();
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to produce PDDL Problem file at: " + targetFile.getAbsolutePath(), e);
 		}
 	}
-	
+
 	public abstract void createProblemFile(File targetFile, PDDLState state, StateCompact targetState);
 	
 	

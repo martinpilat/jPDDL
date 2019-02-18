@@ -1,13 +1,5 @@
 package cz.cuni.mff.jpddl.tools.simulations;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
-
 import cz.cuni.mff.jpddl.PDDLEffector;
 import cz.cuni.mff.jpddl.PDDLProblem;
 import cz.cuni.mff.jpddl.PDDLStringInstance;
@@ -15,12 +7,14 @@ import cz.cuni.mff.jpddl.tools.planners.Lama;
 import cz.cuni.mff.jpddl.tools.search.bench.Timed;
 import cz.cuni.mff.jpddl.tools.utils.CSV;
 import cz.cuni.mff.jpddl.tools.validators.IPlanValidator;
-import cz.cuni.mff.jpddl.tools.validators.IPlanValidator.PlanValidatorResult;
 import cz.cuni.mff.jpddl.tools.validators.PlanChecker;
 import cz.cuni.mff.jpddl.utils.IEventSelector;
 import cz.cuni.mff.jpddl.utils.StateCompact;
 
-public class LamaRun {
+import java.io.File;
+import java.util.*;
+
+public class LamaRun_ReplanNotApplicable {
 	
 	public static enum LamaRunResult {
 		/**
@@ -39,11 +33,12 @@ public class LamaRun {
 		DEAD_END
 		
 	}
-	
+
+	private boolean event_applied = false;
+
 	private List<PDDLEffector> events = new ArrayList<PDDLEffector>();
 	
 	private int action = 0;
-	private boolean event_applied = false;
 	
 	private long planningMillis = 0;
 
@@ -152,92 +147,36 @@ public class LamaRun {
 				System.out.println("  +-- LAMA FAILED TO FIND THE PLAN!");
 				simulateEvent(problem, random, eventSelector);
 			} else {
+				// just obtained a new plan, no events happened yet
+				event_applied = false;
 				// TRANSLATE PLAN
-				PDDLEffector[] plan = problem.getDomain().toEffectors(lamaPlan.toArray(new PDDLStringInstance[0]));			
+				PDDLEffector[] plan = problem.getDomain().toEffectors(lamaPlan.toArray(new PDDLStringInstance[0]));
 				System.out.println("  +-- Plan has " + plan.length + " steps");
+				if (!plan[0].isApplicable(problem.getState())) {
+					lamaPlan = null;  //first step of plan is not applicable, just start new iteration and replan
+					System.out.println("  +-- First action of plan is not applicable -> replan");
+					iteration--; // this was actually not an iteration just plan check
+					continue;
+				}
 					
-				int toExecuteActions = 0;
-				
-				System.out.println("  +-- Validating the plan...");
-				validationTime.start();
-				PlanValidatorResult validatorResult = validator.validate(problem.getGoal(), problem.getState(), plan);
-				validationTime.end();
-				validatingMillis += validationTime.durationMillis;
-				
-				if (validatorResult.valid) {
-					System.out.println("    +-- Plan reported as valid.");
-					if (validatorResult.lastExecutableEffectorIndex+1 < plan.length) {
-						System.out.println("    +-- Plan was not simulated fully, only up to action index " + validatorResult.lastExecutableEffectorIndex);
-						if (validatorResult.lastSafeStateIndex > 0) {
-							System.out.println("    +-- But safe state can be reached after simulating the plan up to action index " + validatorResult.lastExecutableEffectorIndex);
-							toExecuteActions = validatorResult.lastSafeStateIndex;
-						} else {
-							System.out.println("    +-- And no safe state reported to be found.");
-						}
-					} else {
-						System.out.println("    +-- Plan reported to be uninterruptible, simulating it all...");
-						toExecuteActions = plan.length;
-					}					
-				} else {
-					System.out.println("    +-- Plan can be interrupted by events");
-					if (validatorResult.lastSafeStateIndex > 0) {
-						System.out.println("    +-- But safe state can be reached after simulating the plan up to action index " + validatorResult.lastExecutableEffectorIndex);
-						toExecuteActions = validatorResult.lastSafeStateIndex;
-					} else {
-						System.out.println("    +-- And no safe state reported to be found.");
+				int toExecuteActions = 1;
+
+				System.out.println("  +-- Executing plan, actions[0-" + (toExecuteActions-1) + "]");
+				for (int i = 0; i < toExecuteActions; ++i) {
+					if (!plan[i].isApplicable(problem.getState())) {
+						System.out.println("    +-- Action[" + i + "/" + (++action) + "]: " + plan[i].toEffector() + " is NOT APPLICABLE, terminating the plan execution!");
+						break;
 					}
-				}
-				
-				if (toExecuteActions == 0 && plan.length > 0) {
-					System.out.println("  +-- No actions to execute, trying to find a safe state via plan-checker...");
-					validationTime.start();
-					PlanValidatorResult planCheckerResult = planChecker.validate(problem.getGoal(), problem.getState(), plan);
-					validationTime.end();
-					validatingMillis += validationTime.durationMillis;
-					if (planCheckerResult.firstSafeStateIndex > 0) {
-						System.out.println("    +-- First safe state in " + planCheckerResult.firstSafeStateIndex + " actions, going to improve the plan.");
-						PDDLEffector[] improvedPlan = improvePlan(problem, lama, flatDomainFile, plan, planCheckerResult.firstSafeStateIndex, planningTime);
-						if (improvedPlan != null) {
-							System.out.println("      +-- Improved plan found, it has " + improvedPlan.length + " steps");
-							System.out.println("      +-- Checking the improved plan...");
-							validationTime.start();
-							PlanValidatorResult planCheckerImprovedResult = validator.validate(problem.getGoal(), problem.getState(), improvedPlan);
-							validationTime.end();
-							validatingMillis += validationTime.durationMillis;
-							if (planCheckerImprovedResult.firstSafeStateIndex > 0) {
-								System.out.println("      +-- Safe state found in " + planCheckerImprovedResult.firstSafeStateIndex + " steps, simulating plan!");
-								plan = improvedPlan;
-								toExecuteActions = planCheckerImprovedResult.firstSafeStateIndex;
-							} else {
-								System.out.println("      +-- NO SAFE STATE CAN BE REACHED WITH THE IMPROVED PLAN!");
-							}
-						}
-					} else {
-						System.out.println("    +-- No safe state found along the plan.");
-						lamaPlan = null;
+					System.out.println("    +-- ACTION[" + (++action) + ".]: " + plan[i].toEffector());
+					plan[i].apply(problem.getState());
+					lamaPlan.remove(0);
+					if (problem.getGoal().isAchieved(problem.getState())) {
+						System.out.println("    +-- GOAL ACHIEVED!");
+						result = LamaRunResult.GOAL_ACHIEVED;
+						break;
 					}
-				}
-				
-				if (toExecuteActions > 0) {
-					System.out.println("  +-- Executing plan, actions[0-" + (toExecuteActions-1) + "]");
-					for (int i = 0; i < toExecuteActions; ++i) {
-						if (!plan[i].isApplicable(problem.getState())) {
-							System.out.println("    +-- Action[" + i  + "/" + (++action) + "]: " + plan[i].toEffector() + " is NOT APPLICABLE, terminating the plan execution!");
-							break;
-						}
-						System.out.println("    +-- ACTION[" + (++action) + ".]: " + plan[i].toEffector());
-						plan[i].apply(problem.getState());
-						if (problem.getGoal().isAchieved(problem.getState())) {
-							System.out.println("    +-- GOAL ACHIEVED!");
-							result = LamaRunResult.GOAL_ACHIEVED;
-							break;
-						}
-						simulateEvent(problem, random, eventSelector);
-					}
-				} else {
-					System.out.println("  +-- ACTION[" + (++action) + ".]: no-op");
 					simulateEvent(problem, random, eventSelector);
-				}		
+				}
 			}
 		}
 		
