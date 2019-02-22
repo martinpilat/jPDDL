@@ -25,6 +25,10 @@ public abstract class PerestroikaProblem extends PDDLProblem {
 
 	HashMap<T_Location, HashSet<T_Location>> neighbors;
 
+	public String getAdditionalLimitInit() {
+		return null;
+	}
+
 	private void initializeStatic() {
 		neighbors = new HashMap<>();
 		State state = (State)getState();

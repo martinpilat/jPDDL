@@ -16,7 +16,8 @@ public class LamaSimulation {
 		//LamaRun run = new LamaRun();
 		//LamaRun_ReplanAfterEvent run = new LamaRun_ReplanAfterEvent();
 		//LamaRun_ReplanNotApplicable run = new LamaRun_ReplanNotApplicable();
-		LamaRun_Dang run = new LamaRun_Dang();
+		//LamaRun_Dang run = new LamaRun_Dang();
+		LamaRun_SafePlanning run = new LamaRun_SafePlanning();
 				
 		for (int i = 0; i < totalRuns; ++i) {
 			if (i != 0) System.out.println();

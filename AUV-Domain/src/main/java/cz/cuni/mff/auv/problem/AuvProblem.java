@@ -26,9 +26,38 @@ public abstract class AuvProblem extends PDDLProblem {
 	private HashMap<T_Ship, HashMap<T_Location, ArrayList<T_Location>>> ship_neighbors;
 	private Set<T_Ship> ships;
 	private HashMap<T_Ship, HashMap<T_Location, HashMap<T_Location, Integer>>> ship_distances;
+	private Set<T_Location> safeLocations;
 
 	private HashSet<T_Location> accessible_auv_locations;
 	HashMap<T_Location, HashSet<T_Location>> auv_neighbors;
+
+	public String getAdditionalLimitInit() {
+
+		if (accessible_ship_locations == null)
+ 			initializeStaticDang();
+
+		if (safeLocations == null) {
+			safeLocations = new HashSet<>();
+			ArrayList<P_Connected> conns = new ArrayList<>();
+			State state = (State) getState();
+			state.p_Connected.getAll(conns);
+
+
+			for (P_Connected c : conns) {
+				if (!accessible_ship_locations.contains(c.l1))
+					safeLocations.add(c.l1);
+				if (!accessible_ship_locations.contains(c.l2))
+					safeLocations.add(c.l2);
+			}
+		}
+
+		StringBuilder sb = new StringBuilder();
+		for (T_Location loc : safeLocations) {
+			sb.append("(safe a " + loc.name + ")");
+		}
+
+		return sb.toString();
+	}
 
 	private void initializeStaticAUV() {
 		State state = (State) getState();
