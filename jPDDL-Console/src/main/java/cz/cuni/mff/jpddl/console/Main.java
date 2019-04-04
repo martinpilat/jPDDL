@@ -149,6 +149,9 @@ public class Main {
 		
 		validator = new PlanTesterFlat();
 		VALIDATORS.put("FLAT", validator);
+		
+		validator = null;
+		VALIDATORS.put("NONE", validator);
 	}
 
 	private static void fail(String errorMessage) {
@@ -294,7 +297,8 @@ public class Main {
 		
 		FlaggedOption opt544 = new FlaggedOption(ARG_SAFE_STATES_FILE_LONG)
 	    		.setStringParser(JSAP.STRING_PARSER)
-	    		.setRequired(true)
+	    		.setRequired(false)
+	    		.setDefault("")
 		    	.setShortFlag(ARG_SAFE_STATES_FILE_SHORT)
 		    	.setLongFlag(ARG_SAFE_STATES_FILE_LONG);    
 		opt544.setHelp("File containing list of safe states.");
@@ -408,7 +412,7 @@ public class Main {
 		
 		System.out.println("-- Validator: " + validatorString);
 		validator = VALIDATORS.get(validatorString);
-		if (validator == null) {
+		if (validator == null && !"NONE".equals(validatorString)) {
 			fail("Unrecognized validator value: " + validatorString);
 		}
 		
@@ -434,19 +438,25 @@ public class Main {
 			fail("Invalid number of total runs = " + totalRuns + " < 1.");
 		}
 		
-		safeStatesFile = new File(safeStatesFileString);
-		System.out.println("-- Safe states file: " + safeStatesFileString + " --> " + safeStatesFile.getAbsolutePath());		
-		if (!safeStatesFile.exists()) {
-			fail("Safe states file does not exist at '" + safeStatesFileString + "', resolved as: " + safeStatesFile.getAbsolutePath());
+		if (safeStatesFileString != null && !safeStatesFileString.isEmpty()) {
+			safeStatesFile = new File(safeStatesFileString);
+			System.out.println("-- Safe states file: " + safeStatesFileString + " --> " + safeStatesFile.getAbsolutePath());		
+			if (!safeStatesFile.exists()) {
+				fail("Safe states file does not exist at '" + safeStatesFileString + "', resolved as: " + safeStatesFile.getAbsolutePath());
+			}
+			if (!safeStatesFile.isFile()) {
+				fail("Safe states file is not a file at at '" + safeStatesFileString + "', resolved as: " + safeStatesFile.getAbsolutePath());
+			}
+			System.out.println("---- Safe states file exist.");
+			safeStates = new SafeStates(problem.getDomain(), safeStatesFile);
+			System.out.println("---- Safe states file loaded, safe states count: " + safeStates.predicates.size());	
+		} else {
+			System.out.println("-- Safe states not specified.");
+			safeStates = new SafeStates();
 		}
-		if (!safeStatesFile.isFile()) {
-			fail("Safe states file is not a file at at '" + safeStatesFileString + "', resolved as: " + safeStatesFile.getAbsolutePath());
-		}
-		System.out.println("---- Safe states file exist.");
-		safeStates = new SafeStates(problem.getDomain(), safeStatesFile);
-		System.out.println("---- Safe states file loaded, safe states count: " + safeStates.predicates.size());
 		
-		if (safeStatesFile == null) {
+		
+		if (safeStatesFile == null && !"NONE".equals(validatorString)) {
 			fail("Selected plan validator (" + validatorString + ") requires a safe states file!");
 		}
 				
@@ -474,6 +484,9 @@ public class Main {
 		
 		
 		System.out.println("-- configuring the plan validator");
+		if (validatorString.equals("NONE")) {
+			// no config
+		} else
 		if (validatorString.equals("CHECKER")) {
 			((PlanChecker)validator).config(problem.getDomain(), safeStates);
 		} else
@@ -515,18 +528,32 @@ public class Main {
 	// ==============
 	
 	public static String[] getTestArgs() {
+//		return new String[] {
+//				   "-f", Lama.fdDir                   // Lama working dir
+//				  ,"-d", Lama.fdExec                  // Lama shell script relative to the dir
+//				  ,"-i", "ExampleSim"                 // simulation id
+//				  ,"-p", Problem.class.getName()      // FQCN of the problem to instantiate
+//				  ,"-v", "FLAT"					      // plan validator
+//				  ,"-m", "20"					      // max iterations per run to try
+//				  ,"-r", "1"                          // random seed
+//				  ,"-c", "results.csv"			      // results CSV file
+//				  ,"-a", "5"					      // total runs to perform
+//				  ,"-s", "Domains/AUV/safe_states"    // safe states file to load
+//				  ,"-l", "DANG"
+//				  ,"-t"                               // terminate on no runs                         
+//		};
+		
 		return new String[] {
 				   "-f", Lama.fdDir                   // Lama working dir
 				  ,"-d", Lama.fdExec                  // Lama shell script relative to the dir
 				  ,"-i", "ExampleSim"                 // simulation id
 				  ,"-p", Problem.class.getName()      // FQCN of the problem to instantiate
-				  ,"-v", "FLAT"					      // plan validator
+				  ,"-v", "NONE"					      // plan validator
 				  ,"-m", "20"					      // max iterations per run to try
 				  ,"-r", "1"                          // random seed
 				  ,"-c", "results.csv"			      // results CSV file
 				  ,"-a", "5"					      // total runs to perform
-				  ,"-s", "Domains/AUV/safe_states"    // safe states file to load
-				  ,"-l", "DANG"
+				  ,"-l", "REPLAN_EVENT"
 				  ,"-t"                               // terminate on no runs                         
 		};
 	}

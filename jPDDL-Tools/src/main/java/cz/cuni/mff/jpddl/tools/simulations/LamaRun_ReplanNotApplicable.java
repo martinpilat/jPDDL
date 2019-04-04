@@ -81,7 +81,7 @@ public class LamaRun_ReplanNotApplicable {
 		System.out.println("---------");
 		System.out.println("LAMA RUN: " + id);
 		System.out.println("---------");
-		System.out.println("  +-- Validator: " + validator.getDescription());
+		System.out.println("  +-- Validator: " + (validator == null ? "null" : validator.getDescription()));
 		
 		// RESET
 		events.clear();
@@ -208,7 +208,7 @@ public class LamaRun_ReplanNotApplicable {
 
 		CSV.appendCSVRow(csvOutputFile,
 				new String[] {"date", "id", "run", "problem",            "validator",                 "result", "iterations", "durationMillis", "planningMillis", "validatingMillis", "simulationMillis", "randomSeed", "maxIterations", "actions", "algorithm"},
-				now,    id,   run,   problem.getClass(),   validator.getDescription(),  result,   iterations,   durationMillis,   planningMillis,   validatingMillis,   simulationMillis,   randomSeed,   maxIterations, action, "REPLAN_APP"
+				now,    id,   run,   problem.getClass(),   (validator == null ? "null" : validator.getDescription()),  result,   iterations,   durationMillis,   planningMillis,   validatingMillis,   simulationMillis,   randomSeed,   maxIterations, action, "REPLAN_APP"
 		);
 
 	}
