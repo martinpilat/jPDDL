@@ -32,7 +32,7 @@ public final class Ac_PickUpSt extends Action {
 	public T_Block x;
 	public T_Sticky h;	
 	
-	public boolean[] applied = new boolean[] { false, false, false, false, false, false };
+	public boolean[] applied = new boolean[] { false, false, false, false, false };
 	
 	public Ac_PickUpSt() {
 	}
@@ -112,7 +112,8 @@ public final class Ac_PickUpSt extends Action {
 	 * 
 	 * :precondition (and (clear ?x) 
 	 *                    (ontable ?x) 
-	 *                    (handempty ?h))
+	 *                    (handempty ?h)
+	 *                    (movable ?x)
      *               )
      * 
 	 * @param state
@@ -122,14 +123,16 @@ public final class Ac_PickUpSt extends Action {
 	public boolean isApplicable(State state) {
 		return    state.p_Clear.isSet(x) 
 			   && state.p_OnTable.isSet(x) 
-			   && state.p_HandEmpty.isSet(h); 
+			   && state.p_HandEmpty.isSet(h)
+			   && state.p_Movable.isSet(x); 
 	}
 	
 	@Override
 	public boolean isApplicable(State state, State minusState) {
 		return    state.p_Clear.isSet(x)     && !minusState.p_Clear.isSet(x) 
 			   && state.p_OnTable.isSet(x)   && !minusState.p_OnTable.isSet(x) 
-			   && state.p_HandEmpty.isSet(h) && !minusState.p_HandEmpty.isSet(h); 
+			   && state.p_HandEmpty.isSet(h) && !minusState.p_HandEmpty.isSet(h)
+			   && state.p_Movable.isSet(x)   && !minusState.p_Movable.isSet(x); 
 	}
 		
 	@Override
@@ -154,6 +157,12 @@ public final class Ac_PickUpSt extends Action {
 		}
 		if (!applicable) return false;
 		
+		applicable = false;
+		for (State state : states) {
+			if (applicable = state.p_Movable.isSet(x)) break;
+		}
+		if (!applicable) return false;
+		
 		return true;
 	}	
 	
@@ -163,8 +172,7 @@ public final class Ac_PickUpSt extends Action {
 	 * EFFECT
 	 * 
 	 * :effect
-	 *       (and  (movable ?x)
-     *             (not (ontable ?x))
+	 *       (and  (not (ontable ?x))
 	 *             (not (clear ?x))
 	 *	           (not (handempty ?h))
 	 *	           (holding ?h ?x)
@@ -174,33 +182,31 @@ public final class Ac_PickUpSt extends Action {
 	 */
 	@Override
 	public void apply(State state) {
-		applied[0] = state.p_Movable.set(x);
-		applied[1] = state.p_OnTable.clear(x);
-		applied[2] = state.p_Clear.clear(x);
-		applied[3] = state.p_HandEmpty.clear(h);
-		applied[4] = state.p_Holding.set(h, x);
-		applied[5] = state.p_Sticky.set(x);
+		applied[0] = state.p_OnTable.clear(x);
+		applied[1] = state.p_Clear.clear(x);
+		applied[2] = state.p_HandEmpty.clear(h);
+		applied[3] = state.p_Holding.set(h, x);
+		applied[4] = state.p_Sticky.set(x);
 	}
 	
 	public void reverse(State state) {
-		if (applied[0]) state.p_Movable.clear(x);
-		if (applied[1]) state.p_OnTable.set(x);
-		if (applied[2]) state.p_Clear.set(x);
-		if (applied[3]) state.p_HandEmpty.set(h);
-		if (applied[4]) state.p_Holding.clear(h, x);
-		if (applied[5]) state.p_Sticky.clear(x);
+		if (applied[0]) state.p_OnTable.set(x);
+		if (applied[1]) state.p_Clear.set(x);
+		if (applied[2]) state.p_HandEmpty.set(h);
+		if (applied[3]) state.p_Holding.clear(h, x);
+		if (applied[4]) state.p_Sticky.clear(x);
 	}
 	
 	@Override
 	public void addAdds(StateCompact compact) {
-		compact.set(P_Movable.toInt(x));
+		compact.set(P_Holding.toInt(h, x));
 		compact.set(P_Sticky.toInt(x));
 	}
 	
 	@Override
-	public void removeAdds(StateCompact compact) {
-		compact.clear(P_Movable.toInt(x));
+	public void removeAdds(StateCompact compact) {		
 		compact.clear(P_Holding.toInt(h, x));
+		compact.clear(P_Sticky.toInt(x));
 	}
 	
 	@Override
@@ -284,7 +290,7 @@ public final class Ac_PickUpSt extends Action {
 				T_Hand h = E_Hand.THIS.getElement(key);
 				if (h instanceof T_Sticky) {
 					effector.h = (T_Sticky)h;
-					unified();	
+					unify_Movable_4_x();	
 				}				
 				return true;
 			}
@@ -318,8 +324,13 @@ public final class Ac_PickUpSt extends Action {
 				effector.h = null;
 			} else {
 				if (!state.p_HandEmpty.internal().containsKey(effector.h)) return;
-				unified();
+				unify_Movable_4_x();
 			}
+		}
+		
+		private void unify_Movable_4_x() {
+			if (!state.p_Movable.internal().containsKey(effector.x)) return;
+			unified();	
 		}
 				
 		private void unified() {

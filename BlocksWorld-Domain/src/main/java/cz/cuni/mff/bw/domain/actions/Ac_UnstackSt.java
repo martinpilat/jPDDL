@@ -34,7 +34,7 @@ public final class Ac_UnstackSt extends Action {
 	public T_Block y;
 	public T_Sticky h;	
 	
-	public boolean[] applied = new boolean[] { false, false, false, false, false, false, false };
+	public boolean[] applied = new boolean[] { false, false, false, false, false, false };
 	
 	public Ac_UnstackSt() {		
 	}
@@ -117,21 +117,23 @@ public final class Ac_UnstackSt extends Action {
 	 * 
 	 * :precondition (and (handempty ?h) 
 	 *                    (clear ?x) 
-	 *                    (on ?x ?y))
+	 *                    (on ?x ?y)
+	 *                    (movable ?x))
      * 
 	 * @param state
 	 * @return
 	 */
 	@Override
 	public boolean isApplicable(State state) {
-		return state.p_HandEmpty.isSet(h) && state.p_Clear.isSet(x) && state.p_On.isSet(x, y);		  
+		return state.p_HandEmpty.isSet(h) && state.p_Clear.isSet(x) && state.p_On.isSet(x, y) && state.p_Movable.isSet(x);		  
 	}
 	
 	@Override
 	public boolean isApplicable(State state, State minusState) {
 		return    state.p_HandEmpty.isSet(h) && !minusState.p_HandEmpty.isSet(h)
 			   && state.p_Clear.isSet(x)     && !minusState.p_Clear.isSet(x)
-			   && state.p_On.isSet(x, y)     && !minusState.p_On.isSet(x, y);			   
+			   && state.p_On.isSet(x, y)     && !minusState.p_On.isSet(x, y)
+			   && state.p_Movable.isSet(x)   && !minusState.p_Movable.isSet(x);			   
 	}
 	
 	@Override
@@ -156,6 +158,12 @@ public final class Ac_UnstackSt extends Action {
 		}
 		if (!applicable) return false;
 		
+		applicable = false;		
+		for (State state : states) {
+			if (applicable = state.p_Movable.isSet(x)) break;
+		}
+		if (!applicable) return false;
+		
 		return true;
 	}
 	
@@ -164,8 +172,7 @@ public final class Ac_UnstackSt extends Action {
 	 * 
 	 * EFFECT
 	 * 
-	 * :effect (and (movable ?x)
-     *              (holding ?h ?x)
+	 * :effect (and (holding ?h ?x)
 	 *	            (clear ?y)
 	 *	            (not (clear ?x))
 	 *	            (not (handempty ?h))
@@ -175,29 +182,26 @@ public final class Ac_UnstackSt extends Action {
 	 */
 	@Override
 	public void apply(State state) {
-		applied[0] = state.p_Movable.set(x);
-		applied[1] = state.p_Holding.set(h, x);
-		applied[2] = state.p_Clear.set(y);
-		applied[3] = state.p_Clear.clear(x);
-		applied[4] = state.p_HandEmpty.clear(h);
-		applied[5] = state.p_On.clear(x, y);
-		applied[6] = state.p_Sticky.set(x);
+		applied[0] = state.p_Holding.set(h, x);
+		applied[1] = state.p_Clear.set(y);
+		applied[2] = state.p_Clear.clear(x);
+		applied[3] = state.p_HandEmpty.clear(h);
+		applied[4] = state.p_On.clear(x, y);
+		applied[5] = state.p_Sticky.set(x);
 	}
 	
 	@Override
 	public void reverse(State state) {
-		if (applied[0]) state.p_Movable.clear(x);
-		if (applied[1]) state.p_Holding.clear(h, x);
-		if (applied[2]) state.p_Clear.clear(y);
-		if (applied[3]) state.p_Clear.set(x);
-		if (applied[4]) state.p_HandEmpty.set(h);
-		if (applied[5]) state.p_On.set(x, y);
-		if (applied[6]) state.p_Sticky.clear(x);
+		if (applied[0]) state.p_Holding.clear(h, x);
+		if (applied[1]) state.p_Clear.clear(y);
+		if (applied[2]) state.p_Clear.set(x);
+		if (applied[3]) state.p_HandEmpty.set(h);
+		if (applied[4]) state.p_On.set(x, y);
+		if (applied[5]) state.p_Sticky.clear(x);
 	}
 	
 	@Override
 	public void addAdds(StateCompact compact) {
-		compact.set(P_Movable.toInt(x));
 		compact.set(P_Holding.toInt(h, x));
 		compact.set(P_Clear.toInt(y));
 		compact.set(P_Sticky.toInt(x));
@@ -206,7 +210,6 @@ public final class Ac_UnstackSt extends Action {
 	
 	@Override
 	public void removeAdds(StateCompact compact) {
-		compact.clear(P_Movable.toInt(x));
 		compact.clear(P_Holding.toInt(h, x));
 		compact.clear(P_Clear.toInt(y));
 		compact.clear(P_Sticky.toInt(x));
@@ -308,7 +311,7 @@ public final class Ac_UnstackSt extends Action {
 			@Override
 			public boolean entry(int key, Boolean data) {
 				effector.y = E_Block.THIS.getElement(key);
-				unified();
+				unify_Movable_4_x();
 				return true;
 			}
 			
@@ -352,8 +355,13 @@ public final class Ac_UnstackSt extends Action {
 				effector.y = null;
 			} else {
 				if (!state.p_On.isSet(effector.x, effector.y)) return;
-				unified();
+				unify_Movable_4_x();
 			}
+		}
+		
+		private void unify_Movable_4_x() {
+			if (!state.p_Movable.isSet(effector.x)) return;
+			unified();
 		}
 				
 		private void unified() {

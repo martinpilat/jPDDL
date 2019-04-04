@@ -13,9 +13,9 @@
 
   (:action pick-up-sl
 	     :parameters (?x - block ?h - slippery)
-	     :precondition (and (clear ?x) (ontable ?x) (handempty ?h))
+	     :precondition (and (clear ?x) (ontable ?x) (handempty ?h)(movable ?x))
 	     :effect
-	     (and  (movable ?x)
+	     (and  
                    (not (ontable ?x))
 		   (not (clear ?x))
 		   (not (handempty ?h))
@@ -23,9 +23,9 @@
 
   (:action pick-up-st
 	     :parameters (?x - block ?h - stickyh)
-	     :precondition (and (clear ?x) (ontable ?x) (handempty ?h))
+	     :precondition (and (clear ?x) (ontable ?x) (handempty ?h)(movable ?x))
 	     :effect
-	     (and  (movable ?x)
+	     (and  
                    (not (ontable ?x))
 		   (not (clear ?x))
 		   (not (handempty ?h))
@@ -54,9 +54,9 @@
 
   (:action unstack-sl
 	     :parameters (?x - block ?y - block ?h - slippery)
-	     :precondition (and (on ?x ?y) (clear ?x) (handempty ?h))
+	     :precondition (and (on ?x ?y) (clear ?x) (handempty ?h)(movable ?x))
 	     :effect
-	     (and  (movable ?x)
+	     (and  
                    (holding ?h ?x)
 		   (clear ?y)
 		   (not (clear ?x))
@@ -65,15 +65,17 @@
 
   (:action unstack-st
 	     :parameters (?x - block ?y - block ?h - stickyh)
-	     :precondition (and (on ?x ?y) (clear ?x) (handempty ?h))
+	     :precondition (and (on ?x ?y) (clear ?x) (handempty ?h)(movable ?x))
 	     :effect
-	     (and  (movable ?x)
+	     (and  
                    (holding ?h ?x)
 		   (clear ?y)
 		   (not (clear ?x))
 		   (not (handempty ?h))
 		   (not (on ?x ?y))
                    (sticky ?x)))
+
+
 
 ;;; events
 
