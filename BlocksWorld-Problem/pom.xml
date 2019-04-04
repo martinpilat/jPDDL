@@ -1,0 +1,54 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>cz.cuni.amis</groupId>
+		<artifactId>amis-pom</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+
+	<groupId>cz.cuni.mff</groupId>
+	<artifactId>bw-problem</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>BlocksWorld-Problem</name>
+	<!--
+	<url>https://github.com/kefik/BW-Problem</url>
+	-->
+	
+	<dependencies>
+	  <dependency>
+         <groupId>cz.cuni.mff</groupId>
+         <artifactId>bw-domain</artifactId>
+         <version>0.0.1-SNAPSHOT</version>
+      </dependency>
+      
+      <!-- jPDDL Tools -->
+	    <dependency>
+         <groupId>cz.cuni.mff</groupId>
+         <artifactId>jpddl-tools</artifactId>
+         <version>0.0.1-SNAPSHOT</version>
+      </dependency>
+	</dependencies>
+	
+	<build>
+      <resources>
+        <resource>
+            <directory>${basedir}/src/main/resources</directory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </resource>
+      </resources>
+	</build>
+	
+	<repositories>
+		<repository>
+			<id>amis-artifactory</id>
+			<name>AMIS Artifactory</name>
+			<url>http://diana.ms.mff.cuni.cz:8081/artifactory/repo</url>
+		</repository>
+	</repositories>
+</project>
