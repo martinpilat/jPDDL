@@ -67,7 +67,7 @@ public class LamaSimulation {
 		}
 
 		if (algName.equals("REPLAN_APP")) {
-			LamaRun_ReplanNotApplicable run = new LamaRun_ReplanNotApplicable();
+			LamaRun_ReplanNotApplicable run = new LamaRun_ReplanNotApplicable(terminateIfNoPlanFound);
 
 			for (int i = 0; i < totalRuns; ++i) {
 				if (i != 0) System.out.println();

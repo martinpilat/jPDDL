@@ -5,6 +5,7 @@ import cz.cuni.mff.jpddl.PDDLProblem;
 import cz.cuni.mff.jpddl.PDDLStringInstance;
 import cz.cuni.mff.jpddl.tools.planners.Lama;
 import cz.cuni.mff.jpddl.tools.search.bench.Timed;
+import cz.cuni.mff.jpddl.tools.simulations.LamaRun_ReplanAfterEvent.LamaRunResult;
 import cz.cuni.mff.jpddl.tools.utils.CSV;
 import cz.cuni.mff.jpddl.tools.validators.IPlanValidator;
 import cz.cuni.mff.jpddl.tools.validators.PlanChecker;
@@ -30,8 +31,12 @@ public class LamaRun_ReplanNotApplicable {
 		/**
 		 * We got to the dead end.
 		 */
-		DEAD_END
+		DEAD_END,
 		
+		/**
+		 * No plan found, terminated as terminateIfNoPlanFound was set to true.
+		 */
+		NO_PLAN
 	}
 
 	private boolean event_applied = false;
@@ -41,6 +46,16 @@ public class LamaRun_ReplanNotApplicable {
 	private int action = 0;
 	
 	private long planningMillis = 0;
+	
+	private boolean terminateIfNoPlanFound = false;
+	
+	public LamaRun_ReplanNotApplicable() {
+		this(false);
+	}
+
+	public LamaRun_ReplanNotApplicable(boolean terminateIfNoPlanFound) {
+		this.terminateIfNoPlanFound  = terminateIfNoPlanFound;
+	}
 
 	private void simulateEvent(PDDLProblem problem, Random random, IEventSelector eventSelector) {
 		// COLLECT APPLICABLE EVENTS
@@ -145,6 +160,11 @@ public class LamaRun_ReplanNotApplicable {
 			}
 			if (lamaPlan == null) {
 				System.out.println("  +-- LAMA FAILED TO FIND THE PLAN!");
+				if (terminateIfNoPlanFound) {
+					System.out.println("    +-- TERMINATING!");
+					result = LamaRunResult.NO_PLAN;
+					break;
+				}
 				simulateEvent(problem, random, eventSelector);
 			} else {
 				// just obtained a new plan, no events happened yet

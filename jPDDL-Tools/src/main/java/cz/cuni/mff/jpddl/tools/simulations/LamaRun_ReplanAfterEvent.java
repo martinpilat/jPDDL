@@ -49,6 +49,10 @@ public class LamaRun_ReplanAfterEvent {
 	private long planningMillis = 0;
 
 	private boolean terminateIfNoPlanFound = false;
+	
+	public LamaRun_ReplanAfterEvent() {
+		this(false);
+	}
 
 	public LamaRun_ReplanAfterEvent(boolean terminateIfNoPlanFound) {
 		this.terminateIfNoPlanFound  = terminateIfNoPlanFound;

@@ -21,8 +21,8 @@ public class Test02_LamaSimulation {
 		PlanTesterBFS planTesterBFS = new PlanTesterBFS();
 		planTesterBFS.config(problem.getDomain(), problem.getApplicables(), safeStates, 15);
 		
-		LamaSimulation simulation = new LamaSimulation("REPLAN_EVENT");
-		//LamaSimulation simulation = new LamaSimulation("REPLAN_APP");
+		//LamaSimulation simulation = new LamaSimulation("REPLAN_EVENT");
+		LamaSimulation simulation = new LamaSimulation("REPLAN_APP");
 		simulation.terminateIfNoPlanFound = true;
 		IEventSelector eventSelector = new SelectIndependentEvents();
 		simulation.simulate(runs, getClass().getSimpleName(), problem, planChecker, planTesterBFS, 10, 1, new File("results.csv"), eventSelector);
