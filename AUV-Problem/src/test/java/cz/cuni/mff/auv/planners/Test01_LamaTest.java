@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.List;
 
 import cz.cuni.mff.auv.domain.Effector;
-import cz.cuni.mff.auv.problem3.Problem;
+import cz.cuni.mff.auv.problem8.Problem;
 import cz.cuni.mff.jpddl.PDDLStringInstance;
 import cz.cuni.mff.jpddl.tools.planners.Lama;
 import cz.cuni.mff.jpddl.tools.search.bench.Timed;
@@ -42,7 +42,8 @@ public class Test01_LamaTest {
 		File problemFile = new File("auv-problem.pddl");
 		problem.createProblemFile(problemFile, problem.getState());
 		
-		SafeStates safeStates = new SafeStates(problem.getDomain(), new File("../Domains/AUV/safe_states-3"));
+		//SafeStates safeStates = new SafeStates(problem.getDomain(), new File("../Domains/AUV/safe_states-3"));
+		SafeStates safeStates = new SafeStates();
 		
 		Lama lama = new Lama();
 		
