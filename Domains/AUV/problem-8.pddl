@@ -9,6 +9,7 @@
 (:init (act-round)
        (operational a)
        (outside s)
+       (outside s2)
        (at a l-1-1)
        (at-res r1 l-2-4)
        (at-res r2 l-4-4)

@@ -8,13 +8,14 @@ import cz.cuni.mff.jpddl.tools.validators.PlanTesterFlat;
 import cz.cuni.mff.jpddl.tools.validators.SafeStates;
 import cz.cuni.mff.jpddl.utils.IEventSelector;
 import cz.cuni.mff.jpddl.utils.SelectIndependentEvents;
-import cz.cuni.mff.perestroika.problem2.Problem;
+import cz.cuni.mff.perestroika.problem8.Problem;
 
 public class Test02_LamaSimulation {
 	
 	public void sim1(int runs) {
 		Problem problem = new Problem();		
-		SafeStates safeStates = new SafeStates(problem.getDomain(), new File("Domains/Perestroika/safe_states-2"));
+		//SafeStates safeStates = new SafeStates(problem.getDomain(), new File("Domains/Perestroika/safe_states-2"));
+		SafeStates safeStates = new SafeStates();
 				
 		PlanChecker planChecker = new PlanChecker();
 		planChecker.config(problem.getDomain(), safeStates);
