@@ -188,24 +188,24 @@ public class LamaRun_ReplanAfterEvent {
 		System.out.println("    +-- validation " + Timed.getTimeString(validatingMillis));
 		System.out.println("    +-- simulation " + Timed.getTimeString(simulationMillis));
 		
-		outputToCSV(csvOutputFile, id, run, problem, validator, result, iteration, allTime.durationMillis, planningMillis, validatingMillis, simulationMillis, randomSeed, maxIterations);
+		outputToCSV(csvOutputFile, id, run, problem, validator, result, iteration, allTime.durationMillis, planningMillis, validatingMillis, simulationMillis, randomSeed, maxIterations, action);
 		
 		problem.getState().setDynamic(initialState);
 	}
 
 	private void outputToCSV(File csvOutputFile, String id, int run, PDDLProblem problem, IPlanValidator validator, LamaRunResult result, int iterations,
-			long durationMillis, long planningMillis, long validatingMillis, long simulationMillis, long randomSeed,
-			int maxIterations) {
-		
+							 long durationMillis, long planningMillis, long validatingMillis, long simulationMillis, long randomSeed,
+							 int maxIterations, int action) {
+
 		System.out.println("  +-- appending result into " + csvOutputFile.getAbsolutePath());
-		
+
 		Date now = Calendar.getInstance().getTime();
 
 		CSV.appendCSVRow(csvOutputFile,
-				new String[] {"date", "id", "run", "problem",            "validator",                 "result", "iterations", "durationMillis", "planningMillis", "validatingMillis", "simulationMillis", "randomSeed", "maxIterations"},
-				now,    id,   run,   problem.getClass(),   validator.getDescription(),  result,   iterations,   durationMillis,   planningMillis,   validatingMillis,   simulationMillis,   randomSeed,   maxIterations
+				new String[] {"date", "id", "run", "problem",            "validator",                 "result", "iterations", "durationMillis", "planningMillis", "validatingMillis", "simulationMillis", "randomSeed", "maxIterations", "actions", "algorithm"},
+				now,    id,   run,   problem.getClass(),   validator.getDescription(),  result,   iterations,   durationMillis,   planningMillis,   validatingMillis,   simulationMillis,   randomSeed,   maxIterations, action, "REPLAN_EVENT"
 		);
-		
+
 	}
 	
 }

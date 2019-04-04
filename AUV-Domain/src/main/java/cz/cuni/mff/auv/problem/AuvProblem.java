@@ -14,6 +14,7 @@ import cz.cuni.mff.auv.domain.types.T_Auv;
 import cz.cuni.mff.auv.domain.types.T_Location;
 import cz.cuni.mff.auv.domain.types.T_Ship;
 import cz.cuni.mff.auv.domain.types.T_Vehicle;
+import cz.cuni.mff.jpddl.PDDLEffector;
 import cz.cuni.mff.jpddl.PDDLProblem;
 import cz.cuni.mff.jpddl.PDDLState;
 import cz.cuni.mff.jpddl.utils.StateCompact;
@@ -148,15 +149,17 @@ public abstract class AuvProblem extends PDDLProblem {
 		}
 	}
 
-	public int dang() {
+	public int dang(PDDLEffector step) {
 
-		State state = (State)getState();
 		ArrayList<P_At> ship_locations = new ArrayList<>();
 		P_At auv_location = null;
 
 		if (accessible_ship_locations == null) {
 			initializeStaticDang();
 		}
+
+		State state = (State)getState().clone();
+		step.apply(state);
 
 		ArrayList<P_At> locations = new ArrayList<>();
 		state.p_At.getAll(locations);
@@ -186,10 +189,18 @@ public abstract class AuvProblem extends PDDLProblem {
 					blocked = 1;
 				}
 			}
-			dang = Math.min(dang, ship_distances.get(pat.v).get(pat.l).get(auv_location.l) + blocked);
+			if (!ship_distances.get(pat.v).containsKey(pat.l))
+				return Integer.MAX_VALUE;
+			if (!ship_distances.get(pat.v).get(pat.l).containsKey(auv_location.l))
+				return Integer.MAX_VALUE;
+			int dist = ship_distances.get(pat.v).get(pat.l).get(auv_location.l);
+			if (dist > 1) {
+				dist += blocked;
+			}
+			dang = Math.min(dang, dist);
 		}
 
-		return dang;
+		return Math.max(dang - 1, 0);
 	}
 
 	public String getClosestSafeState() {

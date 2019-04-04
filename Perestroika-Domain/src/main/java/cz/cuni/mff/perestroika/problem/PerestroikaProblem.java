@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
+import cz.cuni.mff.jpddl.PDDLEffector;
 import cz.cuni.mff.jpddl.PDDLProblem;
 import cz.cuni.mff.jpddl.PDDLState;
 import cz.cuni.mff.jpddl.utils.StateCompact;
@@ -80,20 +81,21 @@ public abstract class PerestroikaProblem extends PDDLProblem {
 
 	}
 
-	public int dang() {
-		State state = (State)getState();
+	public int dang(PDDLEffector step) {
+		State state = (State)getState().clone();
+		step.apply(state);
 		ArrayList<P_AtAgent> predicates = new ArrayList<>();
 		state.p_AtAgent.getAll(predicates);
 		T_Location agent_loc = predicates.get(0).l; // agent should always be somewhere
 
 		if (state.p_Big.isSet(agent_loc)) {
-			return 3;
-		}
-		if (state.p_Medium.isSet(agent_loc)) {
 			return 2;
 		}
-		if (state.p_Small.isSet(agent_loc)) {
+		if (state.p_Medium.isSet(agent_loc)) {
 			return 1;
+		}
+		if (state.p_Small.isSet(agent_loc)) {
+			return 0;
 		}
 		return Integer.MAX_VALUE;
 	}

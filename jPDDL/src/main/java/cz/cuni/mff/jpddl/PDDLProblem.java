@@ -27,7 +27,7 @@ public abstract class PDDLProblem {
 		return applicables;
 	}
 
-	public int dang() {
+	public int dang(PDDLEffector step) {
 		throw new UnsupportedOperationException();
 	}
 

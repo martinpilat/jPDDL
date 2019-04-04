@@ -104,11 +104,8 @@ public class LamaRun_Dang {
 		planningTime.end();
 		planningMillis += planningTime.durationMillis;
 		problemFile.delete();
-		System.out.println(problem.dang());
 		// ALGORITHM 3
 		while (true) {
-
-			System.out.println(problem.dang());
 
 			if (problem.getGoal().isAchieved(problem.getState())) {
 				System.out.println("  +-- GOAL ACHIEVED!");
@@ -132,21 +129,6 @@ public class LamaRun_Dang {
 				System.out.println("  +-- Not in dead-end state.");								
 			}
 
-			int dang = problem.dang();
-			if (dang < 3) {
-				System.out.println("  +-- Current state is dangerous, dang: " + dang);
-				System.out.println("  +-- Planning to safety... " + problem.getClosestSafeState());
-				problemFile = new File("problem.pddl");
-				problem.createProblemFile(problemFile, problem.getState(), problem.getClosestSafeState());
-				planningTime.start();
-				lamaPlan = lama.plan(domainFile, problemFile);
-				planningTime.end();
-				planningMillis += planningTime.durationMillis;
-				problemFile.delete();
-				if (lamaPlan == null)
-					System.out.println("  +-- LAMA FAILED TO FIND THE PLAN!");
-			}
-
 			// PLAN
 			if (lamaPlan == null || lamaPlan.isEmpty()) {
 				System.out.println("  +-- Planning...");
@@ -160,6 +142,7 @@ public class LamaRun_Dang {
 			}
 			if (lamaPlan == null) {
 				System.out.println("  +-- LAMA FAILED TO FIND THE PLAN!");
+				System.out.println("    +-- ACTION[" + (++action) + ".]: no-op");
 				simulateEvent(problem, random, event_selector);
 			} else {
 				// just obtained a new plan, no events happened yet
@@ -174,14 +157,44 @@ public class LamaRun_Dang {
 					lamaPlan = null; // (and do not increase iteration number, we made no steps)
 				}
 				else {
-					int toExecuteActions = 1;
-
-					System.out.println("  +-- Executing plan, actions[0-" + (toExecuteActions - 1) + "]");
-					for (int i = 0; i < toExecuteActions; ++i) {
+					System.out.println("  +-- Executing plan");
+					plan = problem.getDomain().toEffectors(lamaPlan.toArray(new PDDLStringInstance[0]));
+					System.out.println("  +-- The plan has length " + plan.length);
+					for (int i = 0; i < plan.length; ++i) {
 						if (!plan[i].isApplicable(problem.getState())) {
 							System.out.println("    +-- Action[" + i + "/" + (++action) + "]: " + plan[i].toEffector() + " is NOT APPLICABLE, terminating the plan execution!");
 							break;
 						}
+						int dang = problem.dang(plan[i]);
+						if (dang < 2) {
+							System.out.println("  +-- State after action " + plan[0].toEffector() + " may be dangerous, dang: " + dang);
+							System.out.println("  +-- Planning to safety... " + problem.getClosestSafeState());
+							problemFile = new File("problem.pddl");
+							problem.createProblemFile(problemFile, problem.getState(), problem.getClosestSafeState());
+							planningTime.start();
+							lamaPlan = lama.plan(domainFile, problemFile);
+							planningTime.end();
+							planningMillis += planningTime.durationMillis;
+							problemFile.delete();
+							if (lamaPlan == null) {
+								System.out.println("  +-- LAMA FAILED TO FIND THE PLAN!");
+							}
+							if (lamaPlan == null || lamaPlan.size() == 0) {
+								System.out.println("    +-- ACTION[" + (++action) + ".]: no-op");
+								simulateEvent(problem, random, event_selector);
+								break;
+							}
+							plan = problem.getDomain().toEffectors(lamaPlan.toArray(new PDDLStringInstance[0]));
+							System.out.println("  +-- The plan has length " + plan.length);
+							if (problem.dang(plan[0]) < 2) {
+								System.out.println("  +-- New also dangerous, replanning...");
+								lamaPlan = null;
+								simulateEvent(problem, random, event_selector);
+								break;
+							}
+							i=0; // new plan safe, perform it
+						}
+
 						System.out.println("    +-- ACTION[" + (++action) + ".]: " + plan[i].toEffector());
 						plan[i].apply(problem.getState());
 						lamaPlan.remove(0);
@@ -209,24 +222,24 @@ public class LamaRun_Dang {
 		System.out.println("    +-- validation " + Timed.getTimeString(validatingMillis));
 		System.out.println("    +-- simulation " + Timed.getTimeString(simulationMillis));
 		
-		outputToCSV(csvOutputFile, id, run, problem, validator, result, iteration, allTime.durationMillis, planningMillis, validatingMillis, simulationMillis, randomSeed, maxIterations);
+		outputToCSV(csvOutputFile, id, run, problem, validator, result, iteration, allTime.durationMillis, planningMillis, validatingMillis, simulationMillis, randomSeed, maxIterations, action);
 		
 		problem.getState().setDynamic(initialState);
 	}
 
 	private void outputToCSV(File csvOutputFile, String id, int run, PDDLProblem problem, IPlanValidator validator, LamaRunResult result, int iterations,
-			long durationMillis, long planningMillis, long validatingMillis, long simulationMillis, long randomSeed,
-			int maxIterations) {
-		
+							 long durationMillis, long planningMillis, long validatingMillis, long simulationMillis, long randomSeed,
+							 int maxIterations, int action) {
+
 		System.out.println("  +-- appending result into " + csvOutputFile.getAbsolutePath());
-		
+
 		Date now = Calendar.getInstance().getTime();
 
-        CSV.appendCSVRow(csvOutputFile,
-                new String[] {"date", "id", "run", "problem",            "validator",                 "result", "iterations", "durationMillis", "planningMillis", "validatingMillis", "simulationMillis", "randomSeed", "maxIterations"},
-                now,    id,   run,   problem.getClass(),   validator.getDescription(),  result,   iterations,   durationMillis,   planningMillis,   validatingMillis,   simulationMillis,   randomSeed,   maxIterations
-        );
-		
+		CSV.appendCSVRow(csvOutputFile,
+				new String[] {"date", "id", "run", "problem",            "validator",                 "result", "iterations", "durationMillis", "planningMillis", "validatingMillis", "simulationMillis", "randomSeed", "maxIterations", "actions", "algorithm"},
+				now,    id,   run,   problem.getClass(),   validator.getDescription(),  result,   iterations,   durationMillis,   planningMillis,   validatingMillis,   simulationMillis,   randomSeed,   maxIterations, action, "DANG"
+		);
+
 	}
 	
 }
