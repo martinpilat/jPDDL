@@ -87,7 +87,7 @@ public class LamaRun_Dang {
 		
 		// INIT LAMA
 		File domainFile = problem.getDomain().getDomainPureFile();		
-		File flatDomainFile = problem.getDomain().getDomainFlatFile();		
+		//File flatDomainFile = problem.getDomain().getDomainFlatFile();		
 		Lama lama = new Lama();
 		
 		// INTERNAL VARS

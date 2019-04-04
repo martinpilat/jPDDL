@@ -88,20 +88,20 @@ public class State extends PDDLState {
 	public State clone() {
 		State result = new State(false);
 		result.compact = compact.clone();
-		p_Clear = p_Clear.clone();
-		p_Clear.compact = compact;			
-		p_HandEmpty = p_HandEmpty.clone();
-		p_HandEmpty.compact = compact;
-		p_Holding = p_Holding.clone();
-		p_Holding.compact = compact;								
-		p_Movable = p_Movable.clone();
-		p_Movable.compact = compact;
-		p_On = p_On.clone();
-		p_On.compact = compact;
-		p_OnTable = p_OnTable.clone();
-		p_OnTable.compact = compact;			
-		p_Sticky = p_Sticky.clone();
-		p_Sticky.compact = compact;
+		result.p_Clear = p_Clear.clone();
+		result.p_Clear.compact = compact;			
+		result.p_HandEmpty = p_HandEmpty.clone();
+		result.p_HandEmpty.compact = compact;
+		result.p_Holding = p_Holding.clone();
+		result.p_Holding.compact = compact;								
+		result.p_Movable = p_Movable.clone();
+		result.p_Movable.compact = compact;
+		result.p_On = p_On.clone();
+		result.p_On.compact = compact;
+		result.p_OnTable = p_OnTable.clone();
+		result.p_OnTable.compact = compact;			
+		result.p_Sticky = p_Sticky.clone();
+		result.p_Sticky.compact = compact;
 		return result;
 	}
 	
@@ -120,8 +120,7 @@ public class State extends PDDLState {
 		dumpStorage(p_Movable, includeEmpty, maxLineLength);		
 		dumpStorage(p_On, includeEmpty, maxLineLength);
 		dumpStorage(p_OnTable, includeEmpty, maxLineLength);
-		dumpStorage(p_Sticky, includeEmpty, maxLineLength);
-				
+		dumpStorage(p_Sticky, includeEmpty, maxLineLength);				
 	}
 	
 	public void dumpDiff(State diffFrom) {

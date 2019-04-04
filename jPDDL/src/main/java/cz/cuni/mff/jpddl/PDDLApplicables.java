@@ -19,8 +19,8 @@ public class PDDLApplicables {
 	public void collectApplicableEvents(PDDLDomain domain, PDDLState state, final Collection<? extends PDDLEffector> events) {
 		PDDLEffectorsCollector collector = collectorsPool.get();
 		collector.effectors = events;		
-		for (PDDLEffector action : domain.getEvents()) {
-			action.unify(state, action, collector);
+		for (PDDLEffector event : domain.getEvents()) {
+			event.unify(state, event, collector);
 		}		
 		collector.effectors = null;
 		collectorsPool.back(collector);		
