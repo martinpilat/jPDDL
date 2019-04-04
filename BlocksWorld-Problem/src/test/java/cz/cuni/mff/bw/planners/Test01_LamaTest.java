@@ -25,7 +25,7 @@ public class Test01_LamaTest {
 		Timed time = new Timed();
 		time.start();
 		
-		cz.cuni.mff.bw.problem6.Problem problem = new cz.cuni.mff.bw.problem6.Problem();
+		cz.cuni.mff.bw.problem1.Problem problem = new cz.cuni.mff.bw.problem1.Problem();
 		
 		StateCompact originalState = problem.state.getDynamic().clone();
 		
