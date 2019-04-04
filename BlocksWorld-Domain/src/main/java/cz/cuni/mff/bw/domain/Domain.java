@@ -39,6 +39,12 @@ public final class Domain extends PDDLDomain {
 	}
 	
 	@Override
+	public File getDomainLimitFile() {
+		throw new RuntimeException("LIMIT DOMAIN DOES NOT EXIST FOR BLOCKSWORLD (yet?)");
+		//return locateResourceFile("bw/domain-flat.pddl", "resources/bw/domain-flat.pddl", "BlocksWorld-Domain/src/main/resources/bw/domain-limit.pddl", "../BlocksWorld-Domain/src/main/resources/bw/domain-limit.pddl", "../../BlocksWorld-Domain/src/main/resources/bw/domain-limit.pddl" );
+	}
+	
+	@Override
 	public Action[] getActions() {
 		return Action.ALL;
 	}
