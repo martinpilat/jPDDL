@@ -23,6 +23,8 @@ import cz.cuni.mff.jpddl.tools.validators.PlanTesterBFS;
 import cz.cuni.mff.jpddl.tools.validators.PlanTesterDFS;
 import cz.cuni.mff.jpddl.tools.validators.PlanTesterFlat;
 import cz.cuni.mff.jpddl.tools.validators.SafeStates;
+import cz.cuni.mff.jpddl.utils.IEventSelector;
+import cz.cuni.mff.jpddl.utils.SelectIndependentEvents;
 
 /**
  * Console-app frontend for the {@link ExperimentEvaluator}.
@@ -70,6 +72,10 @@ public class Main {
 	private static final char ARG_SAFE_STATES_FILE_SHORT = 's';
 	
 	private static final String ARG_SAFE_STATES_FILE_LONG = "safe-states-file";
+
+	private static final char ARG_ALG_SHORT = 'l';
+
+	private static final String ARG_ALG_LONG = "algorithm";
 		
 	private static JSAP jsap;
 
@@ -114,7 +120,9 @@ public class Main {
 	private static boolean headerOutput = false;
 
 	private static JSAPResult config;
-	
+
+	private static String algName;
+
 	private static final Map<String, IPlanValidator> VALIDATORS = new HashMap<String, IPlanValidator>();
 	
 	static {
@@ -170,7 +178,17 @@ public class Main {
 		
 	private static void initJSAP() throws JSAPException {
 		jsap = new JSAP();
-		
+
+		FlaggedOption optAlg = new FlaggedOption(ARG_ALG_LONG)
+				.setStringParser(JSAP.STRING_PARSER)
+				.setRequired(false)
+				.setDefault("LIMIT")
+				.setShortFlag(ARG_ALG_SHORT)
+				.setLongFlag(ARG_ALG_LONG);
+		optAlg.setHelp("Algorithm to run");
+
+		jsap.registerParameter(optAlg);
+
 		FlaggedOption opt1 = new FlaggedOption(ARG_FAST_DOWNWARD_DIR_LONG)
 	    	.setStringParser(JSAP.STRING_PARSER)
 	    	.setRequired(false)
@@ -322,6 +340,8 @@ public class Main {
 		totalRuns = config.getInt(ARG_RUNS_LONG);
 		
 		safeStatesFileString = config.getString(ARG_SAFE_STATES_FILE_LONG);
+
+		algName = config.getString(ARG_ALG_LONG);
 	}
 	
 	private static void sanityChecks() {
@@ -455,16 +475,18 @@ public class Main {
 		} else {
 			fail("Unhandled validator: " + validatorString);
 		}
-		
+
 		System.out.println("-- creating the simulation");		
-		LamaSimulation simulation = new LamaSimulation();
+		LamaSimulation simulation = new LamaSimulation(algName);
 		
 		System.out.println("-- RUNNING THE SIMULATION!");
 		System.out.println();
-		
+
+		IEventSelector eventSelector = new SelectIndependentEvents();
+
 		Timed time = new Timed();
 		time.start();
-		simulation.simulate(totalRuns, simulationId, problem, planChecker, validator, maxIterations, randomSeed, resultsCSVFile);
+		simulation.simulate(totalRuns, simulationId, problem, planChecker, validator, maxIterations, randomSeed, resultsCSVFile, eventSelector);
 		time.end();
 		
 		System.out.println();
@@ -486,7 +508,8 @@ public class Main {
 				  ,"-r", "1"                          // random seed
 				  ,"-c", "results.csv"			      // results CSV file
 				  ,"-a", "5"					      // total runs to perform
-				  ,"-s", "../Domains/AUV/safe_states" // safe states file to load
+				  ,"-s", "Domains/AUV/safe_states"    // safe states file to load
+				  ,"-l", "DANG"
 		};
 	}
 	

@@ -377,7 +377,7 @@ public final class Problem extends AuvProblem {
 		
 		state.p_ConnectedShip.set(E_Ships.THIS.s, E_Locations.THIS.l58, E_Locations.THIS.l57);
 		state.p_ConnectedShip.set(E_Ships.THIS.s, E_Locations.THIS.l57, E_Locations.THIS.l56);
-		state.p_ConnectedShip.set(E_Ships.THIS.s, E_Locations.THIS.l56, E_Locations.THIS.l54);
+		state.p_ConnectedShip.set(E_Ships.THIS.s, E_Locations.THIS.l56, E_Locations.THIS.l55);
 		state.p_ConnectedShip.set(E_Ships.THIS.s, E_Locations.THIS.l55, E_Locations.THIS.l54);
 		state.p_ConnectedShip.set(E_Ships.THIS.s, E_Locations.THIS.l54, E_Locations.THIS.l53);
 		state.p_ConnectedShip.set(E_Ships.THIS.s, E_Locations.THIS.l53, E_Locations.THIS.l52);

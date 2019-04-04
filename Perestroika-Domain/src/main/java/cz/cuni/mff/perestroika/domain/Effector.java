@@ -30,6 +30,13 @@ public abstract class Effector extends PDDLEffector {
 	}
 	
 	public static Effector toEffector(PDDLStringInstance se) {
+		if (se.name.equals("move-unsafe")) {
+			se.name = "move";
+			se.args = se.args.subList(0,2);
+		}
+		if (se.name.equals("move-safe")) {
+			se.name = "move";
+		}
 		Effector proto = BY_NAME.get(se.name);
 		if (proto == null) return null;
 		Effector result = (Effector)proto.create();

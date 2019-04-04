@@ -126,7 +126,7 @@ public class State extends PDDLState {
 		result.p_DupFree.compact = result.compact;
 		result.p_Entry = p_Entry;
 		result.p_Exit = p_Exit;
-		result.p_Free = p_Free;
+		result.p_Free = p_Free.clone();
 		result.p_Free.compact = result.compact;
 		result.p_Operational = p_Operational.clone();
 		result.p_Operational.compact = result.compact;

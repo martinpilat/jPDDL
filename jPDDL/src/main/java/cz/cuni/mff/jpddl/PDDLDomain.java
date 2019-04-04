@@ -27,7 +27,8 @@ public abstract class PDDLDomain {
 	 * @return
 	 */
 	public abstract File getDomainFlatFile();
-	
+	public abstract File getDomainLimitFile();
+
 	public abstract PDDLEffector[] getActions();
 	public abstract PDDLEffector[] getEvents();
 	public abstract PDDLEffector[] getEffectors();
