@@ -16,6 +16,10 @@ public class SafeStates {
 	
 	public final List<PDDLPredicate> predicates;
 	
+	public SafeStates() {
+		this.predicates = new ArrayList<PDDLPredicate>();
+	}
+	
 	public SafeStates(List<PDDLPredicate> predicates) {
 		this.predicates = predicates;
 	}

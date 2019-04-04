@@ -45,7 +45,7 @@ public final class Problem extends BwProblem {
 		state.p_On.set(E_Blocks.b12, E_Blocks.b15);
 		state.p_On.set(E_Blocks.b14, E_Blocks.b5);
 				
-		state.p_OnTable.set(E_Blocks.b3);
+		state.p_OnTable.set(E_Blocks.b13);
 		state.p_OnTable.set(E_Blocks.b15);
 		
 		state.p_Clear.set(E_Blocks.b7);

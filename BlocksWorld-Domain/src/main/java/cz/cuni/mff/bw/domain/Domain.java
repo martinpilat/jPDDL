@@ -19,7 +19,7 @@ public final class Domain extends PDDLDomain {
 	
 	@Override
 	public String getName() {
-		return "BW";
+		return "blocksworld";
 	}
 	
 	@Override

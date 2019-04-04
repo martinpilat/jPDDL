@@ -8,8 +8,11 @@ import cz.cuni.mff.bw.domain.predicates.P_Holding;
 import cz.cuni.mff.bw.domain.predicates.P_Movable;
 import cz.cuni.mff.bw.domain.predicates.P_OnTable;
 import cz.cuni.mff.bw.domain.types.T_Block;
+import cz.cuni.mff.bw.domain.types.T_Hand;
 import cz.cuni.mff.bw.domain.types.T_Slippery;
+import cz.cuni.mff.bw.domain.types.T_Sticky;
 import cz.cuni.mff.bw.problem.E_Block;
+import cz.cuni.mff.bw.problem.E_Hand;
 import cz.cuni.mff.bw.problem.E_Slippery;
 import cz.cuni.mff.jpddl.IPDDLUnification;
 import cz.cuni.mff.jpddl.PDDLEffector;
@@ -275,8 +278,11 @@ public final class Ac_PickUpSl extends Action {
 			
 			@Override
 			public boolean entry(int key, Boolean data) {
-				effector.h = E_Slippery.THIS.getElement(key);
-				unified();
+				T_Hand h = E_Hand.THIS.getElement(key);
+				if (h instanceof T_Slippery) {
+					effector.h = (T_Slippery)h;
+					unified();
+				}
 				return true;
 			}
 			

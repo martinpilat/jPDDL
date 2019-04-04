@@ -9,9 +9,11 @@ import cz.cuni.mff.bw.domain.predicates.P_Movable;
 import cz.cuni.mff.bw.domain.predicates.P_OnTable;
 import cz.cuni.mff.bw.domain.predicates.P_Sticky;
 import cz.cuni.mff.bw.domain.types.T_Block;
-import cz.cuni.mff.bw.domain.types.T_Slippery;
+import cz.cuni.mff.bw.domain.types.T_Hand;
+import cz.cuni.mff.bw.domain.types.T_Sticky;
 import cz.cuni.mff.bw.problem.E_Block;
-import cz.cuni.mff.bw.problem.E_Slippery;
+import cz.cuni.mff.bw.problem.E_Hand;
+import cz.cuni.mff.bw.problem.E_Sticky;
 import cz.cuni.mff.jpddl.IPDDLUnification;
 import cz.cuni.mff.jpddl.PDDLEffector;
 import cz.cuni.mff.jpddl.PDDLState;
@@ -28,7 +30,7 @@ import cz.cuni.mff.jpddl.utils.StateCompact;
 public final class Ac_PickUpSt extends Action {
 	
 	public T_Block x;
-	public T_Slippery h;	
+	public T_Sticky h;	
 	
 	public boolean[] applied = new boolean[] { false, false, false, false, false, false };
 	
@@ -39,7 +41,7 @@ public final class Ac_PickUpSt extends Action {
 		source.rewrite(this);
 	}
 	
-	public Ac_PickUpSt(T_Block x, T_Slippery h) {
+	public Ac_PickUpSt(T_Block x, T_Sticky h) {
 		super();
 		this.x = x;
 		this.h = h;		
@@ -94,7 +96,7 @@ public final class Ac_PickUpSt extends Action {
 	@Override
 	public void assign(String[] args) {		
 		x = E_Block.THIS.getElement(args[0]);
-		h = E_Slippery.THIS.getElement(args[1]);
+		h = E_Sticky.THIS.getElement(args[1]);
 	}
 	
 	@Override
@@ -279,8 +281,11 @@ public final class Ac_PickUpSt extends Action {
 			
 			@Override
 			public boolean entry(int key, Boolean data) {
-				effector.h = E_Slippery.THIS.getElement(key);
-				unified();
+				T_Hand h = E_Hand.THIS.getElement(key);
+				if (h instanceof T_Sticky) {
+					effector.h = (T_Sticky)h;
+					unified();	
+				}				
 				return true;
 			}
 			

@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.List;
 
 import cz.cuni.mff.bw.domain.Effector;
-import cz.cuni.mff.bw.problem3.Problem;
 import cz.cuni.mff.jpddl.PDDLStringInstance;
 import cz.cuni.mff.jpddl.tools.planners.Lama;
 import cz.cuni.mff.jpddl.tools.search.bench.Timed;
@@ -16,8 +15,6 @@ import cz.cuni.mff.jpddl.tools.validators.PlanTesterBFS;
 import cz.cuni.mff.jpddl.tools.validators.PlanTesterBFS.PlanTesterBFSResult;
 import cz.cuni.mff.jpddl.tools.validators.PlanTesterDFS;
 import cz.cuni.mff.jpddl.tools.validators.PlanTesterDFS.PlanTesterDFSResult;
-import cz.cuni.mff.jpddl.tools.validators.PlanTesterFlat;
-import cz.cuni.mff.jpddl.tools.validators.PlanTesterFlat.PlanTesterFlatResult;
 import cz.cuni.mff.jpddl.tools.validators.SafeStates;
 import cz.cuni.mff.jpddl.utils.StateCompact;
 
@@ -28,7 +25,7 @@ public class Test01_LamaTest {
 		Timed time = new Timed();
 		time.start();
 		
-		Problem problem = new Problem();
+		cz.cuni.mff.bw.problem6.Problem problem = new cz.cuni.mff.bw.problem6.Problem();
 		
 		StateCompact originalState = problem.state.getDynamic().clone();
 		
@@ -39,10 +36,10 @@ public class Test01_LamaTest {
 		time.start();
 		
 		File domainFile = problem.getDomain().getDomainPureFile();
-		File problemFile = new File("perestroika-problem.pddl");
+		File problemFile = new File("blocksworld-problem.pddl");
 		problem.createProblemFile(problemFile, problem.getState());
 		
-		SafeStates safeStates = new SafeStates(problem.getDomain(), new File("../Domains/Perestroika/safe_states-3"));
+		SafeStates safeStates = new SafeStates();
 		
 		Lama lama = new Lama();
 		
@@ -268,58 +265,6 @@ public class Test01_LamaTest {
 				*/
 			}
 			
-			// TEST THE PLAN - FLAT WAY
-			{
-				System.out.println();
-				System.out.println("PLAN TESTING FLAT");
-				//problem.getState().dump(true);
-				
-				time.start();
-				PlanTesterFlat planTesterFlat = new PlanTesterFlat();
-				planTesterFlat.config(problem.getDomain(), problem.getApplicables(), safeStates);
-				PlanTesterFlatResult planTesterFlatResult = planTesterFlat.validate(problem.getGoal(), problem.getState(), plan);
-				time.end();
-				time.reportInline("  +-- TIME");
-				
-				if (planTesterFlatResult.valid) {
-					System.out.println("  +-- Plan is valid!");
-				} else {
-					System.out.println("  +-- Plan is INvalid! Last executable action index is " + planTesterFlatResult.lastExecutableEffectorIndex + ".");
-					System.out.print("  +-- Actions: ");
-					for (int i = 0; i < planTesterFlatResult.plan.length; ++i) {
-						if (i != 0) System.out.print(" -> ");
-						if (i == planTesterFlatResult.lastExecutableEffectorIndex+1) {
-							System.out.print("!!! ");
-						}
-						System.out.print(planTesterFlatResult.plan[i] == null ? "null" : planTesterFlatResult.plan[i].toEffector());
-						if (i == planTesterFlatResult.lastExecutableEffectorIndex+1) {
-							System.out.print(" !!! ");
-						}
-					}
-					System.out.println();						
-				}
-				
-				System.out.println("  +-- Last safe state index is " + planTesterFlatResult.lastSafeStateIndex + ".");
-				/*
-				System.out.println("SAFE STATE");
-				for (int i = 0; i < planTesterFlatResult.lastSafeStateIndex; ++i) {
-					planTesterFlatResult.plan[i].apply(planTesterFlatResult.state);
-					if (planTesterFlatResult.events[i] != null) planTesterFlatResult.events[i].apply(planTesterFlatResult.state);
-				}
-				planTesterFlatResult.state.dump();
-				*/
-				
-				/*
-				System.out.println("CHECKING THE STATE!");
-				if (!originalState.equals(problem.getState().getDynamic())) {
-					System.out.println("  +-- State differs from the original state!");
-					problem.getState().setDynamic(originalState);
-				} else {
-					System.out.println("  +-- State is still the same.");
-				}
-				*/
-			}
-						
 		}
 		
 		problemFile.delete();

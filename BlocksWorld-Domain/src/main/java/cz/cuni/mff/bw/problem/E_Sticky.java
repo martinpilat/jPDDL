@@ -13,7 +13,7 @@ public final class E_Sticky extends PDDLEnum<T_Sticky> {
 	
 	@Override
 	public String getName() {
-		return "sticky";
+		return "stickyh";
 	}
 	
 	@Override
