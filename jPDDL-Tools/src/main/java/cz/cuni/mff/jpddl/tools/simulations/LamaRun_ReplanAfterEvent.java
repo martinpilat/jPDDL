@@ -31,7 +31,12 @@ public class LamaRun_ReplanAfterEvent {
 		/**
 		 * We got to the dead end.
 		 */
-		DEAD_END
+		DEAD_END, 
+		
+		/**
+		 * No plan found, terminated as terminateIfNoPlanFound was set to true.
+		 */
+		NO_PLAN
 		
 	}
 
@@ -42,6 +47,12 @@ public class LamaRun_ReplanAfterEvent {
 	private int action = 0;
 	
 	private long planningMillis = 0;
+
+	private boolean terminateIfNoPlanFound = false;
+
+	public LamaRun_ReplanAfterEvent(boolean terminateIfNoPlanFound) {
+		this.terminateIfNoPlanFound  = terminateIfNoPlanFound;
+	}
 
 	private void simulateEvent(PDDLProblem problem, Random random, IEventSelector eventSelector) {
 		// COLLECT APPLICABLE EVENTS
@@ -146,6 +157,11 @@ public class LamaRun_ReplanAfterEvent {
 			}
 			if (lamaPlan == null) {
 				System.out.println("  +-- LAMA FAILED TO FIND THE PLAN!");
+				if (terminateIfNoPlanFound) {
+					System.out.println("    +-- TERMINATING!");
+					result = LamaRunResult.NO_PLAN;
+					break;
+				}
 				simulateEvent(problem, random, eventSelector);
 			} else {
 				// just obtained a new plan, no events happened yet

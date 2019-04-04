@@ -12,6 +12,8 @@ import cz.cuni.mff.jpddl.utils.IEventSelector;
 public class LamaSimulation {
 
 	private String algName;
+	
+	public boolean terminateIfNoPlanFound = false; // interpreted only by some runs
 
 	public LamaSimulation() {
 		this("DANG");
@@ -53,7 +55,7 @@ public class LamaSimulation {
 		}
 
 		if (algName.equals("REPLAN_EVENT")) {
-			LamaRun_ReplanAfterEvent run = new LamaRun_ReplanAfterEvent();
+			LamaRun_ReplanAfterEvent run = new LamaRun_ReplanAfterEvent(terminateIfNoPlanFound);
 
 			for (int i = 0; i < totalRuns; ++i) {
 				if (i != 0) System.out.println();
