@@ -9,6 +9,7 @@ import com.martiansoftware.jsap.FlaggedOption;
 import com.martiansoftware.jsap.JSAP;
 import com.martiansoftware.jsap.JSAPException;
 import com.martiansoftware.jsap.JSAPResult;
+import com.martiansoftware.jsap.Switch;
 
 import cz.cuni.mff.auv.problem1.Problem;
 import cz.cuni.mff.jpddl.PDDLProblem;
@@ -76,6 +77,10 @@ public class Main {
 	private static final char ARG_ALG_SHORT = 'l';
 
 	private static final String ARG_ALG_LONG = "algorithm";
+	
+	private static final char ARG_TERMINATE_IF_NO_PLAN_SHORT = 't';
+
+	private static final String ARG_TERMINATE_IF_NO_PLAN_LONG = "terminate-runs-on-no-plan";
 		
 	private static JSAP jsap;
 
@@ -122,6 +127,8 @@ public class Main {
 	private static JSAPResult config;
 
 	private static String algName;
+	
+	private static boolean terminateRunsOnNoPlan = false;
 
 	private static final Map<String, IPlanValidator> VALIDATORS = new HashMap<String, IPlanValidator>();
 	
@@ -293,6 +300,13 @@ public class Main {
 		opt544.setHelp("File containing list of safe states.");
 		    
 		jsap.registerParameter(opt544);
+		
+		Switch opt644 = new Switch(ARG_TERMINATE_IF_NO_PLAN_LONG)
+	    		.setShortFlag(ARG_TERMINATE_IF_NO_PLAN_SHORT)
+		    	.setLongFlag(ARG_TERMINATE_IF_NO_PLAN_LONG);    
+		opt644.setHelp("For certain algorithms, we may terminate runs when planner fails to find a plan from current state.");
+		    
+		jsap.registerParameter(opt644);
 	    
    	}
 
@@ -342,6 +356,8 @@ public class Main {
 		safeStatesFileString = config.getString(ARG_SAFE_STATES_FILE_LONG);
 
 		algName = config.getString(ARG_ALG_LONG);
+		
+		terminateRunsOnNoPlan = config.getBoolean(ARG_TERMINATE_IF_NO_PLAN_LONG);
 	}
 	
 	private static void sanityChecks() {
@@ -478,6 +494,7 @@ public class Main {
 
 		System.out.println("-- creating the simulation");		
 		LamaSimulation simulation = new LamaSimulation(algName);
+		simulation.terminateIfNoPlanFound = terminateRunsOnNoPlan;
 		
 		System.out.println("-- RUNNING THE SIMULATION!");
 		System.out.println();
@@ -510,6 +527,7 @@ public class Main {
 				  ,"-a", "5"					      // total runs to perform
 				  ,"-s", "Domains/AUV/safe_states"    // safe states file to load
 				  ,"-l", "DANG"
+				  ,"-t"                               // terminate on no runs                         
 		};
 	}
 	
