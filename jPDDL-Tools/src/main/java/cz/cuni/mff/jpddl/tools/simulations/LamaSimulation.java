@@ -39,7 +39,6 @@ public class LamaSimulation {
 			}
 		}
 
-
 		if (algName.equals("DANG")) {
 			LamaRun_Dang run = new LamaRun_Dang();
 

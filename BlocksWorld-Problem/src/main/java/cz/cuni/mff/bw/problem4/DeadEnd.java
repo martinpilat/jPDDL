@@ -9,16 +9,17 @@ public class DeadEnd extends PDDLDeadEnd {
 
 	@Override
 	public boolean isDeadEnd(PDDLState pddlState) {
-		State state = (State)pddlState;
-		return isStick(state, E_Blocks.b1) ||
-			   isStick(state, E_Blocks.b2) ||
-			   isStick(state, E_Blocks.b3) ||
-			   isStick(state, E_Blocks.b4) ||
-			   isStick(state, E_Blocks.b5) ||
-			   isStick(state, E_Blocks.b6) ||
-			   isStick(state, E_Blocks.b8) ||
-			   isStick(state, E_Blocks.b9) ||
-			   !state.p_Movable.isSet(E_Blocks.b7) && !state.p_OnTable.isSet(E_Blocks.b7);
+		return false;
+//		State state = (State)pddlState;
+//		return isStick(state, E_Blocks.b1) ||
+//			   isStick(state, E_Blocks.b2) ||
+//			   isStick(state, E_Blocks.b3) ||
+//			   isStick(state, E_Blocks.b4) ||
+//			   isStick(state, E_Blocks.b5) ||
+//			   isStick(state, E_Blocks.b6) ||
+//			   isStick(state, E_Blocks.b8) ||
+//			   isStick(state, E_Blocks.b9) ||
+//			   !state.p_Movable.isSet(E_Blocks.b7) && !state.p_OnTable.isSet(E_Blocks.b7);
 	}
 	
 	public boolean isStick(State state, T_Block block) {

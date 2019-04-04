@@ -275,9 +275,9 @@ public class P_On extends Predicate {
 				public boolean entry(final int key, final Map_T_Block_2 data) {
 					data.clear();
 					return true;
-				}
-				
+				}				
 			});	
+			storage.clear();
 		}	
 		
 	}

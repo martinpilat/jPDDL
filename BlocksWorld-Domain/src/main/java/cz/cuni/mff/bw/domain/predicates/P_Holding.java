@@ -303,6 +303,7 @@ public final class P_Holding extends Predicate {
 				}
 				
 			});	
+			storage.clear();
 		}		
 		
 	}
