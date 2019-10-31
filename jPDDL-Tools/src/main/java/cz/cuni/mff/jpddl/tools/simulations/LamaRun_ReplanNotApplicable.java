@@ -68,6 +68,8 @@ public class LamaRun_ReplanNotApplicable {
 
 		List<PDDLEffector> selected_events = eventSelector.select(problem, events);
 
+		System.out.println("    +-- Got " + selected_events.size() + " events from " + eventSelector.getClass().getName());
+
 		for (PDDLEffector ev : selected_events) {
 			ev.apply(problem.getState());
 			event_applied = true;

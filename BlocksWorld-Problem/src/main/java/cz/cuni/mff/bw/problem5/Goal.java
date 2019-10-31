@@ -58,7 +58,7 @@ public class Goal extends PDDLGoal {
 			   && state.p_On.isSet(E_Blocks.b8, E_Blocks.b14)
 			   && state.p_On.isSet(E_Blocks.b9, E_Blocks.b6)
 			   && state.p_On.isSet(E_Blocks.b10, E_Blocks.b11)
-			   && state.p_On.isSet(E_Blocks.b11, E_Blocks.b14)
+			   && state.p_On.isSet(E_Blocks.b11, E_Blocks.b4)
 			   && state.p_On.isSet(E_Blocks.b12, E_Blocks.b1)
 			   && state.p_On.isSet(E_Blocks.b13, E_Blocks.b7)
 			   && state.p_On.isSet(E_Blocks.b14, E_Blocks.b5)

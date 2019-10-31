@@ -26,6 +26,7 @@ import cz.cuni.mff.jpddl.tools.validators.PlanTesterFlat;
 import cz.cuni.mff.jpddl.tools.validators.SafeStates;
 import cz.cuni.mff.jpddl.utils.IEventSelector;
 import cz.cuni.mff.jpddl.utils.SelectIndependentEvents;
+import cz.cuni.mff.jpddl.utils.SelectSingleEvent;
 
 /**
  * Console-app frontend for the {@link ExperimentEvaluator}.
@@ -512,7 +513,7 @@ public class Main {
 		System.out.println("-- RUNNING THE SIMULATION!");
 		System.out.println();
 
-		IEventSelector eventSelector = new SelectIndependentEvents();
+		IEventSelector eventSelector = new SelectSingleEvent();
 
 		Timed time = new Timed();
 		time.start();
