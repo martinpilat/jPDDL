@@ -45,6 +45,11 @@ public final class Domain extends PDDLDomain {
 	}
 
 	@Override
+	public File getDomainCostFile() {
+		throw  new UnsupportedOperationException();
+	}
+
+	@Override
 	public Action[] getActions() {
 		return Action.ALL;
 	}

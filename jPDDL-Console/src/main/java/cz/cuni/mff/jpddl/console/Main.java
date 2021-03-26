@@ -29,7 +29,7 @@ import cz.cuni.mff.jpddl.utils.SelectIndependentEvents;
 import cz.cuni.mff.jpddl.utils.SelectSingleEvent;
 
 /**
- * Console-app frontend for the {@link ExperimentEvaluator}.
+ * Console-app frontend.
  * 
  * @author Jimmy
  */
@@ -82,6 +82,14 @@ public class Main {
 	private static final char ARG_TERMINATE_IF_NO_PLAN_SHORT = 't';
 
 	private static final String ARG_TERMINATE_IF_NO_PLAN_LONG = "terminate-runs-on-no-plan";
+
+	private static final char ARG_USE_ACTION_COST_SHORT = 'u';
+
+	private static final String ARG_USE_ACTION_COST_LONG = "use-action-cost";
+
+	private static final char ARG_EVENT_SELECTOR_SHORT = 'e';
+
+	private static final String ARG_EVENT_SELECTOR_LONG = "event-selector";
 		
 	private static JSAP jsap;
 
@@ -130,6 +138,10 @@ public class Main {
 	private static String algName;
 	
 	private static boolean terminateRunsOnNoPlan = false;
+
+	private static boolean useActionCost = false;
+
+	private static String eventSelectorString = null;
 
 	private static final Map<String, IPlanValidator> VALIDATORS = new HashMap<String, IPlanValidator>();
 	
@@ -312,6 +324,23 @@ public class Main {
 		opt644.setHelp("For certain algorithms, we may terminate runs when planner fails to find a plan from current state.");
 		    
 		jsap.registerParameter(opt644);
+
+		Switch opt744 = new Switch(ARG_USE_ACTION_COST_LONG)
+				.setShortFlag(ARG_USE_ACTION_COST_SHORT)
+				.setLongFlag(ARG_USE_ACTION_COST_LONG);
+		opt744.setHelp("While planning, use higher cost for potentially dangerous actions.");
+
+		jsap.registerParameter(opt744);
+
+		FlaggedOption opt844 = new FlaggedOption(ARG_EVENT_SELECTOR_LONG)
+				.setStringParser(JSAP.STRING_PARSER)
+				.setRequired(false)
+				.setDefault("SINGLE")
+				.setShortFlag(ARG_EVENT_SELECTOR_SHORT)
+				.setLongFlag(ARG_EVENT_SELECTOR_LONG);
+		opt844.setHelp("The type of event selector, possible values are 'SINGLE' or 'MULTI'");
+
+		jsap.registerParameter(opt844);
 	    
    	}
 
@@ -363,6 +392,10 @@ public class Main {
 		algName = config.getString(ARG_ALG_LONG);
 		
 		terminateRunsOnNoPlan = config.getBoolean(ARG_TERMINATE_IF_NO_PLAN_LONG);
+
+		useActionCost = config.getBoolean(ARG_USE_ACTION_COST_LONG);
+
+		eventSelectorString = config.getString(ARG_EVENT_SELECTOR_LONG);
 	}
 	
 	private static void sanityChecks() {
@@ -506,6 +539,18 @@ public class Main {
 			fail("Unhandled validator: " + validatorString);
 		}
 
+		System.out.println("-- configuring event selector");
+		IEventSelector eventSelector = null;
+
+		if (eventSelectorString.equals("MULTI")) {
+			eventSelector = new SelectIndependentEvents(true); //TODO: make this configurable
+		} else
+		if (eventSelectorString.equals("SINGLE")) {
+			eventSelector = new SelectSingleEvent();
+		} else {
+			fail("Unknown event selector: " + eventSelectorString);
+		}
+
 		System.out.println("-- creating the simulation");		
 		LamaSimulation simulation = new LamaSimulation(algName);
 		simulation.terminateIfNoPlanFound = terminateRunsOnNoPlan;
@@ -513,11 +558,9 @@ public class Main {
 		System.out.println("-- RUNNING THE SIMULATION!");
 		System.out.println();
 
-		IEventSelector eventSelector = new SelectSingleEvent();
-
 		Timed time = new Timed();
 		time.start();
-		simulation.simulate(totalRuns, simulationId, problem, planChecker, validator, maxIterations, randomSeed, resultsCSVFile, eventSelector);
+		simulation.simulate(totalRuns, simulationId, problem, planChecker, validator, maxIterations, randomSeed, resultsCSVFile, eventSelector, useActionCost);
 		time.end();
 		
 		System.out.println();

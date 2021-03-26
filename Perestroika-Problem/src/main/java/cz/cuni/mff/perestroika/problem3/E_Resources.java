@@ -4,7 +4,6 @@ import cz.cuni.mff.perestroika.domain.types.T_Resource;
 import cz.cuni.mff.perestroika.problem.E_Resource;
 
 public final class E_Resources {
-
 	
 	public static final T_Resource r1 = new T_Resource("r1");
 	public static final T_Resource r2 = new T_Resource("r2");

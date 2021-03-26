@@ -16,14 +16,14 @@ public class LamaSimulation {
 	public boolean terminateIfNoPlanFound = false; // interpreted only by some runs
 
 	public LamaSimulation() {
-		this("DANG");
+		this("C1");
 	}
 
 	public LamaSimulation(String algName) {
 		this.algName = algName;
 	}
 	
-	public void simulate(int totalRuns, String id, PDDLProblem problem, PlanChecker planChecker, IPlanValidator validator, int maxIterations, long randomSeed, File csvOutputFile, IEventSelector eventSelector) {
+	public void simulate(int totalRuns, String id, PDDLProblem problem, PlanChecker planChecker, IPlanValidator validator, int maxIterations, long randomSeed, File csvOutputFile, IEventSelector eventSelector, boolean useActionCost) {
 		Random random = new Random(randomSeed);
 
 		if (algName.equals("LIMIT")) {
@@ -48,7 +48,7 @@ public class LamaSimulation {
 				System.out.println("RUN " + (i+1) + " / " + totalRuns);
 				System.out.println("=============================");
 
-				run.run(id, i+1, problem, planChecker, validator, maxIterations, random.nextLong(), csvOutputFile, eventSelector);
+				run.run(id, i+1, problem, planChecker, validator, maxIterations, random.nextLong(), csvOutputFile, eventSelector, useActionCost);
 			}
 
 		}
@@ -62,7 +62,7 @@ public class LamaSimulation {
 				System.out.println("RUN " + (i+1) + " / " + totalRuns);
 				System.out.println("=============================");
 
-				run.run(id, i+1, problem, planChecker, validator, maxIterations, random.nextLong(), csvOutputFile, eventSelector);
+				run.run(id, i+1, problem, planChecker, validator, maxIterations, random.nextLong(), csvOutputFile, eventSelector, useActionCost);
 			}
 		}
 
@@ -75,7 +75,20 @@ public class LamaSimulation {
 				System.out.println("RUN " + (i+1) + " / " + totalRuns);
 				System.out.println("=============================");
 
-				run.run(id, i+1, problem, planChecker, validator, maxIterations, random.nextLong(), csvOutputFile, eventSelector);
+				run.run(id, i+1, problem, planChecker, validator, maxIterations, random.nextLong(), csvOutputFile, eventSelector, useActionCost);
+			}
+		}
+
+		if (algName.equals("C1")) {
+			LamaRun_Escape run = new LamaRun_Escape();
+
+			for (int i = 0; i < totalRuns; ++i) {
+				if (i != 0) System.out.println();
+				System.out.println("=============================");
+				System.out.println("RUN " + (i+1) + " / " + totalRuns);
+				System.out.println("=============================");
+
+				run.run(id, i+1, problem, planChecker, validator, maxIterations, random.nextLong(), csvOutputFile, eventSelector, useActionCost);
 			}
 		}
 

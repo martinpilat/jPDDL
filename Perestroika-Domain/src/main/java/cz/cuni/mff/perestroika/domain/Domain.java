@@ -26,7 +26,12 @@ public final class Domain extends PDDLDomain {
 	public File getDomainFile() {
 		return locateResourceFile("perestroika/domain.pddl", "resources/perestroika/domain.pddl", "Perestroika-Domain/src/main/resources/perestroika/domain.pddl", "../Perestroika-Domain/src/main/resources/perestroika/domain.pddl", "../../Perestroika-Domain/src/main/resources/perestroika/domain.pddl" );
 	}
-	
+
+	@Override
+	public File getDomainCostFile() {
+		return locateResourceFile("perestroika/domain-cost.pddl", "resources/perestroika/domain-cost.pddl", "Perestroika-Domain/src/main/resources/perestroika/domain-cost.pddl", "../Perestroika-Domain/src/main/resources/perestroika/domain-cost.pddl", "../../Perestroika-Domain/src/main/resources/perestroika/domain-cost.pddl" );
+	}
+
 	@Override
 	public File getDomainPureFile() {
 		return locateResourceFile("perestroika/domain-pure.pddl", "resources/perestroika/domain-pure.pddl", "Perestroika-Domain/src/main/resources/perestroika/domain-pure.pddl", "../Perestroika-Domain/src/main/resources/perestroika/domain-pure.pddl", "../../Perestroika-Domain/src/main/resources/perestroika/domain-pure.pddl" );

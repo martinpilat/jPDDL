@@ -2,6 +2,7 @@ package cz.cuni.mff.jpddl.tools.simulations;
 
 import cz.cuni.mff.jpddl.*;
 import cz.cuni.mff.jpddl.tools.planners.Lama;
+import cz.cuni.mff.jpddl.tools.planners.PlannerBase;
 import cz.cuni.mff.jpddl.tools.search.bench.Timed;
 import cz.cuni.mff.jpddl.tools.utils.CSV;
 import cz.cuni.mff.jpddl.tools.validators.IPlanValidator;
@@ -40,6 +41,18 @@ public class LamaRun_Dang {
 	
 	private long planningMillis = 0;
 
+	Timed allTime = new Timed();
+	Timed planningTime = new Timed();
+	Timed validationTime = new Timed();
+
+	PDDLProblem problem = null;
+	File domainFile = null;
+	File flatDomainFile = null;
+	PlannerBase lama = null;
+	int plannerCalls = 0;
+
+	boolean useActionCost = false;
+
 	private void simulateEvent(PDDLProblem problem, Random random, IEventSelector eventSelector) {
 		// COLLECT APPLICABLE EVENTS
 		event_applied = false;
@@ -60,15 +73,31 @@ public class LamaRun_Dang {
 		if (!event_applied)
 			System.out.println("    +-- EVENT [" + action + ".]: no-event");
 	}
-	
-	public void run(String id, int run, PDDLProblem problem, PlanChecker planChecker, IPlanValidator validator, int maxIterations, long randomSeed, File csvOutputFile, IEventSelector event_selector) {
+
+	private List<PDDLStringInstance> plan(boolean useCost, String goalState) {
+		System.out.println("  +-- Planning...");
+		File problemFile = new File("problem.pddl");
+		if (useCost) {
+			problem.createProblemFileCost(problemFile, problem.getState(), goalState);
+		} else {
+			problem.createProblemFile(problemFile, problem.getState(), goalState);
+		}
+		planningTime.start();
+		plannerCalls++;
+		List<PDDLStringInstance> lamaPlan = lama.plan(domainFile, problemFile);
+		planningTime.end();
+		planningMillis += planningTime.durationMillis;
+		problemFile.delete();
+		return lamaPlan;
+	}
+
+	public void run(String id, int run, PDDLProblem problem, PlanChecker planChecker, IPlanValidator validator, int maxIterations, long randomSeed, File csvOutputFile, IEventSelector event_selector, boolean useActionCost) {
 		StateCompact initialState = problem.getState().getDynamic().clone();
 		
 		Random random = new Random(randomSeed);
-		
-		Timed allTime = new Timed();
-		Timed planningTime = new Timed();
-		Timed validationTime = new Timed();
+
+		this.useActionCost = useActionCost;
+		this.problem = problem;
 				
 		planningMillis = 0;
 		long validatingMillis = 0;
@@ -96,14 +125,7 @@ public class LamaRun_Dang {
 		// RESULT
 		LamaRunResult result = LamaRunResult.GOAL_ACHIEVED;
 
-		System.out.println("  +-- Planning...");
-		File problemFile = new File("problem.pddl");
-		problem.createProblemFile(problemFile, problem.getState());
-		planningTime.start();
-		List<PDDLStringInstance> lamaPlan = lama.plan(domainFile, problemFile);
-		planningTime.end();
-		planningMillis += planningTime.durationMillis;
-		problemFile.delete();
+		List<PDDLStringInstance> lamaPlan = plan(useActionCost, null);
 		// ALGORITHM 3
 		while (true) {
 
@@ -131,14 +153,7 @@ public class LamaRun_Dang {
 
 			// PLAN
 			if (lamaPlan == null || lamaPlan.isEmpty()) {
-				System.out.println("  +-- Planning...");
-				problemFile = new File("problem.pddl");
-				problem.createProblemFile(problemFile, problem.getState());
-				planningTime.start();
-				lamaPlan = lama.plan(domainFile, problemFile);
-				planningTime.end();
-				planningMillis += planningTime.durationMillis;
-				problemFile.delete();
+				lamaPlan = plan(useActionCost, null);
 			}
 			if (lamaPlan == null) {
 				System.out.println("  +-- LAMA FAILED TO FIND THE PLAN!");
@@ -169,13 +184,7 @@ public class LamaRun_Dang {
 						if (dang < 2) {
 							System.out.println("  +-- State after action " + plan[0].toEffector() + " may be dangerous, dang: " + dang);
 							System.out.println("  +-- Planning to safety... " + problem.getClosestSafeState());
-							problemFile = new File("problem.pddl");
-							problem.createProblemFile(problemFile, problem.getState(), problem.getClosestSafeState());
-							planningTime.start();
-							lamaPlan = lama.plan(domainFile, problemFile);
-							planningTime.end();
-							planningMillis += planningTime.durationMillis;
-							problemFile.delete();
+							lamaPlan = plan(useActionCost, problem.getClosestSafeState());
 							if (lamaPlan == null) {
 								System.out.println("  +-- LAMA FAILED TO FIND THE PLAN!");
 							}
@@ -222,22 +231,22 @@ public class LamaRun_Dang {
 		System.out.println("    +-- validation " + Timed.getTimeString(validatingMillis));
 		System.out.println("    +-- simulation " + Timed.getTimeString(simulationMillis));
 		
-		outputToCSV(csvOutputFile, id, run, problem, validator, result, iteration, allTime.durationMillis, planningMillis, validatingMillis, simulationMillis, randomSeed, maxIterations, action);
+		outputToCSV(csvOutputFile, id, run, problem, validator, result, iteration, allTime.durationMillis, planningMillis, validatingMillis, simulationMillis, randomSeed, maxIterations, action, useActionCost);
 		
 		problem.getState().setDynamic(initialState);
 	}
 
 	private void outputToCSV(File csvOutputFile, String id, int run, PDDLProblem problem, IPlanValidator validator, LamaRunResult result, int iterations,
 							 long durationMillis, long planningMillis, long validatingMillis, long simulationMillis, long randomSeed,
-							 int maxIterations, int action) {
+							 int maxIterations, int action, boolean useActionCost) {
 
 		System.out.println("  +-- appending result into " + csvOutputFile.getAbsolutePath());
 
 		Date now = Calendar.getInstance().getTime();
 
 		CSV.appendCSVRow(csvOutputFile,
-				new String[] {"date", "id", "run", "problem",            "validator",                 "result", "iterations", "durationMillis", "planningMillis", "validatingMillis", "simulationMillis", "randomSeed", "maxIterations", "actions", "algorithm"},
-				now,    id,   run,   problem.getClass(),   validator.getDescription(),  result,   iterations,   durationMillis,   planningMillis,   validatingMillis,   simulationMillis,   randomSeed,   maxIterations, action, "DANG"
+				new String[] {"date", "id", "run", "problem",            "validator",                 "result", "iterations", "durationMillis", "planningMillis", "validatingMillis", "simulationMillis", "randomSeed", "maxIterations", "actions", "algorithm", "plannerCalls"},
+				now,    id,   run,   problem.getClass(),   (validator == null ? "null" : validator.getDescription()),  result,   iterations,   durationMillis,   planningMillis,   validatingMillis,   simulationMillis,   randomSeed,   maxIterations, action, "REPLAN_APP" + (useActionCost ? "C":""), plannerCalls
 		);
 
 	}

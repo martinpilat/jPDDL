@@ -1,8 +1,8 @@
 cd jPDDL
-call mvn clean install
+call mvn clean install -Dmaven.test.skip=true
 cd ..
 cd jPDDL-Tools
-call mvn clean install
+call mvn clean install -Dmaven.test.skip=true
 cd ..
 cd AUV-Domain
 call mvn clean install

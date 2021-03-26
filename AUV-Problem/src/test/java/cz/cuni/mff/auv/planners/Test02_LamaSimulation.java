@@ -25,7 +25,7 @@ public class Test02_LamaSimulation {
 		
 		LamaSimulation simulation = new LamaSimulation("REPLAN_EVENT");
 		IEventSelector eventSelector = new SelectIndependentEvents();
-		simulation.simulate(runs, getClass().getSimpleName(), problem, planChecker, validator, 50, 1, new File("results.csv"), eventSelector);
+		simulation.simulate(runs, getClass().getSimpleName(), problem, planChecker, validator, 50, 1, new File("results.csv"), eventSelector, false);
 	}
 	
 	public static void main(String[] args) {

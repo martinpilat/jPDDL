@@ -8,7 +8,7 @@ import cz.cuni.mff.jpddl.tools.validators.PlanTesterFlat;
 import cz.cuni.mff.jpddl.tools.validators.SafeStates;
 import cz.cuni.mff.jpddl.utils.IEventSelector;
 import cz.cuni.mff.jpddl.utils.SelectIndependentEvents;
-import cz.cuni.mff.perestroika.problem8.Problem;
+import cz.cuni.mff.perestroika.problem1.Problem;
 
 public class Test02_LamaSimulation {
 	
@@ -23,14 +23,14 @@ public class Test02_LamaSimulation {
 		PlanTesterFlat planTesterFlat = new PlanTesterFlat();
 		planTesterFlat.config(problem.getDomain(), problem.getApplicables(), safeStates);
 		
-		LamaSimulation simulation = new LamaSimulation();
+		LamaSimulation simulation = new LamaSimulation("C1");
 		IEventSelector eventSelector = new SelectIndependentEvents();
-		simulation.simulate(runs, getClass().getSimpleName(), problem, planChecker, planTesterFlat, 1000, 1, new File("results.csv"), eventSelector);
+		simulation.simulate(runs, getClass().getSimpleName(), problem, planChecker, planTesterFlat, 1000, 1, new File("results.csv"), eventSelector, true);
 	}
 	
 	public static void main(String[] args) {
 		Test02_LamaSimulation test = new Test02_LamaSimulation();
-		test.sim1(50);
+		test.sim1(100);
 	}
 
 }

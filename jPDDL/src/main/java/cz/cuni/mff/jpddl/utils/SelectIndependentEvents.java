@@ -10,9 +10,24 @@ import java.util.List;
 
 public class SelectIndependentEvents implements IEventSelector {
 
+    private boolean ignoreDependenceCheck;
+
+
+    public SelectIndependentEvents() {
+        this(false);
+    }
+
+    public SelectIndependentEvents(boolean ignoreDependenceCheck) {
+        this.ignoreDependenceCheck = ignoreDependenceCheck;
+    }
+
     private boolean independent(PDDLState state, PDDLEffector e1, PDDLEffector e2) {
 
         assert e1.isApplicable(state) && e2.isApplicable(state);
+
+        if (ignoreDependenceCheck) {
+            return true;
+        }
 
         PDDLState os1 = state.clone();
         PDDLState os2 = state.clone();

@@ -159,7 +159,8 @@ public abstract class AuvProblem extends PDDLProblem {
 		}
 
 		State state = (State)getState().clone();
-		step.apply(state);
+		if (step != null)
+			step.apply(state);
 
 		ArrayList<P_At> locations = new ArrayList<>();
 		state.p_At.getAll(locations);

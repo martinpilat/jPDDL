@@ -4,6 +4,8 @@ import cz.cuni.mff.jpddl.PDDLEffector;
 import cz.cuni.mff.jpddl.PDDLProblem;
 import cz.cuni.mff.jpddl.PDDLStringInstance;
 import cz.cuni.mff.jpddl.tools.planners.Lama;
+import cz.cuni.mff.jpddl.tools.planners.LamaCost;
+import cz.cuni.mff.jpddl.tools.planners.PlannerBase;
 import cz.cuni.mff.jpddl.tools.search.bench.Timed;
 import cz.cuni.mff.jpddl.tools.simulations.LamaRun_ReplanAfterEvent.LamaRunResult;
 import cz.cuni.mff.jpddl.tools.utils.CSV;
@@ -48,6 +50,18 @@ public class LamaRun_ReplanNotApplicable {
 	private long planningMillis = 0;
 	
 	private boolean terminateIfNoPlanFound = false;
+
+	Timed allTime = new Timed();
+	Timed planningTime = new Timed();
+	Timed validationTime = new Timed();
+	int plannerCalls = 0;
+
+	PDDLProblem problem = null;
+	File domainFile = null;
+	File flatDomainFile = null;
+	PlannerBase lama = null;
+
+	boolean useActionCost = false;
 	
 	public LamaRun_ReplanNotApplicable() {
 		this(false);
@@ -79,15 +93,30 @@ public class LamaRun_ReplanNotApplicable {
 		if (!event_applied)
 			System.out.println("    +-- EVENT [" + action + ".]: no-event");
 	}
+
+	private List<PDDLStringInstance> plan(boolean useCost) {
+		System.out.println("  +-- Planning...");
+		File problemFile = new File("problem.pddl");
+		if (useCost) {
+			problem.createProblemFileCost(problemFile, problem.getState());
+		} else {
+			problem.createProblemFile(problemFile, problem.getState());
+		}
+		planningTime.start();
+		plannerCalls++;
+		List<PDDLStringInstance> lamaPlan = lama.plan(domainFile, problemFile);
+		planningTime.end();
+		planningMillis += planningTime.durationMillis;
+		problemFile.delete();
+		return lamaPlan;
+	}
 	
-	public void run(String id, int run, PDDLProblem problem, PlanChecker planChecker, IPlanValidator validator, int maxIterations, long randomSeed, File csvOutputFile, IEventSelector eventSelector) {
+	public void run(String id, int run, PDDLProblem problem, PlanChecker planChecker, IPlanValidator validator, int maxIterations, long randomSeed, File csvOutputFile, IEventSelector eventSelector, boolean useActionCost) {
 		StateCompact initialState = problem.getState().getDynamic().clone();
 		
 		Random random = new Random(randomSeed);
-		
-		Timed allTime = new Timed();
-		Timed planningTime = new Timed();
-		Timed validationTime = new Timed();
+		this.useActionCost = useActionCost;
+		this.problem = problem;
 				
 		planningMillis = 0;
 		long validatingMillis = 0;
@@ -103,11 +132,16 @@ public class LamaRun_ReplanNotApplicable {
 		// RESET
 		events.clear();
 		action = 0;
-		
-		// INIT LAMA
-		File domainFile = problem.getDomain().getDomainPureFile();		
-		//File flatDomainFile = problem.getDomain().getDomainFlatFile();		
-		Lama lama = new Lama();
+
+		flatDomainFile = problem.getDomain().getDomainFlatFile();
+		if (!useActionCost) {
+			lama = new Lama();
+			domainFile = problem.getDomain().getDomainPureFile();
+		}
+		else {
+			lama = new LamaCost();
+			domainFile = problem.getDomain().getDomainCostFile();
+		}
 		
 		// INTERNAL VARS
 		int iteration = 0;
@@ -115,14 +149,7 @@ public class LamaRun_ReplanNotApplicable {
 		// RESULT
 		LamaRunResult result = LamaRunResult.GOAL_ACHIEVED;
 
-		System.out.println("  +-- Planning...");
-		File problemFile = new File("problem.pddl");
-		problem.createProblemFile(problemFile, problem.getState());
-		planningTime.start();
-		List<PDDLStringInstance> lamaPlan = lama.plan(domainFile, problemFile);
-		planningTime.end();
-		planningMillis += planningTime.durationMillis;
-		problemFile.delete();
+		List<PDDLStringInstance> lamaPlan = plan(useActionCost);
 
 		// ALGORITHM 3
 		while (true) {
@@ -151,14 +178,7 @@ public class LamaRun_ReplanNotApplicable {
 			
 			// PLAN
 			if (lamaPlan == null) {
-				System.out.println("  +-- Planning...");
-				problemFile = new File("problem.pddl");
-				problem.createProblemFile(problemFile, problem.getState());
-				planningTime.start();
-				lamaPlan = lama.plan(domainFile, problemFile);
-				planningTime.end();
-				planningMillis += planningTime.durationMillis;
-				problemFile.delete();
+				lamaPlan = plan(useActionCost);
 			}
 			if (lamaPlan == null) {
 				System.out.println("  +-- LAMA FAILED TO FIND THE PLAN!");
@@ -229,8 +249,8 @@ public class LamaRun_ReplanNotApplicable {
 		Date now = Calendar.getInstance().getTime();
 
 		CSV.appendCSVRow(csvOutputFile,
-				new String[] {"date", "id", "run", "problem",            "validator",                 "result", "iterations", "durationMillis", "planningMillis", "validatingMillis", "simulationMillis", "randomSeed", "maxIterations", "actions", "algorithm"},
-				now,    id,   run,   problem.getClass(),   (validator == null ? "null" : validator.getDescription()),  result,   iterations,   durationMillis,   planningMillis,   validatingMillis,   simulationMillis,   randomSeed,   maxIterations, action, "REPLAN_APP"
+				new String[] {"date", "id", "run", "problem",            "validator",                 "result", "iterations", "durationMillis", "planningMillis", "validatingMillis", "simulationMillis", "randomSeed", "maxIterations", "actions", "algorithm", "plannerCalls"},
+				now,    id,   run,   problem.getClass(),   (validator == null ? "null" : validator.getDescription()),  result,   iterations,   durationMillis,   planningMillis,   validatingMillis,   simulationMillis,   randomSeed,   maxIterations, action, "REPLAN_APP" + (useActionCost ? "C":""), plannerCalls
 		);
 
 	}

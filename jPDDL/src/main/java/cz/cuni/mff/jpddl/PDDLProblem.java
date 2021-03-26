@@ -27,8 +27,19 @@ public abstract class PDDLProblem {
 		return applicables;
 	}
 
-	public int dang(PDDLEffector step) {
+	public int dang() {
+		PDDLState state = this.getState();
+		return dang(state);
+	}
+
+	public int dang(PDDLState state) {
 		throw new UnsupportedOperationException();
+	}
+
+	public int dang(PDDLEffector effector) {
+		PDDLState state = this.getState().clone();
+		effector.apply(state);
+		return Math.max(0, dang(state) - 1);
 	}
 
 	public String getAdditionalLimitInit() {
@@ -134,6 +145,66 @@ public abstract class PDDLProblem {
 		sb.append(")");
 		
 		return sb.toString();
+	}
+
+	public String toPDDLCost(PDDLState state, String goal) {
+		StringBuffer sb = new StringBuffer();
+		sb.append("(define (problem " + getName() + ")\n");
+		sb.append("(:domain " + getDomain().getName() + ")\n");
+		sb.append("  (:objects");
+
+		boolean first = true;
+		for (PDDLEnum pddlEnum : getDomain().getEnums()) {
+			if (!pddlEnum.isFinalType()) continue;
+			if (pddlEnum.getSize() <= 1) continue;
+			if (first) first = false;
+			else sb.append("            ");
+			for (PDDLType type : pddlEnum.elements()) {
+				if (type == null) continue;
+				sb.append(" ");
+				sb.append(type.name);
+			}
+			sb.append(" - " + pddlEnum.getName() + "\n");
+		}
+
+		sb.append(")\n");
+		sb.append("\n");
+
+		sb.append("(:init\n");
+
+		List predicates = new ArrayList();
+		for (IStorage storage : state.getStorages()) {
+			predicates.clear();
+			storage.getAll(predicates);
+			PDDLPredicate.dumpPredicates(sb, (List<PDDLPredicate>)predicates, 80, "       ");
+		}
+		sb.append("       (= (total-cost) 0)");
+		sb.append("\n");
+		sb.append(")\n");
+		sb.append("\n");
+		sb.append(goal);
+		sb.append("\n(:metric minimize (total-cost))\n\n");
+		sb.append("\n");
+		sb.append(")");
+
+		return sb.toString();
+	}
+
+	public void createProblemFileCost(File targetFile, PDDLState state) {
+		createProblemFileCost(targetFile, state, (String)null);
+	}
+
+	public void createProblemFileCost(File targetFile, PDDLState state, String customGoal) {
+		try {
+			PrintWriter writer = new PrintWriter(new BufferedOutputStream(new FileOutputStream(targetFile)));
+			if (customGoal == null)
+				writer.println(toPDDLCost(state, getGoal().toPDDL()));
+			else
+				writer.println((toPDDLCost(state, customGoal)));
+			writer.close();
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to produce PDDL Problem file at: " + targetFile.getAbsolutePath(), e);
+		}
 	}
 
 	public void createProblemFileLimit(File targetFile, PDDLState state, int limit, String additionalInit) {
