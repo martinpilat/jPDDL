@@ -6,6 +6,8 @@ Implementation of the experiments published in the following papers:
 
 > Lukáš Chrpa, Martin Pilát, Jakub Gemrot: "Compiling Planning Problems with Non-deterministic Events into FOND Planning". RCRA Workshop @ 18th International Conference of the Italian Association for Artificial Intelligence (AIIA 2019). CEUR-WS. 2019.
 
+> Lukáš Chrpa, Martin Pilát, Jakub Gemrot: "Planning and Acting in Dynamic Environments:Identifying and Avoiding Dangerous Situations". Journal of Experimental & Theoretical Artificial Intelligence. 
+
 # Files and directories
 
 - `*-Problem`, `*-Domain` - contain the implementation of the problems described in the paper (BlocksWorld was used only in the RCRA paper)
